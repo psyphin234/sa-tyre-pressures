@@ -58,34 +58,6 @@
       <form id="tyre-form" class="inputs" autocomplete="off" novalidate>
         <p class="example-link" data-modes="advanced"><a href="#example" id="example-link">Fill in a made-up example</a></p>
         <fieldset data-modes="advanced">
-          <legend>Your tyres</legend>
-          <div class="field">
-            <label for="size">Size</label>
-            <select id="size" name="size"></select>
-          </div>
-          <div class="field">
-            <label for="type">Type</label>
-            <select id="type" name="type"></select>
-            <p class="hint" id="type-hint"></p>
-          </div>
-          <div class="field" id="li-field">
-            <label for="li">Load index</label>
-            <select id="li" name="li"></select>
-            <p class="hint">The number after the size, e.g. <b>112</b> in 265/65R17 112T.</p>
-          </div>
-          <div class="field" id="range-field">
-            <label for="range">Load range</label>
-            <select id="range" name="range"></select>
-            <p class="hint">The letter (C, D or E) or ply rating on the sidewall. It sets the highest pressure and load; at a given pressure every range carries the same.</p>
-          </div>
-          <details class="inline-help">
-            <summary>Where do I find these on the tyre?</summary>
-            <div class="diagram" data-diagram="markings"></div>
-            <figure class="inline-photo" data-image="markings"></figure>
-          </details>
-        </fieldset>
-
-        <fieldset data-modes="advanced">
           <legend>Load on each axle</legend>
           <div class="field-row">
             <div class="field">
@@ -100,7 +72,7 @@
           <p class="hint">Filled in with a typical loaded double-cab bakkie (example figures, not from a source): change them to yours. Best: weigh each axle, loaded for the trip, on a weighbridge. Worst case: the maximum axle loads on the vehicle's VIN or compliance plate. Each tyre carries half its axle.</p>
         </fieldset>
 
-        <fieldset data-modes="simple">
+        <fieldset>
           <legend>Your tyres</legend>
           <div class="choice-row">
             <label><input type="radio" name="tyreClass" value="lt"> LT (light truck)</label>
@@ -109,7 +81,7 @@
           </div>
           <p class="hint">LT tyres have "LT" before the size (LT265/75R16) or two load numbers, like 121/118. Not sure? You get the passenger-type answer, the more careful one.</p>
           <div class="field">
-            <label for="simpleSize">Size <small class="muted">(optional, for the weight check)</small></label>
+            <label for="simpleSize">Size <small class="muted" data-modes="simple">(optional, for the weight check)</small></label>
             <input id="simpleSize" name="simpleSize" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="e.g. 265/60R18 110H">
             <p class="hint" id="simple-size-read">As on the sidewall, e.g. 265/60R18, LT265/75R16 or 31x10.50R15. Add the load index if you know it (the number after the size).</p>
           </div>
@@ -118,6 +90,11 @@
             <input id="simpleLi" name="simpleLi" type="number" inputmode="numeric" min="60" max="130" step="1" placeholder="e.g. 110">
             <p class="hint">The number straight after the size on the sidewall, e.g. <b>110</b> in 265/60R18 110H.</p>
           </div>
+          <details class="inline-help">
+            <summary>Where do I find these on the tyre?</summary>
+            <div class="diagram" data-diagram="markings"></div>
+            <figure class="inline-photo" data-image="markings"></figure>
+          </details>
         </fieldset>
 
         <fieldset data-modes="simple">

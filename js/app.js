@@ -30,30 +30,6 @@
     if (value != null && options.some((o) => String(o.value) === String(value))) select.value = String(value);
   }
 
-  function sizeChanged(keep) {
-    const size = C.findSize($("size").value);
-    fillSelect($("type"), size.types.map((t) => ({ value: t.id, label: t.label })), keep && keep.type);
-    typeChanged(keep);
-  }
-
-  function typeChanged(keep) {
-    const size = C.findSize($("size").value);
-    const type = C.findType(size, $("type").value);
-    $("type-hint").textContent = "Marked like: " + type.example;
-    const etrto = type.table === "etrto-sl" || type.table === "etrto-xl";
-    $("li-field").hidden = !etrto;
-    if (etrto) fillSelect($("li"), type.loadIndices.map((li) => ({ value: li, label: li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max)" })), (keep && keep.li) || type.defaultLi);
-    const ranges = C.loadRanges(type);
-    $("range-field").hidden = !ranges.length;
-    if (ranges.length) {
-      fillSelect(
-        $("range"),
-        ranges.map((r) => ({ value: r.range, label: r.range + ": up to " + fmt(C.psiToKpa(r.maxPsi)) + ", load index " + r.li })),
-        (keep && keep.range) || ranges[ranges.length - 1].range
-      );
-    }
-  }
-
   function buildTerrains() {
     const grid = $("terrain-grid");
     D.terrains.forEach((t) => {
@@ -190,10 +166,6 @@
       return isFinite(v) ? v : null;
     };
     return {
-      sizeId: f.size.value,
-      typeId: f.type.value,
-      li: parseInt(f.li.value, 10),
-      range: f.range.value,
       frontKg: num("frontKg"),
       rearKg: num("rearKg"),
       placard: [C.parsePressure(f.placardFront.value, unit), C.parsePressure(f.placardRear.value, unit)],
@@ -260,11 +232,12 @@
 
   // ------------------------------------------------------------ compute
 
+  // Both modes use the typed tyre (simpleTyre) for the load table and air volume.
   function compute(st) {
-    const size = C.findSize(st.sizeId);
-    const type = C.findType(size, st.typeId);
-    const curve = C.loadCurve({ sizeId: st.sizeId, typeId: st.typeId, li: st.li, range: st.range });
-    const cls = C.tyreClass(type);
+    const tyre = simpleTyre(st);
+    const curve = tyre && tyre.curve ? tyre.curve : null;
+    const cls = tyre ? tyre.cls : st.tyreClass === "lt" ? "lt" : "passenger";
+    const geometry = tyre && tyre.parsed ? C.geometryFor(tyre.parsed) : null;
     const axles = [
       { name: "Front", kg: st.frontKg, placard: st.placard[0], plan: st.plan[0] },
       { name: "Rear", kg: st.rearKg, placard: st.placard[1], plan: st.plan[1] },
@@ -276,7 +249,7 @@
       const assess = a.plan != null && need && need.status !== "noLoad" ? C.assessPressure(a.plan, need, road.kpa, terrainId, cls) : null;
       return { ...a, wheelKg, need, road, range, assess };
     });
-    return { size, type, curve, axles, cls };
+    return { tyre, curve, axles, cls, geometry, sizeLabel: tyre && tyre.parsed ? tyre.parsed.label : null, table: tyre && tyre.table ? tyre.table : null };
   }
 
   // ------------------------------------------------------------ render helpers
@@ -289,7 +262,17 @@
   }
   // ------------------------------------------------------------ cards
 
+  // Why there's no load table for the typed tyre, in plain words.
+  function noTableReason(tyre) {
+    if (!tyre) return "Type your tyre size under Your tyres to see what your load needs.";
+    if (!tyre.parsed) return "Couldn't read that tyre size. Try it like 265/60R18, LT265/75R16 or 31x10.50R15.";
+    if (tyre.reason === "needsLi") return "Add the load index (the number after the size on the sidewall) to read the load table.";
+    if (tyre.reason === "liOutOfRange") return "That load index isn't in the table here, so there's no load check.";
+    return "There's no load table for this LT size here yet, so there's no load check.";
+  }
+
   function loadCard(m) {
+    if (!m.curve) return card("What your load needs", "card--load", el("p", { class: "muted" }, noTableReason(m.tyre)), UI.sourcesLink(["table-method", "table-lowest-pressure"]));
     const items = m.axles.map((a) => {
       const n = a.need;
       let body;
@@ -321,7 +304,7 @@
       "card--load",
       el("p", { class: "muted" }, "Load table: ", el("strong", null, m.curve.marking), " (", m.curve.label, ")."),
       items,
-      UI.sourcesLink(["table-method", "table-lowest-pressure", "law-reg238", "toyo-load-index"].concat(m.type.table === "michelin-750r16" ? ["michelin-750r16-axle"] : []))
+      UI.sourcesLink(["table-method", "table-lowest-pressure", "law-reg238", "toyo-load-index"].concat(m.table === "michelin-750r16" ? ["michelin-750r16-axle"] : []))
     );
   }
 
@@ -344,7 +327,7 @@
     const extra = [];
     const hdRule = UI.ruleById("etrto-hard-driving").params;
     if (t.id === "tar" && st.towing) {
-      const hd = m.axles.map((a) => ({ a, h: C.hardDriving(m.type, a.road.kpa) }));
+      const hd = m.axles.map((a) => ({ a, h: m.table ? C.hardDriving({ table: m.table }, a.road.kpa) : null }));
       if (hd.some((x) => x.h))
         extra.push(
           el(
@@ -464,7 +447,8 @@
   }
 
   function pumpCard(m, st) {
-    const vol = C.tyreVolume(m.size.geometry);
+    if (!m.geometry) return card("Pumping back up", "card--pump", el("p", { class: "muted" }, "Type your tyre size under Your tyres (or check it) to estimate how much air it takes to pump back up."), UI.sourcesLink(["calc-free-air", "calc-air-volume"]));
+    const vol = C.tyreVolume(m.geometry);
     const axles = m.axles
       .filter((a) => a.road.kpa != null)
       .map((a) => ({ name: a.name, fromKpa: a.plan != null && a.plan < a.road.kpa ? a.plan : a.road.kpa, toKpa: a.road.kpa }));
@@ -472,7 +456,7 @@
       return card("Pumping back up", "card--pump", el("p", { class: "muted" }, "Enter a planned pressure below road pressure to see how much air and time it takes to pump back up."), UI.sourcesLink(["calc-free-air", "calc-air-volume"]));
     const r = C.reinflation({ volumeL: vol.litres, axles, altitudeM: st.altitude, flowLpm: st.flowLpm, dutyPercent: st.duty });
     const lines = [
-      el("p", null, `Air in one ${m.size.label} tyre: about ${Math.round(vol.litres)} L`, vol.published ? " (published by the tyre maker)." : " (estimated from its size)."),
+      el("p", null, `Air in one ${m.sizeLabel} tyre: about ${Math.round(vol.litres)} L`, vol.published ? " (published by the tyre maker)." : " (estimated from its size)."),
       el(
         "ul",
         null,
@@ -544,6 +528,7 @@
     if (li && tyre.cls === "passenger") parts.push("load index " + li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max per tyre)");
     let text = parts.join(", ") + ".";
     if (pz.oddWidth) text += ` ${pz.widthMm} isn't a usual width (they end in 5, like ${Math.round((pz.widthMm - 5) / 10) * 10 + 5}); check the sidewall.`;
+    if (pz.oddAspect) text += ` ${pz.aspect} isn't a usual height: the middle number is the sidewall height as a % of the width, usually 30–95 (e.g. 265/65R17).`;
     if (tyre.reason === "noLtTable") text += " There's no load table for this LT size here yet, so no weight check.";
     if (tyre.reason === "liOutOfRange") text += " That load index isn't in the table here, so no weight check.";
     read.textContent = text;
@@ -664,10 +649,6 @@
       return;
     }
     const m = compute(st);
-    if (!m.curve) {
-      body.replaceChildren(el("p", null, "Choose a tyre."));
-      return;
-    }
     lastRanges = m.axles.map((a) => a.range);
     body.replaceChildren(loadCard(m), terrainCard(m, st), planCard(m, st), safetyCard(m, st), pumpCard(m, st), gapsCard());
     renderDynamicDiagrams(m);
@@ -732,9 +713,9 @@
   const EXAMPLE = {
     unit: "bar",
     terrain: "sand",
-    size: "265-65r17",
-    type: "sl",
-    li: "112",
+    tyreClass: "passenger",
+    simpleSize: "265/65R17 112T",
+    simpleKg: "2800",
     frontKg: "1300",
     rearKg: "1500",
     placardFront: "2.3",
@@ -748,7 +729,6 @@
   };
 
   function init() {
-    fillSelect($("size"), D.tyreSizes.map((s) => ({ value: s.id, label: s.label })));
     let saved = restore();
     if (location.hash === "#advanced" || location.hash === "#example") mode = "advanced";
     if (location.hash === "#example") {
@@ -759,8 +739,6 @@
     window.addEventListener("hashchange", () => {
       if (location.hash === "#example") location.reload();
     });
-    if (saved && saved.size) $("size").value = saved.size;
-    sizeChanged(saved);
     if (saved) applyValues(saved);
     if (saved && saved.simpleSize) {
       // Older saves stored a size id ("265-65r17"); show it as a size instead.
@@ -779,14 +757,6 @@
       })
     );
 
-    $("size").addEventListener("change", () => {
-      sizeChanged();
-      update();
-    });
-    $("type").addEventListener("change", () => {
-      typeChanged();
-      update();
-    });
     form.addEventListener("input", (e) => {
       if (e.target.name === "simpleSize" || e.target.name === "tyreClass" || e.target.name === "simpleLi") simpleTyreChanged();
       update();

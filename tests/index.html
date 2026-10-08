@@ -247,6 +247,8 @@
       test("LT prefix or two load indices make it LT", () => P("LT265/75R16 123/120Q").lt && P("265/75R16 123/120S").lt && !P("265/75R16 116S").lt);
       test("reads flotation and numeric sizes", () => P("31x10.50R15LT 109S").label === "31x10.50R15LT" && P("31X10.5R15").label === "31x10.50R15LT" && P("7.50R16C 116/114N").label === "7.50R16");
       test("not a size: null", () => P("hello") === null && P("") === null);
+      test("flags an unusual height ratio (265/16/17)", () => P("265/16/17").oddAspect === true && P("265/65R17").oddAspect === false);
+      test("no air-volume estimate from an impossible size", () => C.geometryFor(P("265/16/17")) === null && C.geometryFor(P("265/65R17")) !== null);
       test("flags an unusual width (266 instead of 265)", () => P("266/60R18").oddWidth === true && P("265/60R18").oddWidth === false);
       test("any passenger size works by load index (ETRTO tables go by load index)", () => {
         const r = C.curveForTyped(P("245/70R16 111T"), false, null);

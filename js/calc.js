@@ -103,6 +103,8 @@
         li: rest.li,
         liDual: rest.liDual,
         oddWidth: parseInt(m[2], 10) % 10 !== 5,
+        // The middle number is height as a % of width: 30-95, in steps of 5.
+        oddAspect: parseInt(m[3], 10) < 25 || parseInt(m[3], 10) > 100 || parseInt(m[3], 10) % 5 !== 0,
       };
     }
     m = t.match(/^(\d{2})\s*[X×*]\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*[\/ -]?\s*R?\s*[\/ -]?\s*(\d{2})\s*(LT)?(.*)$/);
@@ -150,6 +152,15 @@
     if (!row) return { curve: null, cls: "passenger", table, needsLi: true, reason: "liOutOfRange" };
     const pts = T[table].psi.map((psi, i) => [psiToKpa(psi), row[i] * KG_PER_LB]);
     return { curve: { points: pts, table, source: T[table].source, where: T[table].where, label: T[table].label, marking: parsed.label + " " + li + (parsed.xl ? " XL" : "") }, cls: "passenger", table, li };
+  }
+
+  // Dimensions for the air-volume estimate from a typed size (null if unknown).
+  function geometryFor(parsed) {
+    if (!parsed) return null;
+    if (parsed.kind === "metric") return parsed.oddAspect ? null : { widthMm: parsed.widthMm, aspect: parsed.aspect, rimIn: parsed.rimIn };
+    if (parsed.kind === "flotation") return { overallIn: parsed.overallIn, sectionWidthIn: parsed.sectionWidthIn, rimIn: parsed.rimIn };
+    const known = data().tyreSizes.find((z) => z.label === parsed.label);
+    return known ? known.geometry : null;
   }
 
   /*
@@ -437,6 +448,7 @@
     tyreClass,
     parseTyreSize,
     curveForTyped,
+    geometryFor,
     terrainRange,
     lowestPublished,
     applyLoadFloor,
