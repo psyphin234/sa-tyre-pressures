@@ -11,6 +11,8 @@ OWN = {
   "rock": ("Pics/rock.jpeg", "A white double-cab bakkie climbing a steep, rocky slope among aloes and bare trees", "Rocky climb."),
   "corrugations": ("Pics/corrugations.jpeg", "A rutted, rippled sandy dirt track running between thorn trees", "Rough, rutted track."),
   "riverbed": ("Pics/sand and river.png", "Aerial view of a convoy of 4x4s crossing a wide sandy riverbed with shallow channels of water", "A convoy crossing a sandy riverbed."),
+  "snow": ("Pics/Snow Deep.jpeg", "A snow-covered mountain track with deep wheel ruts, between snowy peaks", "Deep snow on a mountain track."),
+  "snowroad": ("Pics/Snow_Ice.jpeg", "An icy, partly snow-covered mountain road winding between snowy slopes", "Snow and ice on a mountain road."),
   "gravel": ("Pics/Gravel.jpg", "A long, straight gravel road through dry veld towards flat-topped hills", "Gravel road."),
   "mud": ("Pics/mud.jpg", "A white Toyota Hilux with mud-caked tyres climbing a muddy red-earth track", "Hilux in the mud."),
   "sand": ("Pics/DeepSand.jpg", "Two 4x4s on the crest of a red sand dune, with footprints in the sand and mountains behind", "Red dunes."),
