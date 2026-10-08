@@ -801,6 +801,12 @@ input[type="checkbox"] {
   background: #fafafa;
 }
 
+.inline-photo--wide img {
+  max-height: none;
+  width: 100%;
+  max-width: 720px;
+}
+
 .inline-photo img {
   border-radius: 10px;
   max-height: 260px;
