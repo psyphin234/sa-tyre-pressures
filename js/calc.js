@@ -128,7 +128,7 @@
    *   "belowLoad"    below what the tables say the load needs
    *   "belowTable"   below the lowest published pressure (no load data)
    */
-  function assessPressure(planKpa, need, roadKpa, terrainId) {
+  function assessPressure(planKpa, need, roadKpa, terrainId, cls) {
     const below15 = rule("bfg-below-1-5").params;
     const au = rule("bfg-au-20psi").params;
     const flags = [];
@@ -145,35 +145,72 @@
       flags.push("bfg-below-1-5");
       if (planKpa < psiToKpa(au.psi)) flags.push("bfg-au-20psi");
     }
-    if ((terrainId === "sand" || terrainId === "mud") && planKpa < barToKpa(rule(terrainId === "sand" ? "bfg-sand" : "bfg-mud").params.minBar) - 0.5) {
-      flags.push(terrainId === "sand" ? "bfg-sand-min" : "bfg-mud-min");
-    }
+    const lowest = terrainId === "sand" || terrainId === "mud" || terrainId === "rock" ? lowestPublished(terrainId, cls) : null;
+    if (lowest && planKpa < lowest.kpa - 0.5) flags.push("below-published:" + lowest.ruleId);
     if (band === "belowLoad" || band === "belowTable") flags.push("bfg-speed-load");
     const publicRoad = band === "road" || band === "belowPlacard";
     return { band, maxKmh, publicRoad, flags };
   }
 
+  // "lt" for light-truck construction (TRA LT, flotation, C-type), else "passenger".
+  function tyreClass(type) {
+    if (!type) return "passenger";
+    return type.table === "etrto-sl" || type.table === "etrto-xl" ? "passenger" : "lt";
+  }
+
   /*
-   * Range for a terrain on one axle: from road pressure down to the lowest
-   * pressure a tyre-maker source names for that terrain (or no lower, if no
-   * source names one), in the source's steps.
+   * Range for a terrain on one axle and tyre class ("lt" | "passenger"):
+   * - "cooper": Cooper's LT range for the terrain, never above road pressure;
+   *   steps (BFGoodrich's 0.5 bar) only where the terrain says so.
+   * - "toyo20": road pressure down 20% (Toyo's 20 per cent rule).
+   * - "bfg": road pressure down to BFGoodrich's 1.5 bar (steps for sand only).
+   * - none: no citable figure, so the range stays at road pressure.
+   * Returns { terrain, topKpa, bottomKpa, steps, sourced, kind, ruleId }.
    */
-  function terrainRange(terrainId, roadKpa) {
+  function terrainRange(terrainId, roadKpa, cls) {
     const t = data().terrains.find((x) => x.id === terrainId);
     if (!t || roadKpa == null) return null;
-    if (!t.lowerTo) return { terrain: t, topKpa: roadKpa, bottomKpa: roadKpa, steps: [roadKpa], sourced: false };
-    const r = rule(t.lowerTo).params;
-    const bottom = barToKpa(r.minBar);
-    if (roadKpa <= bottom) return { terrain: t, topKpa: roadKpa, bottomKpa: roadKpa, steps: [roadKpa], sourced: true };
-    // Steps only where the source gives them (BFGoodrich's sand advice);
-    // for mud it names a lowest pressure but no steps.
+    const spec = t[cls === "lt" ? "lt" : "passenger"];
+    const flat = (sourced) => ({ terrain: t, topKpa: roadKpa, bottomKpa: roadKpa, steps: [roadKpa], sourced, kind: spec ? spec.kind : null, ruleId: null });
+    if (!spec) return flat(false);
+    let top;
+    let bottom;
+    let stepBar = null;
+    let ruleId;
+    if (spec.kind === "cooper") {
+      ruleId = "cooper-lt-terrain";
+      const [lo, hi] = rule(ruleId).params.psi[spec.key];
+      top = Math.min(psiToKpa(hi), roadKpa);
+      bottom = Math.min(psiToKpa(lo), roadKpa);
+      if (spec.steps) stepBar = rule(spec.steps).params.stepBar;
+    } else if (spec.kind === "toyo20") {
+      ruleId = "toyo-20-percent";
+      top = roadKpa;
+      bottom = roadKpa * (1 - rule(ruleId).params.dropFraction);
+    } else {
+      ruleId = spec.rule;
+      const r = rule(ruleId).params;
+      top = roadKpa;
+      bottom = Math.min(barToKpa(r.minBar), roadKpa);
+      stepBar = r.stepBar || null;
+    }
     const steps = [];
-    if (r.stepBar) {
-      const step = barToKpa(r.stepBar);
-      for (let p = roadKpa; p > bottom + 0.5; p -= step) steps.push(p);
-    } else steps.push(roadKpa);
-    steps.push(bottom);
-    return { terrain: t, topKpa: roadKpa, bottomKpa: bottom, steps, sourced: true };
+    if (stepBar) {
+      const step = barToKpa(stepBar);
+      for (let p = top; p > bottom + 0.5; p -= step) steps.push(p);
+    } else steps.push(top);
+    if (bottom < top - 0.5) steps.push(bottom);
+    return { terrain: t, topKpa: top, bottomKpa: bottom, steps, sourced: true, kind: spec.kind, ruleId };
+  }
+
+  // Lowest pressure a tyre maker publishes for sand or mud, for this tyre class.
+  function lowestPublished(terrainId, cls) {
+    const t = data().terrains.find((x) => x.id === terrainId);
+    const spec = t && t[cls === "lt" ? "lt" : "passenger"];
+    if (!spec) return null;
+    if (spec.kind === "cooper") return { kpa: psiToKpa(rule("cooper-lt-terrain").params.psi[spec.key][0]), ruleId: "cooper-lt-terrain" };
+    if (spec.kind === "bfg") return { kpa: barToKpa(rule(spec.rule).params.minBar), ruleId: spec.rule };
+    return null;
   }
 
   // ETRTO hard-driving extra (towing, sustained high speed): passenger-type tyres only.
@@ -291,7 +328,9 @@
     loadAt,
     roadPressure,
     assessPressure,
+    tyreClass,
     terrainRange,
+    lowestPublished,
     hardDriving,
     atmosphereKpa,
     tyreVolume,

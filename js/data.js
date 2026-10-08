@@ -59,6 +59,26 @@
       url: "https://www.bfgoodrich.com.au/auto/help-and-advice/faq-tyre-pressures",
       kind: "tyre-maker",
     },
+    cooperAu: {
+      label: "Cooper Tires Australia, Tyre Pressure Guide for 4WD and Off-Road Driving (web page, checked October 2026)",
+      url: "https://coopertires.com.au/general-advice/tyre-pressure-guide/",
+      kind: "tyre-maker",
+    },
+    cooperAu2022: {
+      label: "Cooper Tires Australia, 4WD Drivers Guide, effective March 2022 (PDF), Tyre Pressure Guide pp. 8-11",
+      url: "https://www.coopertires.com.au/wp-content/uploads/2022/10/4WD-Drivers-Guide_LR.pdf",
+      kind: "tyre-maker",
+    },
+    toyoAu20: {
+      label: "Toyo Tires Australia, The 20 per cent rule (rule from off-road instructor David Wilson, Adventure 4WD)",
+      url: "https://www.toyotires.com.au/news/the-20-per-cent-rule",
+      kind: "tyre-maker",
+    },
+    toyoAuSpeed: {
+      label: "Toyo Tires Australia, Tyre pressures: why one size doesn't fit all (quoting Steve Burke, Tyre Technical Manager)",
+      url: "https://www.toyotires.com.au/news/tyre-pressures-why-one-size-doesnt-fit-all",
+      kind: "tyre-maker",
+    },
     fordRanger2025: {
       label: "Ford, 2025 Ranger Owner's Manual (USA/Canada, edition 202408), Wheels and Tires chapter",
       url: "https://www.fordservicecontent.com/Ford_Content/Catalog/owner_information/2025_Ranger_P703_TRD_OM_ENG_V1.pdf",
@@ -406,6 +426,83 @@
       checked: CHECKED,
     },
 
+    // ---- Cooper (Australia): terrain ranges for LT tyres
+    {
+      id: "cooper-lt-terrain",
+      category: "tyre-maker",
+      title: "Cooper's terrain ranges (LT tyres only)",
+      summary:
+        "Cooper Tires Australia publishes a pressure range per terrain for light-truck (LT) construction tyres: sand 18–26 psi, fast or smooth gravel 28–34 psi, slow or rough gravel 26–32 psi, mud 22–28 psi, rocky gravel and rocks 22–28 psi, and on bitumen the vehicle placard. Heavier loads need the higher end. The figures are for an average range of sizes, not your exact tyre, and Cooper says they shouldn't be used for passenger or light-duty tyres.",
+      quote:
+        "All pressures stated are suggested for light truck construction tyres only and should not be advised to any person driving on passenger or light duty construction tyres. … lowering tyre pressures below the manufacturer's recommended pressure for your vehicle is at your own risk and judgement, and doing so could cause over-heating and long-term tyre damage. So, you must drive slowly over obstacles and re-inflate your tyres to proper levels once your vehicle is returned to normal road applications and conditions.",
+      sources: ["cooperAu", "cooperAu2022"],
+      checked: CHECKED,
+      params: {
+        psi: { sand: [18, 26], fastGravel: [28, 34], roughGravel: [26, 32], mud: [22, 28], rock: [22, 28], bitumen: [32, 38] },
+      },
+      notes: [
+        "Ranges from the current web page. Cooper's March 2022 PDF guide is a little lower for gravel and rocks: fast gravel 28–32, slow/rough gravel 24–28, rocks 20–26 psi.",
+        "The calculator never shows the top of a Cooper range above your road pressure.",
+      ],
+    },
+    {
+      id: "cooper-rocks",
+      category: "tyre-maker",
+      title: "Rocks: very slow, and not too low",
+      summary:
+        "Cooper's rock range assumes a very slow pace in low range, without much heat in the tyre. Lower pressure helps the tyre wrap over obstacles without impact damage; below about 20 psi there's a risk of pushing the tyre off the rim, so 22 psi is a practical minimum for most vehicles.",
+      quote: "Pressures below around 20 PSI increase the risk of pushing the tyre off the rim.",
+      sources: ["cooperAu", "cooperAu2022"],
+      checked: CHECKED,
+      notes: ["The 2022 PDF puts it at \"around 18 PSI and below\", with 20 psi as the minimum."],
+    },
+    {
+      id: "cooper-corrugations",
+      category: "tyre-maker",
+      title: "Corrugations: slow down",
+      summary:
+        "Corrugated roads build heat in tyres quickly, so Cooper says to reduce speed on them. Rough and corrugated roads make tyres flex and warm up more than usual, and heat in the belts can't always be felt by hand.",
+      quote: "When driving over corrugated roads you should reduce your speed, as heat builds up quickly on these roads.",
+      sources: ["cooperAu2022", "cooperAu"],
+      checked: CHECKED,
+      notes: ["Cooper gives no separate corrugation pressure. The calculator uses its slow/rough gravel range for rough, corrugated roads."],
+    },
+    {
+      id: "cooper-sand",
+      category: "tyre-maker",
+      title: "Sand: depends on the sand, and rest the tyres",
+      summary:
+        "Cooper: the right sand pressure depends on the depth and coarseness of the sand and the slope. Keep enough momentum, avoid sudden steering, slow down, and rest the vehicle regularly because sand builds a lot of heat in tyres run at low pressure.",
+      quote: "Sand can also build up a lot of heat in your tyres because you are running lower pressures for flotation and because of friction and wheel spin. So, you may need to rest your vehicle regularly.",
+      sources: ["cooperAu2022", "cooperAu"],
+      checked: CHECKED,
+    },
+
+    // ---- Toyo (Australia)
+    {
+      id: "toyo-20-percent",
+      category: "tyre-maker",
+      title: "Leaving the tar: 20% less pressure, 20% less speed",
+      summary:
+        "Toyo Tires Australia publishes an off-road instructor's rule: when you go from bitumen to dirt, drop tyre pressure by 20% and speed by 20%. From 36 psi that's about 29 psi, and from 100 km/h a maximum of 80 km/h. Never drive faster than 80 km/h on dirt.",
+      quote:
+        "when you make the transfer from bitumen to dirt, drop your tyre pressure 20 per cent, and reduce your speed 20 per cent. So if you were running 36psi, drop your tyre pressure down to 29psi … You should never go faster than 80km/h on dirt.",
+      sources: ["toyoAu20"],
+      checked: CHECKED,
+      params: { dropFraction: 0.2, maxKmh: 80 },
+      notes: ["The rule comes from David Wilson, an off-road instructor (Adventure 4WD), as published by Toyo. It isn't limited to LT tyres, so the calculator uses it for passenger-type tyres on gravel."],
+    },
+    {
+      id: "toyo-speeds",
+      category: "tyre-maker",
+      title: "Toyo: aired-down speeds",
+      summary: "Toyo's tyre technical manager: off-road pressures should relate to speed. Aired down for dirt roads, keep to 80 km/h at most; aired down for sand, an average of about 30 km/h. Low pressures are a premature tyre killer.",
+      quote: "Off-road tyre pressures should relate to speed … unsealed dirt roads at a maximum of 80km/h … sand (or equivalent terrain) at an average speed of 30km/h",
+      sources: ["toyoAuSpeed"],
+      checked: CHECKED,
+      params: { dirtMaxKmh: 80, sandAvgKmh: 30 },
+    },
+
     // ---- vehicle makers
     {
       id: "ford-off-road",
@@ -602,62 +699,73 @@
   ];
 
   // ---------------------------------------------------------------- terrains
-  // `lowerTo` is the lowest pressure a tyre-maker source names for this
-  // terrain; null means no citable figure, so the range stays at road pressure.
   const terrains = [
+    // lt / passenger: what applies to each tyre class. kind "cooper" uses
+    // cooper-lt-terrain params.psi[key]; "toyo20" the 20% rule; "bfg" the
+    // BFGoodrich 1.5 bar floor (steps only where the rule gives a stepBar);
+    // null means no citable figure, so the range stays at road pressure.
     {
       id: "tar",
       name: "Tar",
       image: "tar",
-      lowerTo: null,
+      lt: null,
+      passenger: null,
       ruleIds: ["toyo-vehicle-maker-minimum", "etrto-off-road", "bfg-reinflate", "etrto-hard-driving"],
-      summary: "Use the vehicle maker's placard pressure (or more if your load needs it). Towing or sustained high speed: ETRTO adds 0.2–0.5 bar for passenger-type tyres.",
+      summary: "Use the vehicle maker's placard pressure (or more if your load needs it).",
     },
     {
       id: "gravel",
-      name: "Gravel / dirt",
+      name: "Gravel road",
       image: "gravel",
-      lowerTo: null,
-      ruleIds: ["bfg-same-as-road", "law-reg238", "law-public-road"],
-      summary: "No tyre or vehicle maker found publishes a lower pressure for gravel. BFGoodrich: most off-road driving can be done at road pressure. Public gravel roads are public roads.",
+      lt: { kind: "cooper", key: "fastGravel" },
+      passenger: { kind: "toyo20" },
+      maxKmh: { rule: "toyo-20-percent", param: "maxKmh" },
+      ruleIds: ["cooper-lt-terrain", "toyo-20-percent", "toyo-speeds", "bfg-same-as-road", "law-reg238", "law-public-road"],
+      summary: "Fast or smooth gravel. Too low costs steering and stability at speed. 80 km/h at most on dirt.",
     },
     {
       id: "corrugations",
-      name: "Corrugations",
+      name: "Rough gravel & corrugations",
       image: "corrugations",
-      lowerTo: null,
-      ruleIds: ["bfg-same-as-road", "watkins-gravel", "law-reg238"],
-      summary: "No tyre or vehicle maker figure found. Research on log trucks shows lower pressures reduce how corrugations form, but that isn't a pressure for your 4x4.",
+      lt: { kind: "cooper", key: "roughGravel" },
+      passenger: { kind: "toyo20" },
+      maxKmh: { rule: "toyo-20-percent", param: "maxKmh" },
+      ruleIds: ["cooper-lt-terrain", "cooper-corrugations", "toyo-20-percent", "watkins-gravel", "law-reg238"],
+      summary: "Slow, rough or corrugated gravel. Slow down: corrugations build heat in tyres quickly.",
     },
     {
       id: "sand",
       name: "Soft sand",
       image: "sand",
-      lowerTo: "bfg-sand",
-      ruleIds: ["bfg-low-traction", "bfg-sand", "bfg-below-1-5", "bfg-au-20psi", "bfg-speed-load", "bfg-side-slopes", "army-hmmwv-sand", "field-practice-sand"],
-      summary: "BFGoodrich: lower 0.5 bar at a time until the tyre floats, down to 1.5 bar (the lowest a tyre maker publishes), and no faster than 20 km/h at 1.5 bar.",
+      lt: { kind: "cooper", key: "sand", steps: "bfg-sand" },
+      passenger: { kind: "bfg", rule: "bfg-sand" },
+      ruleIds: ["cooper-lt-terrain", "cooper-sand", "bfg-low-traction", "bfg-sand", "bfg-below-1-5", "bfg-au-20psi", "toyo-speeds", "bfg-speed-load", "bfg-side-slopes", "army-hmmwv-sand", "field-practice-sand"],
+      summary: "Lower step by step until the tyres float, slow down, and rest the tyres now and then: sand builds heat.",
     },
     {
       id: "mud",
       name: "Mud",
       image: "mud",
-      lowerTo: "bfg-mud",
-      ruleIds: ["bfg-mud", "bfg-speed-load", "bfg-below-1-5", "army-hmmwv-sand"],
-      summary: "BFGoodrich: no single best pressure; too low can cut traction. Down to 1.5 bar (the lowest a tyre maker publishes), not over 20 km/h.",
+      lt: { kind: "cooper", key: "mud" },
+      passenger: { kind: "bfg", rule: "bfg-mud" },
+      ruleIds: ["cooper-lt-terrain", "bfg-mud", "bfg-speed-load", "bfg-below-1-5", "army-hmmwv-sand"],
+      summary: "No single best pressure: thick mud on a soft base needs lower, watery mud on a firm base can stay higher. Too low can cut traction.",
     },
     {
       id: "rock",
       name: "Rock",
       image: "rock",
-      lowerTo: null,
-      ruleIds: ["bfg-hills", "bfg-side-slopes", "bfg-same-as-road", "law-reg212"],
-      summary: "No tyre or vehicle maker figure found for rock. BFGoodrich: climbs may need less pressure, but lower cautiously (punctures mid-climb), and use road pressure across side slopes.",
+      lt: { kind: "cooper", key: "rock" },
+      passenger: null,
+      ruleIds: ["cooper-lt-terrain", "cooper-rocks", "bfg-hills", "bfg-side-slopes", "law-reg212"],
+      summary: "Very slow, in low range. Lower pressure helps the tyre wrap over rocks, but too low risks pushing it off the rim.",
     },
     {
       id: "snow",
       name: "Snow / ice",
       image: "snow",
-      lowerTo: null,
+      lt: null,
+      passenger: null,
       ruleIds: ["bfg-same-as-road", "army-hmmwv-sand"],
       summary: "No civilian tyre or vehicle maker figure found for snow or ice. The only one is military: the US Army's Humvee manual uses about 0.8 bar front, 1.4 bar rear for mud, sand and snow at 24 km/h, on its own 37-inch tyres.",
     },
@@ -728,8 +836,8 @@
   const gaps = [
     { id: "gap-sans1550", title: "SANS 1550 not read", text: "SANS 1550 is a paid standard, so it hasn't been checked that its load tables match the ETRTO and TRA tables used here. Reg 238 refers to SANS 1550." },
     { id: "gap-below-tables", title: "No load data below the tables", text: "No standard or tyre maker found publishes what a tyre can carry below the lowest pressure in its table (2.4 bar for LT tyres, 1.5 bar for passenger tyres). This site shows no floor there, only the makers' speed limits." },
-    { id: "gap-terrain", title: "No figures for gravel, corrugations, rock, snow", text: "No tyre maker, vehicle maker or engineering source found gives pressures for gravel, corrugations, rock or snow/ice. Only BFGoodrich gives figures, for sand and mud." },
-    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "No civilian tyre or vehicle maker publishes sand pressures below 1.5 bar. BFGoodrich's sand tips say not below 1.5 bar, though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
+    { id: "gap-terrain", title: "Snow, and rock on passenger tyres", text: "No civilian tyre or vehicle maker figure was found for snow or ice. Cooper's rock range is for LT tyres only, so passenger-type tyres on rock get no figure." },
+    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "For LT tyres Cooper goes down to 18 psi (about 1.25 bar) in sand; for passenger-type tyres the lowest published figure is BFGoodrich's 1.5 bar, though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
     { id: "gap-speed", title: "Speed limits between road pressure and 1.5 bar", text: "BFGoodrich says to slow down when you lower pressure but gives no figure above 1.5 bar." },
     { id: "gap-tubes", title: "Tubes at low pressure", text: "No tyre or vehicle maker guidance was found on running tube-type tyres at low pressure." },
     { id: "gap-beadlock-law", title: "Beadlocks on SA roads", text: "Whether beadlock wheels are allowed on SA public roads hasn't been checked." },

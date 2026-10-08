@@ -107,6 +107,16 @@
           <p class="hint">Best: weigh each axle, loaded for the trip, on a weighbridge. Worst case: the maximum axle loads on the vehicle's VIN or compliance plate. Each tyre carries half its axle.</p>
         </fieldset>
 
+        <fieldset data-modes="simple">
+          <legend>Your tyres</legend>
+          <div class="choice-row">
+            <label><input type="radio" name="tyreClass" value="lt"> LT (light truck)</label>
+            <label><input type="radio" name="tyreClass" value="passenger"> Passenger / SUV</label>
+            <label><input type="radio" name="tyreClass" value="unsure" checked> Not sure</label>
+          </div>
+          <p class="hint">LT tyres have "LT" before the size (LT265/75R16) or two load numbers, like 121/118. Not sure? You get the passenger-type answer, the more careful one.</p>
+        </fieldset>
+
         <fieldset>
           <legend>Road pressure</legend>
           <div class="field-row">
@@ -244,9 +254,9 @@
 
       <details class="explainer">
         <summary>Corrugations</summary>
-        <p>No tyre or vehicle maker found gives a corrugation pressure, so this page doesn't either. Research on log trucks found that lower tyre pressures reduce how corrugations form on gravel roads and improve the ride, but those were truck tyres within their makers' load and speed tables, not a figure for a 4x4.</p>
+        <p>Corrugations shake the tyre on every ripple, so it flexes more and heats up faster than on smooth gravel. Cooper's advice is to slow down on them; its slow, rough gravel range (for LT tyres) is what this page uses, and Toyo's 20 per cent rule covers passenger-type tyres. Research on log trucks also found that lower tyre pressures make corrugations form less and improve the ride.</p>
         <figure class="inline-photo" data-image="corrugations"></figure>
-        <p class="read-more" data-rules="watkins-gravel bfg-same-as-road"></p>
+        <p class="read-more" data-rules="cooper-corrugations cooper-lt-terrain toyo-20-percent watkins-gravel"></p>
       </details>
 
       <details class="explainer">
