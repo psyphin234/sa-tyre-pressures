@@ -58,6 +58,14 @@
     return el("p", { class: "read-more" }, "Read more: ", parts);
   }
 
+  // One small link per card to the sources page, showing just these rules at
+  // the top (sources.html?show=a,b). Keeps quotes and citations off the calculator.
+  function sourcesLink(ids, text) {
+    const known = ids.filter((id) => ruleById(id));
+    if (!known.length) return null;
+    return el("p", { class: "sources-link" }, el("a", { href: "sources.html?show=" + known.join(",") }, text || "Where these numbers come from"));
+  }
+
   // Fill <figure data-image="key"> with the photo and its credit line.
   function photo(figure, key) {
     const img = (root.TYRE_IMAGES || []).find((i) => i.key === key);
@@ -76,5 +84,5 @@
     return d.toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" });
   }
 
-  root.TYRE_UI = { el, externalLink, categoryTag, ruleById, ruleLinks, photo, formatDate, CATEGORY };
+  root.TYRE_UI = { el, externalLink, categoryTag, ruleById, ruleLinks, sourcesLink, photo, formatDate, CATEGORY };
 })(window);

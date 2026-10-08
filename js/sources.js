@@ -23,10 +23,11 @@
     return s ? el("li", null, externalLink(s.url, s.label)) : null;
   }
 
-  function renderRule(r) {
+  // withAnchor: false for the copies shown at the top (?show=), so ids stay unique.
+  function renderRule(r, withAnchor) {
     return el(
       "li",
-      { class: "source-item", id: r.id, tabindex: "-1" },
+      withAnchor === false ? { class: "source-item" } : { class: "source-item", id: r.id, tabindex: "-1" },
       el("h3", null, r.title, " ", categoryTag(r.category)),
       el("p", null, r.summary),
       r.quote ? el("blockquote", null, "“", r.quote, "”") : null,
@@ -41,7 +42,7 @@
     ...GROUPS.map(([cat, title]) => {
       const rules = D.rules.filter((r) => r.category === cat);
       if (!rules.length) return null;
-      return el("section", null, el("h3", { class: "group-title" }, title, " (", String(rules.length), ")"), el("ul", { class: "source-groups" }, rules.map(renderRule)));
+      return el("section", null, el("h3", { class: "group-title" }, title, " (", String(rules.length), ")"), el("ul", { class: "source-groups" }, rules.map((r) => renderRule(r))));
     }).filter(Boolean)
   );
 
@@ -86,6 +87,23 @@
       )
     )
   );
+
+  // sources.html?show=a,b: the calculator card's sources, at the top.
+  const show = (new URLSearchParams(location.search).get("show") || "")
+    .split(",")
+    .map((id) => D.rules.find((r) => r.id === id))
+    .filter(Boolean);
+  if (show.length) {
+    document.getElementById("shown").replaceChildren(...show.map((r) => renderRule(r, false)));
+    document.getElementById("shown-wrap").hidden = false;
+    // Back to the calculator as it was (Simple or Advanced, inputs kept).
+    document.getElementById("back-to-calc").addEventListener("click", (e) => {
+      if (document.referrer && new URL(document.referrer).origin === location.origin) {
+        e.preventDefault();
+        history.back();
+      }
+    });
+  }
 
   document.getElementById("checked").textContent = "Sources last checked " + formatDate(D.checked) + ".";
   document.getElementById("year").textContent = new Date().getFullYear();

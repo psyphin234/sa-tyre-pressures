@@ -165,9 +165,13 @@
     const r = rule(t.lowerTo).params;
     const bottom = barToKpa(r.minBar);
     if (roadKpa <= bottom) return { terrain: t, topKpa: roadKpa, bottomKpa: roadKpa, steps: [roadKpa], sourced: true };
-    const step = barToKpa(rule("bfg-sand").params.stepBar);
+    // Steps only where the source gives them (BFGoodrich's sand advice);
+    // for mud it names a lowest pressure but no steps.
     const steps = [];
-    for (let p = roadKpa; p > bottom + 0.5; p -= step) steps.push(p);
+    if (r.stepBar) {
+      const step = barToKpa(r.stepBar);
+      for (let p = roadKpa; p > bottom + 0.5; p -= step) steps.push(p);
+    } else steps.push(roadKpa);
     steps.push(bottom);
     return { terrain: t, topKpa: roadKpa, bottomKpa: bottom, steps, sourced: true };
   }

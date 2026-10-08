@@ -19,6 +19,8 @@
 
   let unit = "bar";
   let terrainId = "sand";
+  // "simple" (default): placard + terrain only. "advanced" (#advanced, #example): everything.
+  let mode = "simple";
   let lastRanges = [null, null];
 
   // ------------------------------------------------------------ setup
@@ -197,12 +199,6 @@
   function status(kind, text) {
     return el("span", { class: "status status--" + kind }, text);
   }
-  function ruleSummary(id) {
-    const r = UI.ruleById(id);
-    if (!r) return null;
-    return el("li", null, UI.categoryTag(r.category), " ", el("strong", null, r.title + ": "), r.summary);
-  }
-
   // ------------------------------------------------------------ cards
 
   function loadCard(m) {
@@ -235,9 +231,9 @@
     return card(
       "What your load needs",
       "card--load",
-      el("p", { class: "muted" }, "From the published load table for ", el("strong", null, m.curve.marking), " (", m.curve.label, "; ", m.curve.where, ")."),
+      el("p", { class: "muted" }, "Load table: ", el("strong", null, m.curve.marking), " (", m.curve.label, ")."),
       items,
-      UI.ruleLinks(["table-method", "table-lowest-pressure", "law-reg238", "toyo-load-index"].concat(m.type.table === "michelin-750r16" ? ["michelin-750r16-axle"] : []))
+      UI.sourcesLink(["table-method", "table-lowest-pressure", "law-reg238", "toyo-load-index"].concat(m.type.table === "michelin-750r16" ? ["michelin-750r16-axle"] : []))
     );
   }
 
@@ -284,8 +280,7 @@
       el("p", { class: "lede-small" }, t.summary),
       el("ul", { class: "range-list" }, rows),
       extra,
-      el("ul", { class: "rule-list" }, t.ruleIds.map(ruleSummary)),
-      UI.ruleLinks(t.ruleIds)
+      UI.sourcesLink(t.ruleIds)
     );
   }
 
@@ -346,7 +341,7 @@
       withPlan.length ? null : el("p", { class: "muted" }, "Enter the pressure you plan to run (step 5), or tap \"Use the bottom of the range\"."),
       diagram,
       rows,
-      UI.ruleLinks(["bfg-speed-load", "bfg-below-1-5", "bfg-au-20psi", "law-reg238", "toyo-vehicle-maker-minimum"])
+      UI.sourcesLink(["bfg-speed-load", "bfg-below-1-5", "bfg-au-20psi", "law-reg238", "toyo-vehicle-maker-minimum"])
     );
   }
 
@@ -368,8 +363,9 @@
       el(
         "ul",
         { class: "safety-list" },
-        items.map(([title, text, ids]) => el("li", null, el("strong", null, title + ". "), text, " ", UI.ruleLinks(ids)))
-      )
+        items.map(([title, text]) => el("li", null, el("strong", null, title + ". "), text))
+      ),
+      UI.sourcesLink([...new Set(items.flatMap((i) => i[2]))])
     );
   }
 
@@ -379,7 +375,7 @@
       .filter((a) => a.road.kpa != null)
       .map((a) => ({ name: a.name, fromKpa: a.plan != null && a.plan < a.road.kpa ? a.plan : a.road.kpa, toKpa: a.road.kpa }));
     if (!axles.length || axles.every((a) => a.toKpa <= a.fromKpa))
-      return card("Pumping back up", "card--pump", el("p", { class: "muted" }, "Enter a planned pressure below road pressure to see how much air and time it takes to pump back up."), UI.ruleLinks(["calc-free-air", "calc-air-volume"]));
+      return card("Pumping back up", "card--pump", el("p", { class: "muted" }, "Enter a planned pressure below road pressure to see how much air and time it takes to pump back up."), UI.sourcesLink(["calc-free-air", "calc-air-volume"]));
     const r = C.reinflation({ volumeL: vol.litres, axles, altitudeM: st.altitude, flowLpm: st.flowLpm, dutyPercent: st.duty });
     const lines = [
       el("p", null, `Air in one ${m.size.label} tyre: about ${Math.round(vol.litres)} L`, vol.published ? " (published by the tyre maker)." : " (estimated from its size)."),
@@ -404,7 +400,7 @@
       if (st.freeFlow) lines.push(el("p", { class: "note" }, "Free-flow ratings are measured with nothing to push against. Into a tyre at 2–3 bar a compressor delivers less, so expect longer."));
     } else lines.push(el("p", { class: "muted" }, "Enter your compressor's flow (step 6) for a time."));
     lines.push(el("p", { class: "note" }, "The air comes out warm and the pressure drops a little as it cools: check again once the tyres are cold."));
-    return card("Pumping back up", "card--pump", lines, UI.ruleLinks(["calc-free-air", "calc-air-volume", "calc-altitude"]));
+    return card("Pumping back up", "card--pump", lines, UI.sourcesLink(["calc-free-air", "calc-air-volume", "calc-altitude"]));
   }
 
   function gapsCard() {
@@ -419,12 +415,113 @@
     );
   }
 
+  // ------------------------------------------------------------ simple mode
+
+  /*
+   * Simple: road pressure from the placard and the terrain, nothing else. If
+   * only one axle's placard figure is entered, it's used for both.
+   */
+  function simpleResults(st) {
+    const t = D.terrains.find((x) => x.id === terrainId);
+    const front = st.placard[0] || st.placard[1];
+    const rear = st.placard[1] || st.placard[0];
+    const figure = el("figure", { class: "card-photo" });
+    UI.photo(figure, t.image);
+    const toAdvanced = el("p", { class: "to-advanced" }, "Carrying a heavy load, on LT tyres, or towing? ", el("a", { href: "#advanced", "data-go": "advanced" }, "Advanced"), " checks your tyres can carry the load at the pressure you pick.");
+    if (!front) {
+      return [
+        card(t.name, "card--simple", figure, el("p", { class: "lede-small" }, "Enter the road pressure from your tyre placard to see what to run on " + t.name.toLowerCase() + ".")),
+        toAdvanced,
+      ];
+    }
+    const axles = [
+      { name: "Front", r: C.terrainRange(terrainId, front) },
+      { name: "Rear", r: C.terrainRange(terrainId, rear) },
+    ];
+    const lowers = axles.some((a) => a.r.bottomKpa < a.r.topKpa - 1);
+    const below = UI.ruleById("bfg-below-1-5").params;
+    const answer = el(
+      "div",
+      { class: "answer" },
+      axles.map((a) =>
+        el(
+          "div",
+          { class: "answer-axle" },
+          el("span", { class: "answer-name" }, a.name),
+          el("span", { class: "answer-value" }, a.r.bottomKpa < a.r.topKpa - 1 ? fmt(a.r.topKpa) + " → " + fmt(a.r.bottomKpa) : fmt(a.r.topKpa)),
+          a.r.steps.length > 2 ? el("span", { class: "answer-steps" }, "steps: " + a.r.steps.map(fmt).join(" · ")) : null
+        )
+      )
+    );
+    let headline;
+    const notes = [];
+    if (lowers) {
+      if (t.id === "sand") {
+        headline = "Lower step by step, no lower than " + fmt(axles[0].r.bottomKpa);
+        notes.push(el("p", null, `Let air out ${fmt(C.barToKpa(UI.ruleById("bfg-sand").params.stepBar))} at a time until the tyres float on the sand, and stop at ${fmt(axles[0].r.bottomKpa)}. At that pressure drive ${below.maxKmh} km/h or slower.`));
+      } else {
+        headline = "Lower if you need to, no lower than " + fmt(axles[0].r.bottomKpa);
+        notes.push(el("p", null, `There's no single best pressure here: too low can cut traction as well as too high. Don't go below ${fmt(axles[0].r.bottomKpa)}, and drive ${below.maxKmh} km/h or slower.`));
+      }
+      notes.push(el("p", { class: "note note--warn" }, "Only if the tyres can still carry the load. Heavy load, LT tyres or towing: check in Advanced first."));
+    } else if (t.id === "tar") {
+      headline = "Road pressure";
+      notes.push(el("p", null, "Use the vehicle maker's placard pressure on the tar."));
+    } else {
+      headline = "Keep road pressure";
+      notes.push(el("p", null, `No tyre or vehicle maker publishes a lower pressure for ${t.name.toLowerCase()}, so this page doesn't suggest one.`));
+    }
+    const before = [
+      ["Reinflate before the tar", "back to road pressure before you drive on tar."],
+      ["Carry a gauge and a compressor", "check pressures cold, and pump back up before the road."],
+      ["Warm tyres read higher", "never let air out of warm tyres to reach a cold figure."],
+    ];
+    if (lowers) before.splice(1, 0, ["Side slopes", "go back to road pressure before crossing a steep slope, or a tyre can come off the rim."]);
+    const ids = t.ruleIds.concat(["bfg-reinflate", "ford-off-road", "etrto-hot-pressure"]);
+    return [
+      card(
+        t.name,
+        "card--simple",
+        figure,
+        el("p", { class: "answer-headline" }, headline),
+        answer,
+        notes,
+        el("h4", null, "Before you go"),
+        el("ul", { class: "before-list" }, before.map(([b, rest]) => el("li", null, el("strong", null, b), ": " + rest))),
+        UI.sourcesLink(ids)
+      ),
+      toAdvanced,
+    ];
+  }
+
+  function setMode(next, updateHash) {
+    mode = next === "advanced" ? "advanced" : "simple";
+    document.querySelectorAll(".mode-button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+    document.querySelectorAll("[data-modes]").forEach((node) => {
+      node.hidden = node.dataset.modes.split(" ").indexOf(mode) === -1;
+    });
+    if (updateHash) history.replaceState(null, "", mode === "advanced" ? "#advanced" : location.pathname + location.search);
+  }
+
   // ------------------------------------------------------------ update
 
   function update() {
     const st = readState();
-    const m = compute(st);
     const body = $("results-body");
+    if (mode === "simple") {
+      body.replaceChildren(...simpleResults(st));
+      body.querySelectorAll("[data-go]").forEach((a) =>
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          setMode(a.dataset.go, true);
+          update();
+          $("tyre-form").scrollIntoView({ behavior: "smooth" });
+        })
+      );
+      save();
+      return;
+    }
+    const m = compute(st);
     if (!m.curve) {
       body.replaceChildren(el("p", null, "Choose a tyre."));
       return;
@@ -455,7 +552,7 @@
       if (f) d.replaceChildren(f());
     });
     document.querySelectorAll("p.read-more[data-rules]").forEach((p) => {
-      const links = UI.ruleLinks(p.dataset.rules.split(" "));
+      const links = UI.sourcesLink(p.dataset.rules.split(" "), "Sources");
       if (links) p.replaceWith(links);
     });
     document.querySelectorAll("figure[data-image]").forEach((f) => UI.photo(f, f.dataset.image));
@@ -485,6 +582,7 @@
   function init() {
     fillSelect($("size"), D.tyreSizes.map((s) => ({ value: s.id, label: s.label })));
     let saved = restore();
+    if (location.hash === "#advanced" || location.hash === "#example") mode = "advanced";
     if (location.hash === "#example") {
       saved = EXAMPLE;
       unit = EXAMPLE.unit;
@@ -500,6 +598,13 @@
     setUnit(unit);
     buildTerrains();
     renderStatic();
+    setMode(mode, false);
+    document.querySelectorAll(".mode-button").forEach((b) =>
+      b.addEventListener("click", () => {
+        setMode(b.dataset.mode, true);
+        update();
+      })
+    );
 
     $("size").addEventListener("change", () => {
       sizeChanged();

@@ -153,6 +153,10 @@
         const r = C.terrainRange("sand", 240);
         return JSON.stringify(r.steps.map(Math.round)) === "[240,190,150]" || r.steps;
       });
+      test("mud range: road pressure to 1.5 bar, no steps in between (BFGoodrich gives none for mud)", () => {
+        const r = C.terrainRange("mud", 240);
+        return JSON.stringify(r.steps.map(Math.round)) === "[240,150]" || r.steps;
+      });
       test("gravel range stays at road pressure (no citable lower figure)", () => {
         const r = C.terrainRange("gravel", 240);
         return (r.bottomKpa === 240 && r.sourced === false) || r;

@@ -37,10 +37,17 @@ tests/index.html  Browser tests for data integrity and calc.js
 tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every file
 ```
 
+## Modes
+
+- **Simple** (default, no hash): road pressure from the placard plus the terrain, one answer card (`simpleResults()` in app.js), a short "Before you go" list and one sources link. Meant for someone who just wants a pressure for the terrain. It points heavy, LT or towing users to Advanced.
+- **Advanced** (`#advanced`; `#example` loads the made-up example in Advanced): tyre and load tables, plan check with ladders, safety, pumping, gaps, and the explainers with diagrams.
+- Elements carry `data-modes="advanced"` to show only in Advanced; `setMode()` hides the rest. Inputs are shared, so values carry across modes.
+- **Sources stay on the sources page.** Cards don't quote sources or list rule summaries; each ends with one "Where these numbers come from" link (`UI.sourcesLink(ids)`) to `sources.html?show=id,id`, which lists just those rules at the top (without anchors, so ids stay unique), with "Back to the calculator" going back in history.
+
 ## Rules for changes
 
 - **Sourced numbers live in `data.js`** (a rule's `params`) or `tables.js`. `calc.js`, `app.js` and the HTML read them from there; don't hard-code 1.5 bar, 20 km/h etc.
-- Every result card ends with "Read more" links (`ruleLinks()`) to the rules it used, which open the rule on sources.html.
+- Every result card ends with one sources link (`sourcesLink()`) to the rules it used.
 - Rule `category` drives the tag: law | standard | tyre-maker | vehicle-maker | engineering | calculation. Calculation rules are this site's own physics and must say so.
 - Keep claims that aren't in a source out of rule summaries; put interpretations in `notes`, starting "Not from the regulation:" (or similar) when it's about the law.
 - **Offline:** any new file must be added to `FILES` in `sw.js`, and `VERSION` bumped whenever anything changes, or visitors keep the old copy. `tests/run.ps1` fails if a referenced file isn't cached.

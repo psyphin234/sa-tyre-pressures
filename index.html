@@ -40,18 +40,23 @@
     <section class="intro">
       <p class="disclaimer-link"><a href="#disclaimer">Disclaimer</a></p>
       <h1>4x4 Tyre Pressures</h1>
-      <p class="lede">A starting range, not one "correct" number. Pick your tyre, load and terrain to see the pressure your load needs according to the tyre load tables, how far tyre makers say you can go down for that terrain, and the speed that goes with it. Every number links to where it comes from.</p>
-      <ul class="honesty">
+      <p class="lede">What tyre pressure to run for the terrain ahead, from what tyre makers publish. It's a starting point: carry a gauge and a compressor, and adjust from there.</p>
+      <p class="offline-line"><strong>Works offline</strong> once you've opened it with signal. Nothing you enter leaves your phone.<span class="install" id="install" hidden> <button type="button" class="small-button install-button" id="install-button">Add to home screen</button><span class="install-help" id="install-help" hidden></span></span></p>
+      <ul class="honesty" data-modes="advanced">
         <li><strong>Only tyre makers, vehicle makers, standards, the law and engineering research.</strong> No forum or club figures. Where nobody citable publishes a number, this page says so instead of guessing.</li>
-        <li><strong>Carry a gauge and a compressor.</strong> Start here, then adjust for your tyre, the sand or rock in front of you, and how the vehicle feels.</li>
-        <li><strong>Works offline.</strong> Open it once with signal and it keeps working in the bush. Nothing you enter leaves your phone.<span class="install" id="install" hidden> <button type="button" class="small-button install-button" id="install-button">Add to home screen</button><span class="install-help" id="install-help" hidden></span></span></li>
+        <li><strong>The load sets the floor.</strong> Advanced reads your tyre's load table to find the least pressure your load needs, and checks what you plan to run against it.</li>
       </ul>
-      <figure class="hero-photo" data-image="hero"></figure>
+      <figure class="hero-photo" data-modes="advanced" data-image="hero"></figure>
     </section>
+
+    <div class="modes" role="group" aria-label="How much detail?">
+      <button type="button" class="mode-button" data-mode="simple" aria-pressed="true">Simple <small>placard and terrain</small></button>
+      <button type="button" class="mode-button" data-mode="advanced" aria-pressed="false">Advanced <small>load, tyre, plan, pumping</small></button>
+    </div>
 
     <div class="layout">
       <form id="tyre-form" class="inputs" autocomplete="off" novalidate>
-        <p class="example-link"><a href="#example" id="example-link">Fill in a made-up example</a></p>
+        <p class="example-link" data-modes="advanced"><a href="#example" id="example-link">Fill in a made-up example</a></p>
         <div class="unit-switch" role="group" aria-label="Pressure unit">
           <span class="unit-label">Show pressures in</span>
           <label><input type="radio" name="unit" value="bar" checked> bar</label>
@@ -59,8 +64,8 @@
           <label><input type="radio" name="unit" value="psi"> psi</label>
         </div>
 
-        <fieldset>
-          <legend>1. Your tyres</legend>
+        <fieldset data-modes="advanced">
+          <legend>Your tyres</legend>
           <div class="field">
             <label for="size">Size</label>
             <select id="size" name="size"></select>
@@ -87,8 +92,8 @@
           </details>
         </fieldset>
 
-        <fieldset>
-          <legend>2. Load on each axle</legend>
+        <fieldset data-modes="advanced">
+          <legend>Load on each axle</legend>
           <div class="field-row">
             <div class="field">
               <label for="frontKg">Front axle</label>
@@ -103,7 +108,7 @@
         </fieldset>
 
         <fieldset>
-          <legend>3. Road pressure from the vehicle maker</legend>
+          <legend>Road pressure</legend>
           <div class="field-row">
             <div class="field">
               <label for="placardFront">Front</label>
@@ -114,16 +119,16 @@
               <div class="with-unit"><input id="placardRear" name="placardRear" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
             </div>
           </div>
-          <p class="hint">On the tyre placard, usually on the driver's door pillar, or in the owner's manual. Use the loaded figure if it gives one. Leave blank to use only the load tables.</p>
+          <p class="hint">From the tyre placard, usually on the driver's door pillar, or in the owner's manual. Use the loaded figure if it gives one.<span data-modes="advanced"> Leave blank to use only the load tables.</span></p>
         </fieldset>
 
         <fieldset>
-          <legend>4. Terrain</legend>
+          <legend>Terrain</legend>
           <div class="terrain-grid" id="terrain-grid" role="radiogroup" aria-label="Terrain"></div>
         </fieldset>
 
-        <fieldset>
-          <legend>5. What you plan to run</legend>
+        <fieldset data-modes="advanced">
+          <legend>What you plan to run</legend>
           <div class="field-row">
             <div class="field">
               <label for="planFront">Front</label>
@@ -150,8 +155,8 @@
           <label class="check"><input type="checkbox" name="towing" id="towing"> Towing, or sustained high speed on tar</label>
         </fieldset>
 
-        <fieldset>
-          <legend>6. Pumping back up <small>(optional)</small></legend>
+        <fieldset data-modes="advanced">
+          <legend>Pumping back up <small>(optional)</small></legend>
           <div class="field-row">
             <div class="field">
               <label for="flow">Compressor flow</label>
@@ -178,13 +183,13 @@
         <aside id="disclaimer" class="disclaimer" aria-labelledby="disclaimer-title">
           <h2 id="disclaimer-title">Disclaimer</h2>
           <p><strong>A starting point, not a safe-pressure guarantee.</strong> Tyre pressure off-road depends on your exact tyre, load, terrain, speed and driving. Lowering pressure can unseat a bead, damage a sidewall or overheat a tyre. You choose your pressures and you're responsible for them.</p>
-          <p>Figures come from the sources linked on each card, as published; check your own tyre maker's data for your exact tyre. The load tables are reproduced from a tyre maker's guide and haven't been checked against SANS 1550, which South African law refers to.</p>
+          <p data-modes="advanced">Figures come from the sources listed on the <a href="sources.html">Sources page</a>, as published; check your own tyre maker's data for your exact tyre. The load tables are reproduced from a tyre maker's guide and haven't been checked against SANS 1550, which South African law refers to.</p>
           <p>Reinflate to road pressure before driving on tar.</p>
         </aside>
       </section>
     </div>
 
-    <section class="explainers" aria-labelledby="explain-title">
+    <section class="explainers" aria-labelledby="explain-title" data-modes="advanced">
       <h2 id="explain-title">Why the numbers work like this</h2>
 
       <details class="explainer" open>

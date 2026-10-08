@@ -336,7 +336,7 @@ img {
 
 @media (min-width: 760px) {
   .honesty {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -996,4 +996,129 @@ input[type="checkbox"] {
   display: block;
   margin-top: 6px;
   color: var(--text);
+}
+
+/* ------------------------------------------------------------ modes */
+.modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 520px;
+}
+
+.mode-button {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.15;
+  min-height: 48px;
+  padding: 6px 8px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.mode-button small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.mode-button:hover {
+  color: var(--text);
+}
+
+.mode-button[aria-pressed="true"] {
+  color: #0b0d10;
+  background: var(--accent);
+}
+
+.mode-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.offline-line {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.offline-line strong {
+  color: var(--text);
+}
+
+/* the simple answer */
+.answer-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 8px 0 !important;
+}
+
+.answer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+.answer-axle {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.answer-name {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.answer-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--accent);
+}
+
+.answer-steps {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.before-list {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+}
+
+.before-list li {
+  margin: 4px 0;
+}
+
+.sources-link {
+  font-size: 0.85rem;
+  margin: 10px 0 0 !important;
+}
+
+.to-advanced {
+  font-size: 0.92rem;
+  color: var(--text-muted);
 }
