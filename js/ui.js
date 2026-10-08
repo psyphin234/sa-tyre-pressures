@@ -35,6 +35,7 @@
     "vehicle-maker": { label: "Vehicle maker", cls: "maker" },
     engineering: { label: "Engineering", cls: "engineering" },
     calculation: { label: "Calculation", cls: "calc" },
+    "field-practice": { label: "Field practice", cls: "field" },
   };
 
   function categoryTag(category) {

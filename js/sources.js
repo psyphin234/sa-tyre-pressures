@@ -16,6 +16,7 @@
     ["vehicle-maker", "Vehicle makers"],
     ["engineering", "Engineering research"],
     ["calculation", "This site's own calculations (physics)"],
+    ["field-practice", "Field practice (experience, not from any maker; shown at the owner's request)"],
   ];
 
   function sourceLink(id) {
@@ -32,7 +33,9 @@
       el("p", null, r.summary),
       r.quote ? el("blockquote", null, "“", r.quote, "”") : null,
       r.regulation ? el("p", { class: "source-meta" }, el("strong", null, "Regulation: "), r.regulation) : null,
-      r.sources.length ? el("ul", { class: "source-meta" }, r.sources.map(sourceLink)) : el("p", { class: "source-meta" }, "No outside source: worked out from physics, as described."),
+      r.sources.length
+        ? el("ul", { class: "source-meta" }, r.sources.map(sourceLink))
+        : el("p", { class: "source-meta" }, r.category === "field-practice" ? "No published source: the experience of the site's owner and other drivers." : "No outside source: worked out from physics, as described."),
       r.notes && r.notes.length ? el("ul", { class: "source-meta" }, r.notes.map((n) => el("li", null, n))) : null,
       el("p", { class: "source-meta" }, "Last checked: ", formatDate(r.checked))
     );

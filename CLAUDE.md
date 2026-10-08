@@ -10,6 +10,7 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 
 - Only **tyre makers, vehicle makers, standards bodies (ETRTO/TRA), SA law and engineering research**. No forum, club, retailer, blog or "everyone runs 1 bar" figures, however common.
 - Where nothing citable exists, say so: add a `gaps` entry in `js/data.js` and show "no published figure" rather than a guess.
+- **One owner-approved exception:** the `field-practice-sand` rule (category `field-practice`, dashed amber "Field practice" tag): experienced drivers go to about 1 bar, and 0.3–0.5 bar in very soft sand. It is shown beside the sourced figures in the "Going lower" block (sand only), never used in a calculation or as a range bound (a test checks this). Don't add other field-practice figures without the owner's say-so.
 - **No load floor below the published tables.** The tables stop at 22 psi (ETRTO passenger), 35 psi (TRA LT), 25 psi (TRA flotation), 36 psi (Michelin 7.50R16). Below that the calculator only shows the makers' speed limits (BFGoodrich: below 1.5 bar, 20 km/h).
 - Research notes and the source assessment: `RESEARCH.md` (kept out of git).
 

@@ -240,6 +240,21 @@
     return { atmKpa: atm, perAxle, totalL, runMin, elapsedMin: runMin != null ? runMin / duty : null, duty };
   }
 
+  /*
+   * Gauge pressure after the air in the tyre changes temperature (rule
+   * calc-temperature): absolute pressure scales with absolute temperature.
+   */
+  function pressureAtTemp(gaugeKpa, fromC, toC, altitudeM) {
+    const atm = atmosphereKpa(altitudeM || 0);
+    return ((gaugeKpa + atm) * (toC + 273.15)) / (fromC + 273.15) - atm;
+  }
+
+  // Air temperature rise that explains a given gauge reading (e.g. the 20% warm rise).
+  function tempRiseFor(coldGaugeKpa, warmGaugeKpa, coldC, altitudeM) {
+    const atm = atmosphereKpa(altitudeM || 0);
+    return ((warmGaugeKpa + atm) / (coldGaugeKpa + atm)) * (coldC + 273.15) - 273.15 - coldC;
+  }
+
   // ---------------------------------------------------------------- formatting
 
   function fmtPressure(kpa, unit) {
@@ -282,6 +297,8 @@
     tyreVolume,
     torusLitres,
     reinflation,
+    pressureAtTemp,
+    tempRiseFor,
     fmtPressure,
     fmtAll,
     parsePressure,

@@ -8,7 +8,9 @@
  * bodies, the law and engineering research only. No forum, club, retailer or
  * blog figures. Where nothing citable exists, say so (see `gaps`).
  *
- * Rule categories: law | standard | tyre-maker | vehicle-maker | engineering | calculation
+ * Rule categories: law | standard | tyre-maker | vehicle-maker | engineering | calculation | field-practice
+ * field-practice is the one owner-approved exception to the source policy: clearly
+ * labelled experience, never used as a calculated figure or range bound.
  */
 (function (root) {
   "use strict";
@@ -70,6 +72,11 @@
     armyTm366: {
       label: "US Army TM 9-2320-366-10-1 (FMTV operator's manual), Figure 2-10: Central Tire Inflation System controls (public-domain manual, unofficial web copy)",
       url: "https://trucks5tonops.tpub.com/TM-9-2320-366-10-1/css/TM-9-2320-366-10-1_139.htm",
+      kind: "engineering",
+    },
+    armyTm280: {
+      label: "US Army TM 9-2320-280-10, HMMWV (Humvee) operator's manual: para 2-32 Operating in dusty, sandy areas, and Table 2-2 item 42 Tires (public-domain manual, unofficial web copy)",
+      url: "https://hummer-hmmwv.tpub.com/TM-9-2320-280-10/css/TM-9-2320-280-10_141.htm",
       kind: "engineering",
     },
     watkins1991: {
@@ -471,6 +478,22 @@
       notes: ["Figures for FMTV models other than the M1088/M1089, which use higher pressures. Shown only to illustrate the principle."],
     },
     {
+      id: "army-hmmwv-sand",
+      category: "engineering",
+      title: "A military 4x4 below 1.5 bar (Humvee manual)",
+      summary:
+        "The US Army's Humvee manual takes its 37x12.50R16.5 LT radial tyres well below 1.5 bar: 12 psi (0.83 bar) front and 16 psi (1.1 bar) rear in sand, and 12 psi front, 20 psi (1.38 bar) rear for mud, sand and snow, at 15 mph (24 km/h) at most. Loaded, the same vehicles run about 20–42 psi depending on model. It's a military vehicle on its own tyres and wheels, so the numbers aren't for your 4x4, but it shows a vehicle maker's manual going under 1 bar at low speed.",
+      quote:
+        "Reduce tire inflation to 12 psi (83 kPa) front and 16 psi (110 kPa) rear to increase traction when operating in sand. … MUD, SAND, AND SNOW … 12 [psi front] 20 [psi rear] (15 mph [48 kph] max. speed)",
+      sources: ["armyTm280"],
+      checked: CHECKED,
+      params: { sandFrontPsi: 12, sandRearPsi: 16, mssFrontPsi: 12, mssRearPsi: 20, maxMph: 15, maxKmh: 24 },
+      notes: [
+        "The manual prints \"15 mph [48 kph]\", but 15 mph is 24 km/h (48 km/h is 30 mph). This site uses the lower figure, 24 km/h.",
+        "The table's column layout is hard to read in the web copy; front and rear are as reconstructed from it. The 12/16 psi sand figures are stated in words in para 2-32.",
+      ],
+    },
+    {
       id: "watkins-gravel",
       category: "engineering",
       title: "Lower pressure, fewer corrugations (log trucks)",
@@ -481,6 +504,53 @@
       sources: ["watkins1991"],
       checked: CHECKED,
       notes: ["Log trucks, not 4x4s. It explains why corrugations form, not what pressure a 4x4 should run on them."],
+    },
+
+    {
+      id: "nhtsa-temperature",
+      category: "engineering",
+      title: "Colder air, lower pressure",
+      summary: "Check pressures cold, after the vehicle has stood for several hours. Every 10°F (about 5.5°C) drop in air temperature gives about 1 psi (0.07 bar) less in the tyre.",
+      quote:
+        "Pressures should be checked when the tires are cold, i.e., when the vehicle has not been driven for several hours, and using an accurate gauge. It should be noted that every 10°F drop in ambient temperature results in about one psi drop in tire inflation pressure.",
+      sources: ["nhtsaPneumaticTire"],
+      checked: CHECKED,
+    },
+    {
+      id: "toyo-cold",
+      category: "tyre-maker",
+      title: "What \"cold\" means",
+      summary:
+        "Cold pressure is taken with the tyres at the surrounding air temperature, without any build-up from driving: parked for at least three hours, or driven less than a mile (1.6 km). The morning, after standing overnight, is the easiest time.",
+      quote:
+        "According to TRA, the cold inflation pressure is \"taken with the tires at the prevailing atmospheric temperatures and do not include any inflation pressure build-up due to vehicle operation.\" In short, tires should be checked when they are cold; that is after the vehicle has been parked for at least three hours or driven less than one mile. It is easiest to check your inflation pressure in the morning, after the car has been parked overnight.",
+      sources: ["toyo2020", "fordRanger2025"],
+      checked: CHECKED,
+      notes: ["Ford's Ranger manual: \"Wait at least three hours after parking the vehicle before checking tire pressure.\" ETRTO is a little shorter: at least one hour, or no more than 2–3 km at low speed."],
+    },
+    {
+      id: "etrto-90c",
+      category: "standard",
+      title: "Above 90°C can damage a tyre",
+      summary: "ETRTO warns that exposing tyres to more than 90°C may cause permanent damage, for example heat from brakes or exhausts.",
+      quote: "The exposure of tyres to temperatures in excess of 90° C may cause permanent damage to the tyre and this is to be avoided. Such exposure may be caused by brakes, exhaust pipes, catalytic converters, etc.",
+      sources: ["etrtoRec2024"],
+      checked: CHECKED,
+      params: { damageC: 90 },
+      notes: ["This is in ETRTO's commercial-vehicle chapter. It's about outside heat sources, not a running-temperature limit."],
+    },
+
+    // ---- field practice: the one owner-approved exception to the source policy
+    {
+      id: "field-practice-sand",
+      category: "field-practice",
+      title: "Field practice: very soft sand",
+      summary:
+        "Experienced drivers, the site's owner among them, often run about 1 bar in soft sand, and go as low as 0.3–0.5 bar in very soft sand at walking pace. No tyre or vehicle maker publishes figures this low: it's experience, not a recommendation. The risks rise sharply down there: the bead coming off the rim, sidewall and rim damage, and heat if you speed up.",
+      sources: [],
+      checked: CHECKED,
+      params: { lowBar: 0.3, highBar: 0.5, typicalBar: 1.0 },
+      notes: ["Not from any tyre maker, vehicle maker, standard or engineering source. Shown at the owner's request, beside the published figures, never in place of them."],
     },
 
     // ---- the site's own calculations (physics, not a source's figures)
@@ -507,6 +577,16 @@
       checked: CHECKED,
       params: { calibration: 0.86 },
       notes: ["An estimate. It's calibrated on one tyre only."],
+    },
+    {
+      id: "calc-temperature",
+      category: "calculation",
+      title: "Pressure and temperature (gas law)",
+      summary:
+        "With the same air in the tyre, absolute pressure (gauge + atmosphere) rises in step with absolute temperature (°C + 273). A tyre set to 2.4 bar at 15°C reads about 2.5 bar at 25°C, and 20% higher after driving means the air inside has warmed by about 40°C.",
+      sources: ["nhtsaPneumaticTire"],
+      checked: CHECKED,
+      notes: ["Ignores the small change in the tyre's volume. Agrees with NHTSA's rule of thumb of about 1 psi per 10°F."],
     },
     {
       id: "calc-altitude",
@@ -554,16 +634,16 @@
       name: "Soft sand",
       image: "sand",
       lowerTo: "bfg-sand",
-      ruleIds: ["bfg-low-traction", "bfg-sand", "bfg-below-1-5", "bfg-au-20psi", "bfg-speed-load", "bfg-side-slopes"],
-      summary: "BFGoodrich: lower 0.5 bar at a time until the tyre floats, no lower than 1.5 bar, and no faster than 20 km/h at 1.5 bar.",
+      ruleIds: ["bfg-low-traction", "bfg-sand", "bfg-below-1-5", "bfg-au-20psi", "bfg-speed-load", "bfg-side-slopes", "army-hmmwv-sand", "field-practice-sand"],
+      summary: "BFGoodrich: lower 0.5 bar at a time until the tyre floats, down to 1.5 bar (the lowest a tyre maker publishes), and no faster than 20 km/h at 1.5 bar.",
     },
     {
       id: "mud",
       name: "Mud",
       image: "mud",
       lowerTo: "bfg-mud",
-      ruleIds: ["bfg-mud", "bfg-speed-load"],
-      summary: "BFGoodrich: no single best pressure; too low can cut traction. Not below 1.5 bar, not over 20 km/h.",
+      ruleIds: ["bfg-mud", "bfg-speed-load", "bfg-below-1-5", "army-hmmwv-sand"],
+      summary: "BFGoodrich: no single best pressure; too low can cut traction. Down to 1.5 bar (the lowest a tyre maker publishes), not over 20 km/h.",
     },
     {
       id: "rock",
@@ -578,8 +658,8 @@
       name: "Snow / ice",
       image: "snow",
       lowerTo: null,
-      ruleIds: ["bfg-same-as-road"],
-      summary: "No tyre or vehicle maker figure found for snow or ice.",
+      ruleIds: ["bfg-same-as-road", "army-hmmwv-sand"],
+      summary: "No civilian tyre or vehicle maker figure found for snow or ice. The only one is military: the US Army's Humvee manual uses about 0.8 bar front, 1.4 bar rear for mud, sand and snow at 24 km/h, on its own 37-inch tyres.",
     },
   ];
 
@@ -649,7 +729,7 @@
     { id: "gap-sans1550", title: "SANS 1550 not read", text: "SANS 1550 is a paid standard, so it hasn't been checked that its load tables match the ETRTO and TRA tables used here. Reg 238 refers to SANS 1550." },
     { id: "gap-below-tables", title: "No load data below the tables", text: "No standard or tyre maker found publishes what a tyre can carry below the lowest pressure in its table (2.4 bar for LT tyres, 1.5 bar for passenger tyres). This site shows no floor there, only the makers' speed limits." },
     { id: "gap-terrain", title: "No figures for gravel, corrugations, rock, snow", text: "No tyre maker, vehicle maker or engineering source found gives pressures for gravel, corrugations, rock or snow/ice. Only BFGoodrich gives figures, for sand and mud." },
-    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "Pressures around 0.8–1.2 bar for soft sand are widely repeated, but no tyre or vehicle maker publishing them was found. BFGoodrich says not below 1.5 bar on sand." },
+    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "No civilian tyre or vehicle maker publishes sand pressures below 1.5 bar. BFGoodrich's sand tips say not below 1.5 bar, though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
     { id: "gap-speed", title: "Speed limits between road pressure and 1.5 bar", text: "BFGoodrich says to slow down when you lower pressure but gives no figure above 1.5 bar." },
     { id: "gap-tubes", title: "Tubes at low pressure", text: "No tyre or vehicle maker guidance was found on running tube-type tyres at low pressure." },
     { id: "gap-beadlock-law", title: "Beadlocks on SA roads", text: "Whether beadlock wheels are allowed on SA public roads hasn't been checked." },

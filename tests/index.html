@@ -43,12 +43,12 @@
       });
       test("rule ids are unique", () => new Set(D.rules.map((r) => r.id)).size === D.rules.length);
       test("every rule has a category, title, summary and checked date", () => {
-        const cats = ["law", "standard", "tyre-maker", "vehicle-maker", "engineering", "calculation"];
+        const cats = ["law", "standard", "tyre-maker", "vehicle-maker", "engineering", "calculation", "field-practice"];
         const bad = D.rules.filter((r) => !cats.includes(r.category) || !r.title || !r.summary || !/^\d{4}-\d\d-\d\d$/.test(r.checked)).map((r) => r.id);
         return bad.length === 0 || bad;
       });
       test("every outside-sourced rule (not a calculation) cites a source", () => {
-        const bad = D.rules.filter((r) => r.category !== "calculation" && !r.sources.length).map((r) => r.id);
+        const bad = D.rules.filter((r) => r.category !== "calculation" && r.category !== "field-practice" && !r.sources.length).map((r) => r.id);
         return bad.length === 0 || bad;
       });
       test("every terrain's rules exist", () => {
@@ -182,6 +182,19 @@
         const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 50, dutyPercent: 50 });
         return near(r.elapsedMin, r.runMin * 2, 1e-9);
       });
+
+      test("field practice never sets a range bound (sand still stops at 1.5 bar)", () => {
+        const r = C.terrainRange("sand", 240);
+        return r.bottomKpa === 150 || r;
+      });
+      test("only the owner-approved field-practice rule exists", () => {
+        const fp = D.rules.filter((r) => r.category === "field-practice").map((r) => r.id);
+        return JSON.stringify(fp) === '["field-practice-sand"]' || fp;
+      });
+      test("temperature: 2.4 bar set at 15°C reads about 2.5 bar at 25°C (sea level)", () => near(C.pressureAtTemp(240, 15, 25, 0), 251.9, 0.5));
+      test("temperature: matches NHTSA's ~1 psi per 10°F at a 35 psi tyre", () => near(C.kpaToPsi(C.pressureAtTemp(C.psiToKpa(35), 20, 20 - 50 / 9, 0)), 34, 0.15));
+      test("temperature: a 20% warm rise on 2.4 bar is about 40°C hotter air", () => near(C.tempRiseFor(240, 288, 15, 0), 40.5, 0.5));
+      test("Humvee: 15 mph is used as 24 km/h, not the manual's 48", () => D.rules.find((r) => r.id === "army-hmmwv-sand").params.maxKmh === 24);
 
       // ---------------- formatting
       test("formats 240 kPa as 2.4 bar / 240 kPa / 35 psi", () => C.fmtPressure(240, "bar") === "2.4 bar" && C.fmtPressure(240, "kpa") === "240 kPa" && C.fmtPressure(240, "psi") === "35 psi");

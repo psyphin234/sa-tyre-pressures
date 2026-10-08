@@ -93,6 +93,31 @@
   }
 
   const fmt = (kpa) => C.fmtPressure(kpa, unit);
+  // A quoted figure without the site's 0.05 bar rounding (12 psi -> 0.83 bar, not 0.85).
+  const fmtExact = (kpa) => (unit === "kpa" ? Math.round(kpa) + " kPa" : unit === "psi" ? Math.round(C.kpaToPsi(kpa)) + " psi" : (kpa / 100).toFixed(2) + " bar");
+
+  /*
+   * What's known about going below 1.5 bar (sand and mud): BFGoodrich's speed
+   * rule, the Humvee manual, and, for sand only, the labelled field-practice note.
+   */
+  function goingLower(terrain) {
+    if (terrain !== "sand" && terrain !== "mud") return null;
+    const below = UI.ruleById("bfg-below-1-5").params;
+    const hm = UI.ruleById("army-hmmwv-sand").params;
+    const items = [
+      el("li", null, UI.categoryTag("tyre-maker"), ` BFGoodrich allows less than ${fmt(C.barToKpa(below.bar))} off-road only at ${below.maxKmh} km/h or slower, and only if the tyre still carries the load. (Its sand tips say not to go below it.)`),
+      el(
+        "li",
+        null,
+        UI.categoryTag("engineering"),
+        terrain === "sand"
+          ? ` The US Army's Humvee manual runs its 37-inch tyres at ${fmtExact(C.psiToKpa(hm.sandFrontPsi))} front and ${fmtExact(C.psiToKpa(hm.sandRearPsi))} rear in sand, at ${hm.maxKmh} km/h at most. Military tyres and wheels: not a figure for your 4x4.`
+          : ` The US Army's Humvee manual uses ${fmtExact(C.psiToKpa(hm.mssFrontPsi))} front and ${fmtExact(C.psiToKpa(hm.mssRearPsi))} rear for mud, sand and snow, at ${hm.maxKmh} km/h at most. Military tyres and wheels: not a figure for your 4x4.`
+      ),
+    ];
+    if (terrain === "sand") items.push(el("li", { class: "field-note" }, UI.categoryTag("field-practice"), " ", UI.ruleById("field-practice-sand").summary));
+    return el("div", { class: "going-lower" }, el("h4", null, "Going lower than " + fmt(C.barToKpa(below.bar))), el("ul", null, items));
+  }
   const fmtAll = (kpa) => C.fmtAll(kpa, unit);
 
   // ------------------------------------------------------------ state
@@ -280,6 +305,7 @@
       el("p", { class: "lede-small" }, t.summary),
       el("ul", { class: "range-list" }, rows),
       extra,
+      goingLower(t.id),
       UI.sourcesLink(t.ruleIds)
     );
   }
@@ -350,7 +376,7 @@
     const items = [
       ["Reinflate before the road", "Back to road pressure before the tar. On any public road, gravel included, the law also needs at least the pressure your load needs.", ["bfg-reinflate", "ford-off-road", "etrto-off-road", "law-reg238", "law-public-road"]],
       ["Heat", "Low pressure plus load plus speed makes heat, a tyre's greatest enemy. Slow down when you air down.", ["bfg-air-carries-load", "bfg-speed-load", "nhtsa-deflection-heat"]],
-      ["Warm tyres", "Never let air out of warm tyres to reach a cold figure; check again when cold.", ["etrto-hot-pressure"]],
+      ["Temperature", "Set pressures cold (morning, or parked at least an hour). Warm tyres read 20% or more higher: never let air out to reach a cold figure, and recheck once cool after airing down or pumping up warm tyres. Keep tyres away from anything over 90°C.", ["etrto-hot-pressure", "toyo-cold", "nhtsa-temperature", "calc-temperature", "etrto-90c"]],
       ["After the trail", "Check every tyre for cuts, exposed cords and bulges before the road; those make a tyre illegal on public roads.", ["ford-off-road", "law-reg212"]],
       ["No compressor", "Don't air down far. BFGoodrich: without a compressor drive very slowly and only short distances.", ["bfg-sand"]],
     ];
@@ -456,14 +482,18 @@
     let headline;
     const notes = [];
     if (lowers) {
+      const lowest = fmt(axles[0].r.bottomKpa);
       if (t.id === "sand") {
-        headline = "Lower step by step, no lower than " + fmt(axles[0].r.bottomKpa);
-        notes.push(el("p", null, `Let air out ${fmt(C.barToKpa(UI.ruleById("bfg-sand").params.stepBar))} at a time until the tyres float on the sand, and stop at ${fmt(axles[0].r.bottomKpa)}. At that pressure drive ${below.maxKmh} km/h or slower.`));
+        headline = "Lower step by step, down to " + lowest;
+        notes.push(el("p", { class: "answer-sub" }, lowest + " is the lowest pressure a tyre maker publishes."));
+        notes.push(el("p", null, `Let air out ${fmt(C.barToKpa(UI.ruleById("bfg-sand").params.stepBar))} at a time until the tyres float on the sand. At ${lowest}, drive ${below.maxKmh} km/h or slower.`));
       } else {
-        headline = "Lower if you need to, no lower than " + fmt(axles[0].r.bottomKpa);
-        notes.push(el("p", null, `There's no single best pressure here: too low can cut traction as well as too high. Don't go below ${fmt(axles[0].r.bottomKpa)}, and drive ${below.maxKmh} km/h or slower.`));
+        headline = "Lower if you need to, down to " + lowest;
+        notes.push(el("p", { class: "answer-sub" }, lowest + " is the lowest pressure a tyre maker publishes."));
+        notes.push(el("p", null, `There's no single best pressure here: too low can cut traction as well as too high. At ${lowest}, drive ${below.maxKmh} km/h or slower.`));
       }
       notes.push(el("p", { class: "note note--warn" }, "Only if the tyres can still carry the load. Heavy load, LT tyres or towing: check in Advanced first."));
+      notes.push(goingLower(t.id));
     } else if (t.id === "tar") {
       headline = "Road pressure";
       notes.push(el("p", null, "Use the vehicle maker's placard pressure on the tar."));
@@ -474,10 +504,10 @@
     const before = [
       ["Reinflate before the tar", "back to road pressure before you drive on tar."],
       ["Carry a gauge and a compressor", "check pressures cold, and pump back up before the road."],
-      ["Warm tyres read higher", "never let air out of warm tyres to reach a cold figure."],
+      ["Set pressures cold", "first thing in the morning, or after at least an hour parked. Warm tyres read 20% or more higher, so never let air out to reach a cold figure. Air down warm tyres and they'll drop a little more as they cool."],
     ];
     if (lowers) before.splice(1, 0, ["Side slopes", "go back to road pressure before crossing a steep slope, or a tyre can come off the rim."]);
-    const ids = t.ruleIds.concat(["bfg-reinflate", "ford-off-road", "etrto-hot-pressure"]);
+    const ids = t.ruleIds.concat(["bfg-reinflate", "ford-off-road", "etrto-hot-pressure", "toyo-cold", "nhtsa-temperature", "calc-temperature"]);
     return [
       card(
         t.name,
@@ -542,6 +572,32 @@
     });
     const rise = UI.ruleById("etrto-hot-pressure").params.warmRiseFraction;
     document.querySelectorAll('[data-diagram="hotcold"]').forEach((d) => d.replaceChildren(G.hotCold(road, rise, fmt)));
+    const alt = readState().altitude;
+    const setC = 20;
+    const temps = [0, 10, 20, 30, 40];
+    const warmRise = C.tempRiseFor(road, road * (1 + rise), setC, alt);
+    document.querySelectorAll('[data-diagram="temptable"]').forEach((d) =>
+      d.replaceChildren(
+        el(
+          "table",
+          { class: "temp-table" },
+          el("caption", null, `A tyre set to ${fmt(road)} with the air at ${setC}°C reads:`),
+          el("thead", null, el("tr", null, el("th", { scope: "col" }, "Air temperature"), temps.map((t) => el("th", { scope: "col" }, t + "°C")), el("th", { scope: "col" }, "After driving"))),
+          el(
+            "tbody",
+            null,
+            el(
+              "tr",
+              null,
+              el("th", { scope: "row" }, "Gauge reads"),
+              temps.map((t) => el("td", { class: t === setC ? "set" : null }, fmt(C.pressureAtTemp(road, setC, t, alt)))),
+              el("td", null, "about " + fmt(road * (1 + rise)))
+            )
+          )
+        ),
+        el("p", { class: "diagram-caption" }, `"After driving" is ETRTO's normal 20% rise: the air inside about ${Math.round(warmRise)}°C warmer than it was. Same air in the tyre throughout.`)
+      )
+    );
   }
 
   function renderStatic() {
