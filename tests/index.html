@@ -135,6 +135,10 @@
         const r = C.roadPressure(200, { kpa: 260, status: "ok" });
         return (r.kpa === 260 && r.raisedForLoad) || r;
       });
+      test("road pressure isn't raised just because the table starts above the placard", () => {
+        const r = C.roadPressure(240, { kpa: 241.3, status: "belowTable" });
+        return (r.kpa === 240 && !r.raisedForLoad) || r;
+      });
       const curveSl = C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 });
       const need600 = C.requiredPressure(curveSl, 600); // below table
       const need900 = C.requiredPressure(curveSl, 900); // ~1.94 bar
@@ -180,6 +184,22 @@
         return (Math.round(lt.bottomKpa) === 152 && pc.sourced === false && pc.bottomKpa === 260) || [lt, pc];
       });
       test("snow: no figure for either tyre class", () => C.terrainRange("snow", 240, "lt").sourced === false && C.terrainRange("snow", 240, "passenger").sourced === false);
+      test("load floor: gravel range raised to what the load needs (public roads)", () => {
+        const r = C.applyLoadFloor(C.terrainRange("gravel", 240, "passenger"), 210);
+        return (r.raised && r.bottomKpa === 210 && r.topKpa === 240) || r;
+      });
+      test("load floor above the whole range lifts top and bottom", () => {
+        const r = C.applyLoadFloor(C.terrainRange("gravel", 220, "lt"), 260);
+        return (r.raised && r.bottomKpa === 260 && r.topKpa === 260) || r;
+      });
+      test("load floor in sand is flagged, not raised (off-road)", () => {
+        const r = C.applyLoadFloor(C.terrainRange("sand", 240, "passenger"), 200);
+        return (!r.raised && r.belowFloor && r.bottomKpa === 150) || r;
+      });
+      test("no load floor leaves the range alone", () => {
+        const r = C.applyLoadFloor(C.terrainRange("gravel", 240, "passenger"), null);
+        return (!r.raised && !r.belowFloor && Math.round(r.bottomKpa) === 192) || r;
+      });
       test("tyre class: ETRTO passenger tyres vs LT, flotation and 7.50R16", () => C.tyreClass({ table: "etrto-sl" }) === "passenger" && C.tyreClass({ table: "etrto-xl" }) === "passenger" && C.tyreClass({ table: "tra-lt" }) === "lt" && C.tyreClass({ table: "tra-flotation" }) === "lt" && C.tyreClass({ table: "michelin-750r16" }) === "lt");
       test("towing on tar, ETRTO SL: +20 to +50 kPa, capped at 320 kPa", () => {
         const h = C.hardDriving({ table: "etrto-sl" }, 290);

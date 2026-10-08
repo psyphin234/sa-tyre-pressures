@@ -115,6 +115,24 @@
             <label><input type="radio" name="tyreClass" value="unsure" checked> Not sure</label>
           </div>
           <p class="hint">LT tyres have "LT" before the size (LT265/75R16) or two load numbers, like 121/118. Not sure? You get the passenger-type answer, the more careful one.</p>
+          <div class="field">
+            <label for="simpleSize">Size <small class="muted">(optional, for the weight check)</small></label>
+            <select id="simpleSize" name="simpleSize"></select>
+          </div>
+          <div class="field" id="simple-li-field" hidden>
+            <label for="simpleLi">Load index</label>
+            <select id="simpleLi" name="simpleLi"></select>
+            <p class="hint">The number after the size, e.g. <b>112</b> in 265/65R17 112T.</p>
+          </div>
+        </fieldset>
+
+        <fieldset data-modes="simple">
+          <legend>Loaded weight <small>(optional)</small></legend>
+          <div class="field">
+            <label for="simpleKg">The vehicle as you'll drive it</label>
+            <div class="with-unit"><input id="simpleKg" name="simpleKg" type="number" inputmode="numeric" min="0" step="50" placeholder="e.g. 2800"><span>kg</span></div>
+            <p class="hint">With people, fuel, water and gear. A weighbridge is best; the GVM on your licence disc is the most it may weigh. Needs the tyre size above.</p>
+          </div>
         </fieldset>
 
         <fieldset>

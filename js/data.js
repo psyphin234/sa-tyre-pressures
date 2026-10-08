@@ -443,6 +443,7 @@
       notes: [
         "Ranges from the current web page. Cooper's March 2022 PDF guide is a little lower for gravel and rocks: fast gravel 28–32, slow/rough gravel 24–28, rocks 20–26 psi.",
         "The calculator never shows the top of a Cooper range above your road pressure.",
+        "Cooper's guide also says: \"Narrow commercial-style tyres require higher pressures.\" (2022 PDF, p. 8)",
       ],
     },
     {

@@ -40,9 +40,10 @@ tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every f
 
 ## Modes
 
-- **Simple** (default, no hash): road pressure from the placard plus the terrain, one answer card (`simpleResults()` in app.js), a short "Before you go" list and one sources link. Meant for someone who just wants a pressure for the terrain. It points heavy, LT or towing users to Advanced.
+- **Simple** (default, no hash): LT / passenger / not sure, an optional tyre size (load index defaults per size) and optional total loaded weight (shared evenly over 4 tyres, never axle weights: the owner says nobody knows them), road pressure from the placard, and the terrain; one answer card (`simpleResults()` in app.js), a short "Before you go" list and one sources link. Meant for someone who just wants a pressure for the terrain. It points heavy, LT or towing users to Advanced.
 - **Advanced** (`#advanced`; `#example` loads the made-up example in Advanced): tyre and load tables, plan check with ladders, safety, pumping, gaps, and the explainers with diagrams.
 - Elements carry `data-modes="advanced"` to show only in Advanced; `setMode()` hides the rest. Inputs are shared, so values carry across modes.
+- **Terrain answers by tyre class:** LT tyres get Cooper's ranges, passenger-type tyres Toyo's 20% rule (gravel, corrugations) or BFGoodrich's 1.5 bar (sand, mud); rock on passenger tyres and snow have no figure. `applyLoadFloor()` raises the bottom of tar/gravel/corrugation ranges to what the load needs (reg 238) and flags it elsewhere.
 - **Sources stay on the sources page.** Cards don't quote sources or list rule summaries; each ends with one "Where these numbers come from" link (`UI.sourcesLink(ids)`) to `sources.html?show=id,id`, which lists just those rules at the top (without anchors, so ids stay unique), with "Back to the calculator" going back in history.
 
 ## Rules for changes

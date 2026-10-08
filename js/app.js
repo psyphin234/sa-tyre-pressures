@@ -127,7 +127,8 @@
    * The words for a terrain answer, shared by Simple and Advanced. ranges are
    * the per-axle results of C.terrainRange; the numbers all come from them.
    */
-  function terrainAdvice(t, cls, ranges) {
+  function terrainAdvice(t, cls, ranges, opts) {
+    const loadKnown = opts && opts.loadKnown;
     const r = ranges.find(Boolean);
     const lines = [];
     if (!r) return { headline: t.name, lines };
@@ -159,6 +160,9 @@
       headline = lowers ? "Lower if you need to, down to " + b : "Keep road pressure";
       lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} is the lowest a tyre maker publishes for passenger-type tyres.`));
       lines.push(el("p", null, "There's no single best pressure: thick mud on a soft base needs lower, watery mud on a firm base can stay higher, and too low can cut traction. Keep it slow."));
+    } else if (!lowers) {
+      headline = "Keep " + tp;
+      lines.push(el("p", null, "That's what your load needs, so there's no room to go lower here."));
     } else if (t.id === "rock") {
       headline = `Very slow, low range: ${b}–${tp}`;
       lines.push(el("p", { class: "answer-sub" }, "Cooper's range for LT tyres on rock."));
@@ -172,7 +176,7 @@
       lines.push(el("p", { class: "answer-sub" }, `Cooper's range for LT tyres on ${t.name.toLowerCase()}. Heavier loads and faster driving: the higher end.`));
       lines.push(el("p", null, (t.id === "corrugations" ? "Slow down on corrugations: they build heat in tyres quickly. " : "Too low costs steering and stability at speed. ") + `${dirtMax} km/h at most on dirt.`));
     }
-    if (lowers) lines.push(el("p", { class: "note note--warn" }, "Only if the tyres can still carry the load. Heavy load or towing: check in Advanced first."));
+    if (lowers && !loadKnown) lines.push(el("p", { class: "note note--warn" }, "Only if the tyres can still carry the load. Add your tyre size and weight above, or use Advanced, to check."));
     lines.push(goingLower(t.id, cls));
     return { headline, lines, lowers };
   }
@@ -199,6 +203,9 @@
       speed: num("speed"),
       tube: f.tube.value,
       tyreClass: f.tyreClass ? f.tyreClass.value : "unsure",
+      simpleSize: f.simpleSize.value,
+      simpleLi: parseInt(f.simpleLi.value, 10),
+      simpleKg: num("simpleKg"),
       beadlock: f.beadlock.checked,
       towing: f.towing.checked,
       flowLpm: num("flow") != null ? num("flow") * (f.flowUnit.value === "cfm" ? CFM_TO_LPM : 1) : null,
@@ -246,7 +253,7 @@
   function applyValues(v) {
     const f = form.elements;
     Object.entries(v).forEach(([name, value]) => {
-      if (["size", "type", "li", "range", "unit", "terrain"].includes(name)) return;
+      if (["size", "type", "li", "range", "unit", "terrain", "simpleSize", "simpleLi"].includes(name)) return;
       const input = f[name];
       if (!input) return;
       if (input instanceof RadioNodeList) {
@@ -270,7 +277,7 @@
       const wheelKg = a.kg != null ? a.kg / 2 : null;
       const need = curve ? C.requiredPressure(curve, wheelKg) : null;
       const road = C.roadPressure(a.placard, need && need.status !== "overload" ? need : null);
-      const range = road.kpa != null ? C.terrainRange(terrainId, road.kpa, cls) : null;
+      const range = road.kpa != null ? C.applyLoadFloor(C.terrainRange(terrainId, road.kpa, cls), need && need.status === "ok" ? need.kpa : null) : null;
       const assess = a.plan != null && need && need.status !== "noLoad" ? C.assessPressure(a.plan, need, road.kpa, terrainId, cls) : null;
       return { ...a, wheelKg, need, road, range, assess };
     });
@@ -358,7 +365,9 @@
         );
       else extra.push(el("p", { class: "note" }, `ETRTO's towing advice (${fmt(hdRule.addMinKpa)}–${fmt(hdRule.addMaxKpa)} extra) is for passenger-type tyres; nothing equivalent was found for LT tyres. Check your vehicle handbook.`));
     }
-    const advice = terrainAdvice(t, m.cls, m.axles.map((x) => x.range));
+    const advice = terrainAdvice(t, m.cls, m.axles.map((x) => x.range), { loadKnown: m.axles.some((a) => a.need && a.need.status !== "noLoad") });
+    if (m.axles.some((a) => a.range && a.range.raised))
+      extra.push(el("p", { class: "note note--warn" }, "The bottom of the range is raised to what your load needs: the law doesn't allow less on public roads, gravel included."));
     return card(
       "Terrain: " + t.name,
       "card--terrain",
@@ -509,6 +518,31 @@
   // ------------------------------------------------------------ simple mode
 
   /*
+   * Simple's optional tyre: a size plus the LT / passenger answer picks the
+   * table. A size that only comes as LT is LT whatever was ticked.
+   */
+  function simpleTyre(st) {
+    const size = st.simpleSize ? C.findSize(st.simpleSize) : null;
+    if (!size) return null;
+    const wantLt = st.tyreClass === "lt";
+    const type =
+      size.types.find((t) => (wantLt ? t.table !== "etrto-sl" && t.table !== "etrto-xl" : t.table === "etrto-sl")) || size.types[0];
+    const li = type.loadIndices && type.loadIndices.includes(st.simpleLi) ? st.simpleLi : type.defaultLi;
+    const ranges = C.loadRanges(type);
+    const curve = C.loadCurve({ sizeId: size.id, typeId: type.id, li, range: ranges.length ? ranges[ranges.length - 1].range : null });
+    return { size, type, li, curve, cls: C.tyreClass(type) };
+  }
+
+  function simpleTyreChanged() {
+    const st = readState();
+    const size = st.simpleSize ? C.findSize(st.simpleSize) : null;
+    const tyre = size ? simpleTyre(st) : null;
+    const etrto = tyre && (tyre.type.table === "etrto-sl" || tyre.type.table === "etrto-xl");
+    $("simple-li-field").hidden = !etrto;
+    if (etrto) fillSelect($("simpleLi"), tyre.type.loadIndices.map((li) => ({ value: li, label: li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max)" })), tyre.li);
+  }
+
+  /*
    * Simple: road pressure from the placard and the terrain, nothing else. If
    * only one axle's placard figure is entered, it's used for both.
    */
@@ -525,12 +559,20 @@
         toAdvanced,
       ];
     }
-    const cls = st.tyreClass === "lt" ? "lt" : "passenger";
+    const tyre = simpleTyre(st);
+    const cls = tyre ? tyre.cls : st.tyreClass === "lt" ? "lt" : "passenger";
+    // Load check: one total weight shared evenly over four tyres.
+    const perTyreKg = tyre && st.simpleKg > 0 ? st.simpleKg / 4 : null;
+    const need = perTyreKg ? C.requiredPressure(tyre.curve, perTyreKg) : null;
+    const floor = need && need.status === "ok" ? need.kpa : null;
     const axles = [
-      { name: "Front", r: C.terrainRange(terrainId, front, cls) },
-      { name: "Rear", r: C.terrainRange(terrainId, rear, cls) },
-    ];
-    const advice = terrainAdvice(t, cls, axles.map((a) => a.r));
+      { name: "Front", placard: front },
+      { name: "Rear", placard: rear },
+    ].map((a) => {
+      const road = C.roadPressure(a.placard, need && need.status !== "overload" ? need : null);
+      return { ...a, road, r: C.applyLoadFloor(C.terrainRange(terrainId, road.kpa, cls), floor) };
+    });
+    const advice = terrainAdvice(t, cls, axles.map((a) => a.r), { loadKnown: !!need });
     const lowers = advice.lowers;
     const answer = el(
       "div",
@@ -547,6 +589,23 @@
     );
     const headline = advice.headline;
     const notes = advice.lines;
+    const loadLines = [];
+    if (tyre && tyre.type.table === "michelin-750r16" && axles.some((a) => a.r.kind === "cooper"))
+      loadLines.push(el("p", { class: "note" }, "Cooper says narrow commercial-style tyres like this one need higher pressures than its ranges, which are for average LT sizes."));
+    if (tyre && tyre.cls === "lt" && st.tyreClass !== "lt") loadLines.push(el("p", { class: "muted" }, `${tyre.size.label} comes as an LT tyre, so this is the LT answer.`));
+    if (need) {
+      const kg = Math.round(perTyreKg);
+      if (need.status === "overload") loadLines.push(el("p", { class: "note note--fail" }, `About ${kg} kg per tyre is more than these tyres can carry at any pressure (${Math.round(need.maxKg)} kg). You need tyres with a higher load rating, or less weight.`));
+      else if (need.status === "belowTable") loadLines.push(el("p", { class: "note" }, `About ${kg} kg per tyre: these tyres carry that even at the lowest pressure in their load table (${fmt(need.tableMinKpa)}).`));
+      else loadLines.push(el("p", { class: "note" }, `About ${kg} kg per tyre: these tyres need at least ${fmt(need.kpa)} to carry it, according to their load table.`));
+      if (axles.some((a) => a.road.raisedForLoad)) loadLines.push(el("p", { class: "note note--warn" }, "Your placard pressure is lower than this weight needs, so road pressure here is raised to match."));
+      if (axles.some((a) => a.r.raised)) loadLines.push(el("p", { class: "note note--warn" }, `The bottom of the range is raised to ${fmt(floor)}, what your weight needs: the law doesn't allow less on public roads, gravel included.`));
+      if (axles.some((a) => a.r.belowFloor)) loadLines.push(el("p", { class: "note note--warn" }, `Below ${fmt(floor)} your tyres are carrying more than their load table allows. The makers allow that off-road only if the tyre still carries the load, and slowly; keep off public roads until you've pumped up.`));
+      loadLines.push(el("p", { class: "muted small" }, "This assumes the weight is shared evenly by all four tyres. A loaded bakkie's rear tyres carry more, so leave some margin, or use Advanced with weighbridge axle weights."));
+    }
+    // Weight notes go right after the "lowest published" line under the headline.
+    const subAt = notes.findIndex((n) => n && n.classList && n.classList.contains("answer-sub"));
+    notes.splice(subAt + 1, 0, ...loadLines);
     const before = [
       ["Reinflate before the tar", "back to road pressure before you drive on tar."],
       ["Carry a gauge and a compressor", "check pressures cold, and pump back up before the road."],
@@ -683,6 +742,7 @@
 
   function init() {
     fillSelect($("size"), D.tyreSizes.map((s) => ({ value: s.id, label: s.label })));
+    fillSelect($("simpleSize"), [{ value: "", label: "Not sure / skip" }].concat(D.tyreSizes.map((s) => ({ value: s.id, label: s.label }))));
     let saved = restore();
     if (location.hash === "#advanced" || location.hash === "#example") mode = "advanced";
     if (location.hash === "#example") {
@@ -697,6 +757,9 @@
     if (saved && saved.size) $("size").value = saved.size;
     sizeChanged(saved);
     if (saved) applyValues(saved);
+    if (saved && saved.simpleSize) $("simpleSize").value = saved.simpleSize;
+    simpleTyreChanged();
+    if (saved && saved.simpleLi) $("simpleLi").value = saved.simpleLi;
     setUnit(unit);
     buildTerrains();
     renderStatic();
@@ -718,6 +781,7 @@
     });
     form.addEventListener("input", (e) => {
       if (e.target.name === "unit") return;
+      if (e.target.name === "simpleSize" || e.target.name === "tyreClass") simpleTyreChanged();
       update();
     });
     form.addEventListener("change", (e) => {

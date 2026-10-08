@@ -1177,6 +1177,10 @@ input[type="checkbox"] {
   margin: 10px 0 0 !important;
 }
 
+.small {
+  font-size: 0.82rem;
+}
+
 .to-advanced {
   font-size: 0.92rem;
   color: var(--text-muted);

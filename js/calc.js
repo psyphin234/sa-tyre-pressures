@@ -114,7 +114,9 @@
    * the load; ETRTO: inflate to the load carried).
    */
   function roadPressure(placardKpa, need) {
-    const floor = need && need.kpa != null ? need.kpa : null;
+    // Only a real requirement raises it: "belowTable" just means the load is
+    // carried at the lowest published pressure, which says nothing about need.
+    const floor = need && need.status === "ok" && need.kpa != null ? need.kpa : null;
     if (placardKpa > 0 && floor != null) return { kpa: Math.max(placardKpa, floor), raisedForLoad: floor > placardKpa + 0.5 };
     if (placardKpa > 0) return { kpa: placardKpa, raisedForLoad: false };
     return { kpa: floor, raisedForLoad: false };
@@ -211,6 +213,27 @@
     if (spec.kind === "cooper") return { kpa: psiToKpa(rule("cooper-lt-terrain").params.psi[spec.key][0]), ruleId: "cooper-lt-terrain" };
     if (spec.kind === "bfg") return { kpa: barToKpa(rule(spec.rule).params.minBar), ruleId: spec.rule };
     return null;
+  }
+
+  /*
+   * Hold a terrain range to the pressure the load needs (from the tables).
+   * On terrain that's usually a public road (tar, gravel, corrugations: reg 238
+   * applies) the range is raised so it never goes below that; elsewhere it's
+   * left alone and flagged, because the makers allow going lower off-road only
+   * if the tyre still carries the load and you slow down.
+   * Returns the range with { floorKpa, raised, belowFloor }.
+   */
+  const PUBLIC_ROAD_TERRAINS = ["tar", "gravel", "corrugations"];
+  function applyLoadFloor(range, floorKpa) {
+    if (!range) return range;
+    const base = { ...range, floorKpa: floorKpa == null ? null : floorKpa, raised: false, belowFloor: false };
+    if (floorKpa == null || floorKpa <= range.bottomKpa + 0.5) return base;
+    if (PUBLIC_ROAD_TERRAINS.indexOf(range.terrain.id) === -1) return { ...base, belowFloor: true };
+    const top = Math.max(range.topKpa, floorKpa);
+    const steps = range.steps.filter((p) => p > floorKpa + 0.5);
+    steps.push(floorKpa);
+    if (steps[0] < top - 0.5) steps.unshift(top);
+    return { ...base, topKpa: top, bottomKpa: floorKpa, steps, raised: true };
   }
 
   // ETRTO hard-driving extra (towing, sustained high speed): passenger-type tyres only.
@@ -331,6 +354,7 @@
     tyreClass,
     terrainRange,
     lowestPublished,
+    applyLoadFloor,
     hardDriving,
     atmosphereKpa,
     tyreVolume,
