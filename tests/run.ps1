@@ -20,7 +20,7 @@ $listed = [regex]::Matches($sw, '"([^"]+\.(?:html|css|js|woff2|png|ico|jpg|webp|
 $refs = @()
 foreach ($f in @("index.html", "sources.html")) {
   $html = Get-Content "$root\$f" -Raw
-  $refs += [regex]::Matches($html, '(?:src|href)="([^":#?]+\.(?:css|js|woff2|png|ico|jpg|webmanifest))"') | ForEach-Object { $_.Groups[1].Value }
+  $refs += [regex]::Matches($html, '(?:src|href)="(?!//)([^":#?]+\.(?:css|js|woff2|png|ico|jpg|webmanifest))"') | ForEach-Object { $_.Groups[1].Value }
 }
 $refs += [regex]::Matches((Get-Content "$root\css\style.css" -Raw), 'url\("\.\./([^"]+)"\)') | ForEach-Object { $_.Groups[1].Value }
 $refs += [regex]::Matches((Get-Content "$root\js\images.js" -Raw), '"(img/[^"]+)"') | ForEach-Object { $_.Groups[1].Value }

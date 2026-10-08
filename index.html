@@ -44,7 +44,7 @@
   <main id="main" class="wrap">
     <section class="intro">
       <p class="disclaimer-link"><a href="#disclaimer">Disclaimer</a></p>
-      <p class="offline-line"><strong>Works offline</strong> once you've opened it with signal. Nothing you enter leaves your phone.<span class="install" id="install" hidden> <button type="button" class="small-button install-button" id="install-button">Add to home screen</button><span class="install-help" id="install-help" hidden></span></span></p>
+      <p class="offline-line"><strong>Works offline</strong> once you've opened it with signal. Nothing you enter leaves your phone; page visits are counted anonymously, without cookies.<span class="install" id="install" hidden> <button type="button" class="small-button install-button" id="install-button">Add to home screen</button><span class="install-help" id="install-help" hidden></span></span></p>
       <ul class="honesty" data-modes="advanced">
         <li><strong>Only tyre makers, vehicle makers, standards, the law and engineering research.</strong> No forum or club figures. Where nobody citable publishes a number, this page says so instead of guessing.</li>
         <li><strong>The load sets the floor.</strong> Advanced reads your tyre's load table to find the least pressure your load needs, and checks what you plan to run against it.</li>
@@ -280,5 +280,9 @@
       navigator.serviceWorker.register("sw.js").catch(function () {});
     }
   </script>
+  <!-- GoatCounter: cookie-free page-visit stats at https://psyphin.goatcounter.com/ (never sees form inputs) -->
+  <!-- Shared with psyphin.co.za: prefix paths with the host so this site's pages are counted separately -->
+  <script>window.goatcounter = { path: function (p) { return location.host + p; } };</script>
+  <script data-goatcounter="https://psyphin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

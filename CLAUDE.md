@@ -2,7 +2,9 @@
 
 Static calculator that gives a starting tyre-pressure **range** for a 4x4 by tyre, axle load and terrain, part of the PsyPhin site. Repo `psyphin234/sa-tyre-pressures` (public), GitHub Pages from `main` / root, live at **https://tyres.psyphin.co.za/** since 2026-10-08 (the `CNAME` file here, committed by GitHub, plus the Afrihost `tyres` CNAME → `psyphin234.github.io`; see the psyphin.co.za CLAUDE.md). The first test address `psyphin.co.za/sa-tyre-pressures/` still served the page (no redirect yet) on 2026-10-08; GitHub normally starts redirecting it to the custom domain. Push to `main` to deploy; check with `gh api repos/psyphin234/sa-tyre-pressures/pages/builds/latest`.
 
-**Status: UNDER CONSTRUCTION.** Every page carries the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise. No GoatCounter yet (add it like the towing site when it launches).
+**Status: UNDER CONSTRUCTION.** Every page carries the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.
+
+GoatCounter (since 2026-10-08): cookie-free visit counts on index.html and sources.html, just before `</body>`, with the same `window.goatcounter.path` host prefix as the towing site, so visits show as `tyres.psyphin.co.za/…` on the shared dashboard https://psyphin.goatcounter.com/. It never sees inputs; the offline line says visits are counted. Offline visits aren't counted (the service worker only handles this site's own files). Don't add it to tests/.
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Everything runs in the browser; inputs are only kept in the visitor's own `localStorage`.
 
