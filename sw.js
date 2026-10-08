@@ -5,7 +5,7 @@
  * tests/run.ps1 checks that every local file referenced by the pages is in
  * FILES.
  */
-const VERSION = "tyres-2026-10-08-2";
+const VERSION = "tyres-2026-10-08-3";
 const FILES = [
   "./",
   "index.html",
@@ -28,6 +28,9 @@ const FILES = [
   "favicon-96x96.png",
   "favicon-192x192.png",
   "apple-touch-icon.png",
+  "icon-192.png",
+  "icon-512.png",
+  "icon-maskable-512.png",
   "img/hero.jpg",
   "img/tar.jpg", "img/tar-thumb.jpg",
   "img/gravel.jpg", "img/gravel-thumb.jpg",

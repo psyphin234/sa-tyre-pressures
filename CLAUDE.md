@@ -28,7 +28,7 @@ js/app.js         Wires the form to calc.js and renders the cards; #example load
 js/sources.js     Builds sources.html from data.js
 css/style.css     All styles; colours at the top (match psyphin.co.za / towing). Dark only, like the other tools
 sw.js             Service worker: caches every file on first visit (offline-first). Bump VERSION on every change
-manifest.webmanifest  Installable app
+manifest.webmanifest  Installable app; icons icon-192/512 and icon-maskable-512 (plus apple-touch-icon) are made by scripts/make_icons.py from psyphin.co.za's psyphin-logo-black.jpg
 fonts/            Inter + Rajdhani woff2 (self-hosted for offline; OFL licences alongside)
 img/              Photos (Wikimedia Commons, credited) and terrain thumbnails
 scripts/          Python tools that extracted the tables from the Toyo PDF and prepared the photos
