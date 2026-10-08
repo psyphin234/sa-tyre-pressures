@@ -16,7 +16,7 @@ $summary
 
 # Offline cache check: every local file referenced must be in sw.js FILES.
 $sw = Get-Content "$root\sw.js" -Raw
-$listed = [regex]::Matches($sw, '"([^"]+\.(?:html|css|js|woff2|png|ico|jpg|webmanifest))"') | ForEach-Object { $_.Groups[1].Value }
+$listed = [regex]::Matches($sw, '"([^"]+\.(?:html|css|js|woff2|png|ico|jpg|webp|webmanifest))"') | ForEach-Object { $_.Groups[1].Value }
 $refs = @()
 foreach ($f in @("index.html", "sources.html")) {
   $html = Get-Content "$root\$f" -Raw

@@ -88,16 +88,16 @@ window.TYRE_IMAGES = [
     "file": "img/mud.jpg",
     "thumb": "img/mud-thumb.jpg",
     "w": 1000,
-    "h": 666,
-    "alt": "A muddy, rutted 4x4 track beside long grass",
-    "caption": "Mud track at a 4x4 venue.",
-    "author": "AliV",
+    "h": 541,
+    "alt": "A white Toyota Hilux with mud-caked tyres climbing a muddy red-earth track",
+    "caption": "Hilux in the mud.",
+    "author": "PsyPhin",
     "authorUrl": null,
-    "own": false,
-    "license": "CC BY-SA 3.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Mud_Track_at_Venture_4x4_near_Three_Holes_-_panoramio.jpg",
-    "title": "Mud Track at Venture 4x4 near Three Holes - panoramio.jpg"
+    "own": true,
+    "license": "Own photo",
+    "licenseUrl": null,
+    "page": null,
+    "title": null
   },
   {
     "key": "rock",
@@ -226,5 +226,22 @@ window.TYRE_IMAGES = [
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
     "page": "https://commons.wikimedia.org/wiki/File:Deflated_car_tire.jpg",
     "title": "Deflated car tire.jpg"
+  },
+  {
+    "key": "deflate-anim",
+    "file": "img/deflate.webp",
+    "still": "img/deflate-still.jpg",
+    "thumb": null,
+    "w": 720,
+    "h": 318,
+    "alt": "Animation of a tyre on sand, side and front view, letting air out from 2.5 to 1.0 bar: the tyre flattens and its footprint grows longer and wider",
+    "caption": "Illustration: as pressure drops the footprint grows. It goes down to 1.0 bar, below the 1.4 bar that tyre makers publish.",
+    "author": "PsyPhin",
+    "authorUrl": null,
+    "own": true,
+    "license": "Own animation",
+    "licenseUrl": null,
+    "page": null,
+    "title": null
   }
 ];

@@ -794,6 +794,13 @@ input[type="checkbox"] {
   max-width: 72ch;
 }
 
+.anim img {
+  width: 100%;
+  max-width: 560px;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
 .inline-photo img {
   border-radius: 10px;
   max-height: 260px;

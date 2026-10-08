@@ -74,8 +74,10 @@
       figure.hidden = true;
       return;
     }
+    const image = el("img", { src: img.file, alt: img.alt, width: img.w, height: img.h, loading: "lazy", decoding: "async" });
     figure.replaceChildren(
-      el("img", { src: img.file, alt: img.alt, width: img.w, height: img.h, loading: "lazy", decoding: "async" }),
+      // Animations show a still to visitors who've asked for reduced motion.
+      img.still ? el("picture", null, el("source", { media: "(prefers-reduced-motion: reduce)", srcset: img.still }), image) : image,
       el(
         "figcaption",
         null,

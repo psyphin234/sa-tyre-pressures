@@ -129,6 +129,11 @@
       headline = lowers ? (t.id === "deepsnow" ? "Off-road only: lower step by step, down to " : "Lower step by step, down to ") + b : "Keep road pressure";
       if (t.id === "deepsnow") lines.push(el("p", { class: "answer-sub" }, "No civilian tyre maker publishes deep-snow pressures, so these are your tyres' sand figures: deep soft snow is a flotation problem like sand."));
       else lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `${b} is the lowest Cooper publishes for LT tyres in sand.` : `${b} is the lowest BFGoodrich (South Africa) publishes for sand.`));
+      if (t.id === "sand") {
+        const anim = el("figure", { class: "anim" });
+        UI.photo(anim, "deflate-anim");
+        lines.push(anim);
+      }
       lines.push(
         el(
           "p",

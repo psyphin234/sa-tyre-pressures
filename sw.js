@@ -5,7 +5,7 @@
  * tests/run.ps1 checks that every local file referenced by the pages is in
  * FILES.
  */
-const VERSION = "tyres-2026-10-08-18";
+const VERSION = "tyres-2026-10-08-19";
 const FILES = [
   "./",
   "index.html",
@@ -46,6 +46,8 @@ const FILES = [
   "img/compressor.jpg",
   "img/beadlock.jpg",
   "img/deflated.jpg",
+  "img/deflate.webp",
+  "img/deflate-still.jpg",
 ];
 
 self.addEventListener("install", (event) => {
