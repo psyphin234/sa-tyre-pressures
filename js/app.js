@@ -487,7 +487,8 @@
           "."
         )
       );
-      lines.push(el("p", null, `That's about ${r.runMin / 4 < 1 ? "under a minute" : Math.round((r.runMin / 4) * 10) / 10 + " min"} of pumping per tyre on average${r.duty < 1 ? ", plus rests" : ""}.`));
+      const perTyre = r.runMin / 4;
+      lines.push(el("p", null, `That's ${perTyre < 1 ? "under a minute" : "about " + Math.round(perTyre * 10) / 10 + " min"} of pumping per tyre on average${r.duty < 1 ? ", plus rests" : ""}.`));
       if (st.freeFlow) lines.push(el("p", { class: "note" }, "Free-flow ratings are measured with nothing to push against. Into a tyre at 2–3 bar a compressor delivers less, so expect longer."));
     } else lines.push(el("p", { class: "muted" }, "Enter your compressor's flow (step 6) for a time."));
     lines.push(el("p", { class: "note" }, "The air comes out warm and the pressure drops a little as it cools: check again once the tyres are cold."));
