@@ -58,7 +58,7 @@ tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every f
 - Rule `category` drives the tag: law | standard | tyre-maker | vehicle-maker | engineering | calculation. Calculation rules are this site's own physics and must say so.
 - Keep claims that aren't in a source out of rule summaries; put interpretations in `notes`, starting "Not from the regulation:" (or similar) when it's about the law.
 - **Offline:** any new file must be added to `FILES` in `sw.js`, and `VERSION` bumped whenever anything changes, or visitors keep the old copy. `tests/run.ps1` fails if a referenced file isn't cached.
-- The owner's own photos and animation live in `Pics/` (gitignored: originals can carry GPS). `scripts/make_images.py` (`OWN` map: cover → hero, DeepSand → sand, mud → mud) and `scripts/make_anim.py` (deflate.gif → `img/deflate.webp` + `img/deflate-still.jpg` for reduced motion) publish resized copies without EXIF, credited "Photo: PsyPhin". `Pics/Gravel.jpg` is there but not used yet.
+- The owner's own photos and animation live in `Pics/` (gitignored: originals can carry GPS). `scripts/make_images.py` (`OWN` map: cover → hero, DeepSand → sand, mud → mud, Gravel → gravel) and `scripts/make_anim.py` (deflate.gif → `img/deflate.webp` + `img/deflate-still.jpg` for reduced motion) publish resized copies without EXIF, credited "Photo: PsyPhin".
 - Other photos: Wikimedia Commons only, with author, licence and file page in `images.js`; credits show under each photo and on sources.html. One author asked for a credit link to their site (`authorUrl`).
 
 ## Tables (how they were made)

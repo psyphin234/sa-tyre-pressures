@@ -8,6 +8,7 @@ meta = json.load(open(os.path.join(src, "meta.json"), encoding="utf-8"))
 # photo with the same key. Saved without EXIF, so no GPS or camera data is published.
 OWN = {
   "hero": ("Pics/Cover.jpeg", "A Toyota Land Cruiser driving across wide white sand dunes under a blue sky", "Land Cruiser on the dunes."),
+  "gravel": ("Pics/Gravel.jpg", "A long, straight gravel road through dry veld towards flat-topped hills", "Gravel road."),
   "mud": ("Pics/mud.jpg", "A white Toyota Hilux with mud-caked tyres climbing a muddy red-earth track", "Hilux in the mud."),
   "sand": ("Pics/DeepSand.jpg", "Two 4x4s on the crest of a red sand dune, with footprints in the sand and mountains behind", "Red dunes."),
 }
