@@ -117,12 +117,13 @@
           <p class="hint">LT tyres have "LT" before the size (LT265/75R16) or two load numbers, like 121/118. Not sure? You get the passenger-type answer, the more careful one.</p>
           <div class="field">
             <label for="simpleSize">Size <small class="muted">(optional, for the weight check)</small></label>
-            <select id="simpleSize" name="simpleSize"></select>
+            <input id="simpleSize" name="simpleSize" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="e.g. 265/60R18 110H">
+            <p class="hint" id="simple-size-read">As on the sidewall, e.g. 265/60R18, LT265/75R16 or 31x10.50R15. Add the load index if you know it (the number after the size).</p>
           </div>
           <div class="field" id="simple-li-field" hidden>
             <label for="simpleLi">Load index</label>
-            <select id="simpleLi" name="simpleLi"></select>
-            <p class="hint">The number after the size, e.g. <b>112</b> in 265/65R17 112T.</p>
+            <input id="simpleLi" name="simpleLi" type="number" inputmode="numeric" min="60" max="130" step="1" placeholder="e.g. 110">
+            <p class="hint">The number straight after the size on the sidewall, e.g. <b>110</b> in 265/60R18 110H.</p>
           </div>
         </fieldset>
 

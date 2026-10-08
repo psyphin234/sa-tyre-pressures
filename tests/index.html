@@ -237,6 +237,32 @@
       test("temperature: a 20% warm rise on 2.4 bar is about 40°C hotter air", () => near(C.tempRiseFor(240, 288, 15, 0), 40.5, 0.5));
       test("Humvee: 15 mph is used as 24 km/h, not the manual's 48", () => D.rules.find((r) => r.id === "army-hmmwv-sand").params.maxKmh === 24);
 
+      // ---------------- typed tyre sizes (Simple)
+      const P = (t) => C.parseTyreSize(t);
+      test("reads 265/60/R18, 265/60R18 and 265 60 18 the same", () => [P("265/60/R18"), P("265/60R18"), P("265 60 18"), P("265-60-r18")].every((x) => x && x.label === "265/60R18" && !x.lt));
+      test("reads the load index, speed symbol and XL", () => {
+        const x = P("265/65r17 116h xl");
+        return (x.label === "265/65R17" && x.li === 116 && x.xl) || x;
+      });
+      test("LT prefix or two load indices make it LT", () => P("LT265/75R16 123/120Q").lt && P("265/75R16 123/120S").lt && !P("265/75R16 116S").lt);
+      test("reads flotation and numeric sizes", () => P("31x10.50R15LT 109S").label === "31x10.50R15LT" && P("31X10.5R15").label === "31x10.50R15LT" && P("7.50R16C 116/114N").label === "7.50R16");
+      test("not a size: null", () => P("hello") === null && P("") === null);
+      test("flags an unusual width (266 instead of 265)", () => P("266/60R18").oddWidth === true && P("265/60R18").oddWidth === false);
+      test("any passenger size works by load index (ETRTO tables go by load index)", () => {
+        const r = C.curveForTyped(P("245/70R16 111T"), false, null);
+        return (r.curve && r.cls === "passenger" && Math.round(r.curve.points.slice(-1)[0][1]) === 1090) || r;
+      });
+      test("passenger size without a load index asks for one", () => C.curveForTyped(P("245/70R16"), false, null).needsLi === true);
+      test("load index typed separately is used", () => Math.round(C.curveForTyped(P("265/60R18"), false, 110).curve.points.slice(-1)[0][1]) === 1060);
+      test("XL uses the reinforced table", () => C.curveForTyped(P("265/65R17 116 XL"), false, null).table === "etrto-xl");
+      test("LT size in the TRA list gets its curve; LI 123 picks load range E", () => {
+        const r = C.curveForTyped(P("LT265/75R16 123/120Q"), false, null);
+        return (r.table === "tra-lt" && /range E/.test(r.curve.marking)) || r;
+      });
+      test("LT size not in the list: no curve, says why", () => C.curveForTyped(P("LT245/75R16"), false, null).reason === "noLtTable");
+      test("the LT button makes a plain size LT", () => C.curveForTyped(P("265/65R17"), true, null).table === "tra-lt");
+      test("7.50R16 uses Michelin's table", () => C.curveForTyped(P("7.50R16"), false, null).table === "michelin-750r16");
+
       // ---------------- formatting
       test("formats 240 kPa as 2.4 bar / 240 kPa / 35 psi", () => C.fmtPressure(240, "bar") === "2.4 bar" && C.fmtPressure(240, "kpa") === "240 kPa" && C.fmtPressure(240, "psi") === "35 psi");
       test("parses 1,5 bar (comma decimal)", () => C.parsePressure("1,5", "bar") === 150);

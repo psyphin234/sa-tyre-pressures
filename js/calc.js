@@ -70,6 +70,89 @@
   }
 
   /*
+   * Read a tyre size as people type it: "265/60R18", "265/60/R18", "265 60 18",
+   * "LT265/75R16 123/120Q", "265/65R17 116H XL", "31x10.50R15LT", "7.50R16C".
+   * Returns null if it isn't a size. Fields: kind (metric | flotation |
+   * numeric), label (normalised), lt, xl, li, liDual, and the dimensions.
+   */
+  function parseTyreSize(text) {
+    if (!text) return null;
+    const t = String(text).toUpperCase().replace(/\s+/g, " ").trim();
+    const tail = (rest) => {
+      const m = rest.match(/(\d{2,3})(?:\s*\/\s*(\d{2,3}))?\s*([A-Z])?\b/);
+      return {
+        li: m ? parseInt(m[1], 10) : null,
+        liDual: m && m[2] ? parseInt(m[2], 10) : null,
+        xl: /\b(XL|RF|REINF|REINFORCED|EXTRA ?LOAD)\b/.test(rest),
+        ltMark: /\bLT\b/.test(rest),
+        cMark: /^\s*C\b/.test(rest),
+      };
+    };
+    let m = t.match(/^(LT|P)?\s*(\d{3})\s*[\/ -]\s*(\d{2})\s*[\/ -]?\s*(?:Z?R|D|B)?\s*[\/ -]?\s*(\d{2})(?:\s*(LT|C)\b)?(.*)$/);
+    if (m) {
+      const rest = tail(m[6] || "");
+      const lt = m[1] === "LT" || m[5] === "LT" || m[5] === "C" || rest.ltMark || !!rest.liDual;
+      return {
+        kind: "metric",
+        widthMm: parseInt(m[2], 10),
+        aspect: parseInt(m[3], 10),
+        rimIn: parseInt(m[4], 10),
+        label: `${m[2]}/${m[3]}R${m[4]}`,
+        lt,
+        xl: rest.xl,
+        li: rest.li,
+        liDual: rest.liDual,
+        oddWidth: parseInt(m[2], 10) % 10 !== 5,
+      };
+    }
+    m = t.match(/^(\d{2})\s*[X×*]\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*[\/ -]?\s*R?\s*[\/ -]?\s*(\d{2})\s*(LT)?(.*)$/);
+    if (m) {
+      const w = m[2].replace(",", ".");
+      const rest = tail(m[5] || "");
+      return { kind: "flotation", overallIn: parseInt(m[1], 10), sectionWidthIn: parseFloat(w), rimIn: parseInt(m[3], 10), label: `${m[1]}x${parseFloat(w).toFixed(2)}R${m[3]}LT`, lt: true, xl: false, li: rest.li, liDual: rest.liDual };
+    }
+    m = t.match(/^(\d{1,2}[.,]\d{2})\s*[\/ -]?\s*R?\s*[\/ -]?\s*(\d{2})\s*(C|LT)?(.*)$/);
+    if (m) {
+      const w = m[1].replace(",", ".");
+      const rest = tail(m[4] || "");
+      return { kind: "numeric", sectionWidthIn: parseFloat(w), rimIn: parseInt(m[2], 10), label: `${w}R${m[2]}`, lt: true, xl: false, li: rest.li, liDual: rest.liDual };
+    }
+    return null;
+  }
+
+  /*
+   * The load curve for a typed size (Simple): ETRTO passenger tyres by load
+   * index (any size), LT and flotation sizes only if their TRA row is here,
+   * 7.50R16 from Michelin's table. wantLt: the LT / passenger answer.
+   * Returns { curve, cls, table, needsLi, reason } (curve null if unknown).
+   */
+  function curveForTyped(parsed, wantLt, typedLi) {
+    if (!parsed) return { curve: null, cls: wantLt ? "lt" : "passenger", reason: "unreadable" };
+    const lt = parsed.lt || wantLt;
+    const T = tables();
+    const li = parsed.li || typedLi || null;
+    if (parsed.kind === "numeric") {
+      if (parsed.label === "7.50R16") return { curve: loadCurve({ sizeId: "750r16", typeId: "michelin" }), cls: "lt", table: "michelin-750r16" };
+      return { curve: null, cls: "lt", reason: "noLtTable" };
+    }
+    if (lt) {
+      const key = parsed.kind === "flotation" ? parsed.label : "LT" + parsed.label;
+      const table = parsed.kind === "flotation" ? "tra-flotation" : "tra-lt";
+      const row = T[table].sizes[key];
+      if (!row) return { curve: null, cls: "lt", reason: "noLtTable" };
+      const rg = row.ranges.find((r) => r.li === li) || row.ranges[row.ranges.length - 1];
+      const pts = row.single.filter(([psi]) => psi <= rg.maxPsi).map(([psi, lb]) => [psiToKpa(psi), lb * KG_PER_LB]);
+      return { curve: { points: pts, table, source: T[table].source, where: T[table].where, label: T[table].label, marking: key + " load range " + rg.range + " (" + rg.li + ")" }, cls: "lt", table };
+    }
+    const table = parsed.xl ? "etrto-xl" : "etrto-sl";
+    if (!li) return { curve: null, cls: "passenger", table, needsLi: true, reason: "needsLi" };
+    const row = T[table].rowsLb[li];
+    if (!row) return { curve: null, cls: "passenger", table, needsLi: true, reason: "liOutOfRange" };
+    const pts = T[table].psi.map((psi, i) => [psiToKpa(psi), row[i] * KG_PER_LB]);
+    return { curve: { points: pts, table, source: T[table].source, where: T[table].where, label: T[table].label, marking: parsed.label + " " + li + (parsed.xl ? " XL" : "") }, cls: "passenger", table, li };
+  }
+
+  /*
    * The lowest pressure at which the tables say one tyre carries wheelKg.
    * Between published pressures, read in a straight line (rule table-method).
    * status: "ok" | "belowTable" (load already carried at the lowest published
@@ -352,6 +435,8 @@
     roadPressure,
     assessPressure,
     tyreClass,
+    parseTyreSize,
+    curveForTyped,
     terrainRange,
     lowestPublished,
     applyLoadFloor,

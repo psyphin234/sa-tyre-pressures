@@ -203,7 +203,7 @@
       speed: num("speed"),
       tube: f.tube.value,
       tyreClass: f.tyreClass ? f.tyreClass.value : "unsure",
-      simpleSize: f.simpleSize.value,
+      simpleSize: f.simpleSize.value.trim(),
       simpleLi: parseInt(f.simpleLi.value, 10),
       simpleKg: num("simpleKg"),
       beadlock: f.beadlock.checked,
@@ -518,28 +518,41 @@
   // ------------------------------------------------------------ simple mode
 
   /*
-   * Simple's optional tyre: a size plus the LT / passenger answer picks the
-   * table. A size that only comes as LT is LT whatever was ticked.
+   * Simple's optional tyre, typed as on the sidewall. The typed marks (LT, two
+   * load indices, XL) win over the LT / passenger buttons.
    */
   function simpleTyre(st) {
-    const size = st.simpleSize ? C.findSize(st.simpleSize) : null;
-    if (!size) return null;
-    const wantLt = st.tyreClass === "lt";
-    const type =
-      size.types.find((t) => (wantLt ? t.table !== "etrto-sl" && t.table !== "etrto-xl" : t.table === "etrto-sl")) || size.types[0];
-    const li = type.loadIndices && type.loadIndices.includes(st.simpleLi) ? st.simpleLi : type.defaultLi;
-    const ranges = C.loadRanges(type);
-    const curve = C.loadCurve({ sizeId: size.id, typeId: type.id, li, range: ranges.length ? ranges[ranges.length - 1].range : null });
-    return { size, type, li, curve, cls: C.tyreClass(type) };
+    const parsed = C.parseTyreSize(st.simpleSize);
+    if (!st.simpleSize || !parsed) return parsed === null && st.simpleSize ? { parsed: null, curve: null, cls: st.tyreClass === "lt" ? "lt" : "passenger", reason: "unreadable" } : null;
+    const r = C.curveForTyped(parsed, st.tyreClass === "lt", st.simpleLi > 0 ? st.simpleLi : null);
+    return { parsed, ...r };
   }
 
+  // Show what was read from the size box, and ask for the load index if needed.
   function simpleTyreChanged() {
     const st = readState();
-    const size = st.simpleSize ? C.findSize(st.simpleSize) : null;
-    const tyre = size ? simpleTyre(st) : null;
-    const etrto = tyre && (tyre.type.table === "etrto-sl" || tyre.type.table === "etrto-xl");
-    $("simple-li-field").hidden = !etrto;
-    if (etrto) fillSelect($("simpleLi"), tyre.type.loadIndices.map((li) => ({ value: li, label: li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max)" })), tyre.li);
+    const tyre = simpleTyre(st);
+    const read = $("simple-size-read");
+    // Passenger-type tyres need a load index; ask for it unless it's in the size text.
+    $("simple-li-field").hidden = !(tyre && tyre.parsed && tyre.cls === "passenger" && !tyre.parsed.li);
+    if (!tyre) {
+      read.textContent = "As on the sidewall, e.g. 265/60R18, LT265/75R16 or 31x10.50R15. Add the load index if you know it (the number after the size).";
+      return;
+    }
+    if (!tyre.parsed) {
+      read.textContent = "Couldn't read that size. Try it like 265/60R18, LT265/75R16 or 31x10.50R15.";
+      return;
+    }
+    const pz = tyre.parsed;
+    const kind = tyre.cls === "lt" ? "LT (light truck)" : pz.xl ? "passenger-type, Extra Load" : "passenger-type";
+    const li = pz.li || tyre.li;
+    const parts = ["Read as " + (tyre.cls === "lt" && pz.kind === "metric" ? "LT" : "") + pz.label + ", " + kind];
+    if (li && tyre.cls === "passenger") parts.push("load index " + li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max per tyre)");
+    let text = parts.join(", ") + ".";
+    if (pz.oddWidth) text += ` ${pz.widthMm} isn't a usual width (they end in 5, like ${Math.round((pz.widthMm - 5) / 10) * 10 + 5}); check the sidewall.`;
+    if (tyre.reason === "noLtTable") text += " There's no load table for this LT size here yet, so no weight check.";
+    if (tyre.reason === "liOutOfRange") text += " That load index isn't in the table here, so no weight check.";
+    read.textContent = text;
   }
 
   /*
@@ -562,7 +575,7 @@
     const tyre = simpleTyre(st);
     const cls = tyre ? tyre.cls : st.tyreClass === "lt" ? "lt" : "passenger";
     // Load check: one total weight shared evenly over four tyres.
-    const perTyreKg = tyre && st.simpleKg > 0 ? st.simpleKg / 4 : null;
+    const perTyreKg = tyre && tyre.curve && st.simpleKg > 0 ? st.simpleKg / 4 : null;
     const need = perTyreKg ? C.requiredPressure(tyre.curve, perTyreKg) : null;
     const floor = need && need.status === "ok" ? need.kpa : null;
     const axles = [
@@ -590,9 +603,9 @@
     const headline = advice.headline;
     const notes = advice.lines;
     const loadLines = [];
-    if (tyre && tyre.type.table === "michelin-750r16" && axles.some((a) => a.r.kind === "cooper"))
+    if (tyre && tyre.table === "michelin-750r16" && axles.some((a) => a.r.kind === "cooper"))
       loadLines.push(el("p", { class: "note" }, "Cooper says narrow commercial-style tyres like this one need higher pressures than its ranges, which are for average LT sizes."));
-    if (tyre && tyre.cls === "lt" && st.tyreClass !== "lt") loadLines.push(el("p", { class: "muted" }, `${tyre.size.label} comes as an LT tyre, so this is the LT answer.`));
+    if (tyre && tyre.parsed && tyre.cls === "lt" && st.tyreClass !== "lt") loadLines.push(el("p", { class: "muted" }, `${tyre.parsed.label} is marked as an LT tyre, so this is the LT answer.`));
     if (need) {
       const kg = Math.round(perTyreKg);
       if (need.status === "overload") loadLines.push(el("p", { class: "note note--fail" }, `About ${kg} kg per tyre is more than these tyres can carry at any pressure (${Math.round(need.maxKg)} kg). You need tyres with a higher load rating, or less weight.`));
@@ -742,7 +755,6 @@
 
   function init() {
     fillSelect($("size"), D.tyreSizes.map((s) => ({ value: s.id, label: s.label })));
-    fillSelect($("simpleSize"), [{ value: "", label: "Not sure / skip" }].concat(D.tyreSizes.map((s) => ({ value: s.id, label: s.label }))));
     let saved = restore();
     if (location.hash === "#advanced" || location.hash === "#example") mode = "advanced";
     if (location.hash === "#example") {
@@ -757,9 +769,13 @@
     if (saved && saved.size) $("size").value = saved.size;
     sizeChanged(saved);
     if (saved) applyValues(saved);
-    if (saved && saved.simpleSize) $("simpleSize").value = saved.simpleSize;
-    simpleTyreChanged();
+    if (saved && saved.simpleSize) {
+      // Older saves stored a size id ("265-65r17"); show it as a size instead.
+      const old = C.findSize(saved.simpleSize);
+      $("simpleSize").value = old ? old.label : saved.simpleSize;
+    }
     if (saved && saved.simpleLi) $("simpleLi").value = saved.simpleLi;
+    simpleTyreChanged();
     setUnit(unit);
     buildTerrains();
     renderStatic();
@@ -781,7 +797,7 @@
     });
     form.addEventListener("input", (e) => {
       if (e.target.name === "unit") return;
-      if (e.target.name === "simpleSize" || e.target.name === "tyreClass") simpleTyreChanged();
+      if (e.target.name === "simpleSize" || e.target.name === "tyreClass" || e.target.name === "simpleLi") simpleTyreChanged();
       update();
     });
     form.addEventListener("change", (e) => {
