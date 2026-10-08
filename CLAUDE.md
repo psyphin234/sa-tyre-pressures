@@ -26,6 +26,7 @@ js/diagrams.js    SVG diagrams (pressure ladder, footprint, deflection/heat, bea
 js/ui.js          DOM helpers: el(), rule links ("Read more"), category tags, photo + credit
 js/app.js         Wires the form to calc.js and renders the cards; #example loads a made-up example
 js/sources.js     Builds sources.html from data.js
+js/install.js     Holds back Chrome's automatic install pop-up; optional "Add to home screen" button in the Works offline box
 css/style.css     All styles; colours at the top (match psyphin.co.za / towing). Dark only, like the other tools
 sw.js             Service worker: caches every file on first visit (offline-first). Bump VERSION on every change
 manifest.webmanifest  Installable app; icons icon-192/512 and icon-maskable-512 (plus apple-touch-icon) are made by scripts/make_icons.py from psyphin.co.za's psyphin-logo-black.jpg

@@ -44,7 +44,7 @@
       <ul class="honesty">
         <li><strong>Only tyre makers, vehicle makers, standards, the law and engineering research.</strong> No forum or club figures. Where nobody citable publishes a number, this page says so instead of guessing.</li>
         <li><strong>Carry a gauge and a compressor.</strong> Start here, then adjust for your tyre, the sand or rock in front of you, and how the vehicle feels.</li>
-        <li><strong>Works offline.</strong> Open it once with signal and it keeps working in the bush. Nothing you enter leaves your phone.</li>
+        <li><strong>Works offline.</strong> Open it once with signal and it keeps working in the bush. Nothing you enter leaves your phone.<span class="install" id="install" hidden> <button type="button" class="small-button install-button" id="install-button">Add to home screen</button><span class="install-help" id="install-help" hidden></span></span></li>
       </ul>
       <figure class="hero-photo" data-image="hero"></figure>
     </section>
@@ -262,6 +262,7 @@
   <script src="js/ui.js"></script>
   <script src="js/diagrams.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/install.js"></script>
   <script>
     if ("serviceWorker" in navigator && location.protocol === "https:") {
       navigator.serviceWorker.register("sw.js").catch(function () {});
