@@ -40,6 +40,10 @@ tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every f
 
 ## Modes
 
+- **Bar only** (owner's call): no kPa/psi switch. Source figures in psi are converted to bar for display; the sources page keeps the original quotes. Old saves in kPa/psi are converted once on load (`convertSavedPressures`).
+- **No tube-type option** (owner: SA drivers use tubeless).
+- Advanced axle loads default to 1 300 kg front / 1 500 kg rear, labelled as a typical loaded double-cab bakkie (example figures, not a source).
+
 - **Simple** (default, no hash): LT / passenger / not sure, an optional tyre size typed as on the sidewall (`parseTyreSize()`: 265/60R18, 265/60/R18, LT265/75R16 123/120Q, 31x10.50R15, 7.50R16; LT, XL and dual load indices are read; passenger-type sizes work for any size via the load index, LT sizes only if their TRA row is in tables.js) and optional total loaded weight (shared evenly over 4 tyres, never axle weights: the owner says nobody knows them), road pressure from the placard, and the terrain; one answer card (`simpleResults()` in app.js), a short "Before you go" list and one sources link. Meant for someone who just wants a pressure for the terrain. It points heavy, LT or towing users to Advanced.
 - **Advanced** (`#advanced`; `#example` loads the made-up example in Advanced): tyre and load tables, plan check with ladders, safety, pumping, gaps, and the explainers with diagrams.
 - Elements carry `data-modes="advanced"` to show only in Advanced; `setMode()` hides the rest. Inputs are shared, so values carry across modes.

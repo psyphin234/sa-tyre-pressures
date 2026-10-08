@@ -232,7 +232,7 @@
       const h2 = (m.kmh / maxKmh) * 130;
       nodes.push(s("rect", { x: x + bw / 2, y: 170 - h2, width: bw / 2 - 4, height: h2, class: "d-bar-speed" }));
       nodes.push(text(x + bw / 2 - 2, 190, m.mode, "d-small d-strong", { "text-anchor": "middle" }));
-      nodes.push(text(x + bw / 2 - 2, 206, m.psi + " psi · " + m.kmh + " km/h", "d-small", { "text-anchor": "middle" }));
+      nodes.push(text(x + bw / 2 - 2, 206, (m.psi * 0.0689476).toFixed(1) + " bar · " + m.kmh + " km/h", "d-small", { "text-anchor": "middle" }));
     });
     nodes.push(s("line", { x1: 30, x2: W - 20, y1: 170, y2: 170, class: "d-ground" }));
     nodes.push(s("rect", { x: 330, y: 10, width: 10, height: 10, class: "d-bar-pressure" }), text(346, 19, "pressure", "d-small"));

@@ -5,7 +5,7 @@
  * tests/run.ps1 checks that every local file referenced by the pages is in
  * FILES.
  */
-const VERSION = "tyres-2026-10-08-12";
+const VERSION = "tyres-2026-10-08-13";
 const FILES = [
   "./",
   "index.html",

@@ -48,7 +48,7 @@
     if (ranges.length) {
       fillSelect(
         $("range"),
-        ranges.map((r) => ({ value: r.range, label: r.range + ": up to " + r.maxPsi + " psi, load index " + r.li })),
+        ranges.map((r) => ({ value: r.range, label: r.range + ": up to " + fmt(C.psiToKpa(r.maxPsi)) + ", load index " + r.li })),
         (keep && keep.range) || ranges[ranges.length - 1].range
       );
     }
@@ -73,28 +73,26 @@
     });
   }
 
-  function setUnit(next) {
-    const prev = unit;
-    unit = next;
+  // Pressures are entered and shown in bar. Older saves may hold kPa or psi
+  // (the site used to offer them): convert those values once, on load.
+  function convertSavedPressures(v) {
+    if (!v || !v.unit || v.unit === "bar") return v;
+    const out = { ...v, unit: "bar" };
     PRESSURE_FIELDS.forEach((name) => {
-      const input = form.elements[name];
-      const kpa = C.parsePressure(input.value, prev);
-      input.step = unit === "bar" ? "0.1" : unit === "kpa" ? "10" : "1";
-      if (kpa != null) input.value = toUnitValue(kpa);
+      const kpa = C.parsePressure(v[name], v.unit);
+      if (kpa != null) out[name] = String(Math.round(kpa / 5) / 20);
     });
-    document.querySelectorAll(".unit-text").forEach((s) => (s.textContent = unit === "kpa" ? "kPa" : unit));
+    return out;
   }
 
-  // A kPa figure as a number in the current unit, for an input field.
+  // A kPa figure as a bar number, for an input field.
   function toUnitValue(kpa) {
-    if (unit === "kpa") return String(Math.round(kpa / 5) * 5);
-    if (unit === "psi") return String(Math.round(C.kpaToPsi(kpa)));
     return String(Math.round(kpa / 5) / 20);
   }
 
-  const fmt = (kpa) => C.fmtPressure(kpa, unit);
+  const fmt = (kpa) => C.fmtPressure(kpa, "bar");
   // A quoted figure without the site's 0.05 bar rounding (12 psi -> 0.83 bar, not 0.85).
-  const fmtExact = (kpa) => (unit === "kpa" ? Math.round(kpa) + " kPa" : unit === "psi" ? Math.round(C.kpaToPsi(kpa)) + " psi" : (kpa / 100).toFixed(2) + " bar");
+  const fmtExact = (kpa) => (kpa / 100).toFixed(2) + " bar";
 
   /*
    * What's known about going below the lowest published pressure (sand and
@@ -181,7 +179,7 @@
     return { headline, lines, lowers };
   }
 
-  const fmtAll = (kpa) => C.fmtAll(kpa, unit);
+  const fmtAll = fmt; // bar only
 
   // ------------------------------------------------------------ state
 
@@ -201,7 +199,6 @@
       placard: [C.parsePressure(f.placardFront.value, unit), C.parsePressure(f.placardRear.value, unit)],
       plan: [C.parsePressure(f.planFront.value, unit), C.parsePressure(f.planRear.value, unit)],
       speed: num("speed"),
-      tube: f.tube.value,
       tyreClass: f.tyreClass ? f.tyreClass.value : "unsure",
       simpleSize: f.simpleSize.value.trim(),
       simpleLi: parseInt(f.simpleLi.value, 10),
@@ -241,11 +238,7 @@
       v = null;
     }
     if (!v) return null;
-    if (v.unit) {
-      unit = v.unit;
-      const r = form.querySelector(`input[name="unit"][value="${v.unit}"]`);
-      if (r) r.checked = true;
-    }
+    v = convertSavedPressures(v);
     if (v.terrain && D.terrains.some((t) => t.id === v.terrain)) terrainId = v.terrain;
     return v;
   }
@@ -254,6 +247,8 @@
     const f = form.elements;
     Object.entries(v).forEach(([name, value]) => {
       if (["size", "type", "li", "range", "unit", "terrain", "simpleSize", "simpleLi"].includes(name)) return;
+      // Blank axle loads keep the page's default bakkie figures.
+      if ((name === "frontKg" || name === "rearKg") && value === "") return;
       const input = f[name];
       if (!input) return;
       if (input instanceof RadioNodeList) {
@@ -456,7 +451,6 @@
     ];
     if (lowered) items.splice(1, 0, ["Side slopes and the bead", "Low pressure plus a sideways push can roll a bead off the rim. Run road pressure across steep side slopes.", ["bfg-side-slopes", "etrto-hump-rims", "etrto-underinflation"]]);
     if (st.beadlock) items.push(["Beadlocks", "They hold the bead, but the air still carries the load, so the floor and speed limits don't change. Ford approves true beadlocks off-road only.", ["ford-beadlock", "bfg-air-carries-load"]]);
-    if (st.tube === "tube") items.push(["Tube-type tyres", "No tyre or vehicle maker guidance on airing down tubed tyres was found.", ["etrto-tube-type"]]);
     return card(
       "Safety",
       "card--safety",
@@ -761,7 +755,6 @@
       saved = EXAMPLE;
       unit = EXAMPLE.unit;
       terrainId = EXAMPLE.terrain;
-      form.querySelector(`input[name="unit"][value="${unit}"]`).checked = true;
     }
     window.addEventListener("hashchange", () => {
       if (location.hash === "#example") location.reload();
@@ -776,7 +769,6 @@
     }
     if (saved && saved.simpleLi) $("simpleLi").value = saved.simpleLi;
     simpleTyreChanged();
-    setUnit(unit);
     buildTerrains();
     renderStatic();
     setMode(mode, false);
@@ -796,15 +788,8 @@
       update();
     });
     form.addEventListener("input", (e) => {
-      if (e.target.name === "unit") return;
       if (e.target.name === "simpleSize" || e.target.name === "tyreClass" || e.target.name === "simpleLi") simpleTyreChanged();
       update();
-    });
-    form.addEventListener("change", (e) => {
-      if (e.target.name === "unit") {
-        setUnit(e.target.value);
-        update();
-      }
     });
     $("use-bottom").addEventListener("click", () => {
       ["planFront", "planRear"].forEach((name, i) => {

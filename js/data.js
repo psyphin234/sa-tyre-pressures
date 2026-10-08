@@ -288,19 +288,6 @@
       checked: CHECKED,
     },
     {
-      id: "etrto-tube-type",
-      category: "standard",
-      title: "Tube-type tyres",
-      summary:
-        "A tyre without a tubeless marking is meant to be used with an inner tube, and a new tube, valve and flap should be fitted when a tube-type tyre is replaced.",
-      quote:
-        "Where no tubeless marking appears on the tyre sidewalls, tyres are intended for fitment with an appropriate inner tube. … In the case of replacement of tube type tyres, always fit a new inner tube, valve and flap.",
-      sources: ["etrtoRec2024"],
-      checked: CHECKED,
-    },
-
-    // ---- BFGoodrich (the only tyre maker found that publishes off-road figures)
-    {
       id: "bfg-same-as-road",
       category: "tyre-maker",
       title: "Most off-road driving: road pressure",
@@ -840,7 +827,6 @@
     { id: "gap-terrain", title: "Snow, and rock on passenger tyres", text: "No civilian tyre or vehicle maker figure was found for snow or ice. Cooper's rock range is for LT tyres only, so passenger-type tyres on rock get no figure." },
     { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "For LT tyres Cooper goes down to 18 psi (about 1.25 bar) in sand; for passenger-type tyres the lowest published figure is BFGoodrich's 1.5 bar, though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
     { id: "gap-speed", title: "Speed limits between road pressure and 1.5 bar", text: "BFGoodrich says to slow down when you lower pressure but gives no figure above 1.5 bar." },
-    { id: "gap-tubes", title: "Tubes at low pressure", text: "No tyre or vehicle maker guidance was found on running tube-type tyres at low pressure." },
     { id: "gap-beadlock-law", title: "Beadlocks on SA roads", text: "Whether beadlock wheels are allowed on SA public roads hasn't been checked." },
     { id: "gap-vehicle-handbooks", title: "SA-market owner's manuals", text: "Only a US Ford Ranger manual was read. SA editions of the Hilux, Land Cruiser, Fortuner, Ranger and Defender manuals may give figures." },
     { id: "gap-etrto-c", title: "ETRTO commercial (C) tyres", text: "Only Michelin's own 7.50R16 table is included. The ETRTO table for other C-type tyres wasn't available." },

@@ -57,13 +57,6 @@
     <div class="layout">
       <form id="tyre-form" class="inputs" autocomplete="off" novalidate>
         <p class="example-link" data-modes="advanced"><a href="#example" id="example-link">Fill in a made-up example</a></p>
-        <div class="unit-switch" role="group" aria-label="Pressure unit">
-          <span class="unit-label">Show pressures in</span>
-          <label><input type="radio" name="unit" value="bar" checked> bar</label>
-          <label><input type="radio" name="unit" value="kpa"> kPa</label>
-          <label><input type="radio" name="unit" value="psi"> psi</label>
-        </div>
-
         <fieldset data-modes="advanced">
           <legend>Your tyres</legend>
           <div class="field">
@@ -97,14 +90,14 @@
           <div class="field-row">
             <div class="field">
               <label for="frontKg">Front axle</label>
-              <div class="with-unit"><input id="frontKg" name="frontKg" type="number" inputmode="numeric" min="0" step="10" placeholder="e.g. 1250"><span>kg</span></div>
+              <div class="with-unit"><input id="frontKg" name="frontKg" type="number" inputmode="numeric" min="0" step="10" value="1300"><span>kg</span></div>
             </div>
             <div class="field">
               <label for="rearKg">Rear axle</label>
-              <div class="with-unit"><input id="rearKg" name="rearKg" type="number" inputmode="numeric" min="0" step="10" placeholder="e.g. 1450"><span>kg</span></div>
+              <div class="with-unit"><input id="rearKg" name="rearKg" type="number" inputmode="numeric" min="0" step="10" value="1500"><span>kg</span></div>
             </div>
           </div>
-          <p class="hint">Best: weigh each axle, loaded for the trip, on a weighbridge. Worst case: the maximum axle loads on the vehicle's VIN or compliance plate. Each tyre carries half its axle.</p>
+          <p class="hint">Filled in with a typical loaded double-cab bakkie (example figures, not from a source): change them to yours. Best: weigh each axle, loaded for the trip, on a weighbridge. Worst case: the maximum axle loads on the vehicle's VIN or compliance plate. Each tyre carries half its axle.</p>
         </fieldset>
 
         <fieldset data-modes="simple">
@@ -141,11 +134,11 @@
           <div class="field-row">
             <div class="field">
               <label for="placardFront">Front</label>
-              <div class="with-unit"><input id="placardFront" name="placardFront" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+              <div class="with-unit"><input id="placardFront" name="placardFront" type="number" inputmode="decimal" min="0" step="0.1"><span>bar</span></div>
             </div>
             <div class="field">
               <label for="placardRear">Rear</label>
-              <div class="with-unit"><input id="placardRear" name="placardRear" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+              <div class="with-unit"><input id="placardRear" name="placardRear" type="number" inputmode="decimal" min="0" step="0.1"><span>bar</span></div>
             </div>
           </div>
           <p class="hint">From the tyre placard, usually on the driver's door pillar, or in the owner's manual. Use the loaded figure if it gives one.<span data-modes="advanced"> Leave blank to use only the load tables.</span></p>
@@ -161,24 +154,17 @@
           <div class="field-row">
             <div class="field">
               <label for="planFront">Front</label>
-              <div class="with-unit"><input id="planFront" name="planFront" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+              <div class="with-unit"><input id="planFront" name="planFront" type="number" inputmode="decimal" min="0" step="0.1"><span>bar</span></div>
             </div>
             <div class="field">
               <label for="planRear">Rear</label>
-              <div class="with-unit"><input id="planRear" name="planRear" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+              <div class="with-unit"><input id="planRear" name="planRear" type="number" inputmode="decimal" min="0" step="0.1"><span>bar</span></div>
             </div>
           </div>
           <button type="button" class="small-button" id="use-bottom">Use the bottom of the range</button>
           <div class="field">
             <label for="speed">Fastest you expect to drive like this</label>
             <div class="with-unit"><input id="speed" name="speed" type="number" inputmode="numeric" min="0" step="5" placeholder="e.g. 30"><span>km/h</span></div>
-          </div>
-          <div class="field">
-            <span class="label">Tyres</span>
-            <div class="choice-row">
-              <label><input type="radio" name="tube" value="tubeless" checked> Tubeless</label>
-              <label><input type="radio" name="tube" value="tube"> Tube type</label>
-            </div>
           </div>
           <label class="check"><input type="checkbox" name="beadlock" id="beadlock"> Beadlock wheels</label>
           <label class="check"><input type="checkbox" name="towing" id="towing"> Towing, or sustained high speed on tar</label>
@@ -196,7 +182,7 @@
               <div class="with-unit"><input id="duty" name="duty" type="number" inputmode="numeric" min="1" max="100" step="5" placeholder="100"><span>%</span></div>
             </div>
           </div>
-          <label class="check"><input type="checkbox" name="freeFlow" id="freeFlow" checked> That flow is the "free flow" (0 psi) figure</label>
+          <label class="check"><input type="checkbox" name="freeFlow" id="freeFlow" checked> That flow is the "free flow" (0 bar) figure</label>
           <div class="field">
             <label for="altitude">Altitude where you'll pump up</label>
             <div class="with-unit"><input id="altitude" name="altitude" type="number" inputmode="numeric" step="50" placeholder="0"><span>m</span></div>
@@ -263,7 +249,7 @@
         <p><strong>Set and check pressures cold:</strong> with the tyres at the temperature of the air around them, before driving. First thing in the morning is easiest; otherwise let the vehicle stand (ETRTO says at least an hour, Toyo and Ford say three).</p>
         <p><strong>Driving warms the air inside.</strong> A reading 20% or more above the cold figure is normal, so never let air out of warm tyres to get back to the cold number. The law also judges a tyre at its cold pressure.</p>
         <div class="diagram" data-diagram="hotcold"></div>
-        <p><strong>The weather moves it too:</strong> about 1 psi (0.07 bar) for every 5.5°C, so a cold desert morning and a hot afternoon can differ by a few tenths of a bar with the same air inside.</p>
+        <p><strong>The weather moves it too:</strong> about 0.07 bar for every 5.5°C, so a cold desert morning and a hot afternoon can differ by a few tenths of a bar with the same air inside.</p>
         <div class="diagram" data-diagram="temptable"></div>
         <p><strong>Airing down at the start of the sand?</strong> The tyres are usually warm by then, so they'll lose a little more as they cool: check again later. The same goes for pumping up warm tyres: they'll read lower once cold.</p>
         <p>Keep tyres away from anything hotter than 90°C, such as brakes or exhausts: ETRTO says that can damage them for good.</p>
