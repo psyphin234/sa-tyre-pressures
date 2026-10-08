@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4x4 Tyre Pressures | PsyPhin</title>
+  <meta name="description" content="A starting range for 4x4 tyre pressures by load, tyre and terrain, from tyre-maker load tables and published guidance only, with the source for every number. Works offline.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#020203">
+  <link rel="canonical" href="https://tyres.psyphin.co.za/">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon-96x96.png" type="image/png" sizes="96x96">
+  <link rel="icon" href="favicon-192x192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+  <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="construction" role="alert">
+    <strong>Under construction.</strong> Not finished or checked yet. The numbers may be wrong: don't rely on this page for real trips.
+  </div>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="back-link" href="https://psyphin.co.za/#tools"><span class="back-link-arrow" aria-hidden="true">&larr;</span> <span class="back-link-label"><span class="back-link-more">More </span>PsyPhin tools</span> <span class="back-link-domain">psyphin.co.za</span></a>
+      <div class="header-end">
+        <nav class="nav" aria-label="Site">
+          <a href="index.html" aria-current="page">Calculator</a>
+          <a href="sources.html">Sources</a>
+        </nav>
+        <a class="brand" href="https://psyphin.co.za/" aria-label="PsyPhin home"><img src="brand-64.png" alt="" width="32" height="32"></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="intro">
+      <p class="disclaimer-link"><a href="#disclaimer">Disclaimer</a></p>
+      <h1>4x4 Tyre Pressures</h1>
+      <p class="lede">A starting range, not one "correct" number. Pick your tyre, load and terrain to see the pressure your load needs according to the tyre load tables, how far tyre makers say you can go down for that terrain, and the speed that goes with it. Every number links to where it comes from.</p>
+      <ul class="honesty">
+        <li><strong>Only tyre makers, vehicle makers, standards, the law and engineering research.</strong> No forum or club figures. Where nobody citable publishes a number, this page says so instead of guessing.</li>
+        <li><strong>Carry a gauge and a compressor.</strong> Start here, then adjust for your tyre, the sand or rock in front of you, and how the vehicle feels.</li>
+        <li><strong>Works offline.</strong> Open it once with signal and it keeps working in the bush. Nothing you enter leaves your phone.</li>
+      </ul>
+      <figure class="hero-photo" data-image="hero"></figure>
+    </section>
+
+    <div class="layout">
+      <form id="tyre-form" class="inputs" autocomplete="off" novalidate>
+        <p class="example-link"><a href="#example" id="example-link">Fill in a made-up example</a></p>
+        <div class="unit-switch" role="group" aria-label="Pressure unit">
+          <span class="unit-label">Show pressures in</span>
+          <label><input type="radio" name="unit" value="bar" checked> bar</label>
+          <label><input type="radio" name="unit" value="kpa"> kPa</label>
+          <label><input type="radio" name="unit" value="psi"> psi</label>
+        </div>
+
+        <fieldset>
+          <legend>1. Your tyres</legend>
+          <div class="field">
+            <label for="size">Size</label>
+            <select id="size" name="size"></select>
+          </div>
+          <div class="field">
+            <label for="type">Type</label>
+            <select id="type" name="type"></select>
+            <p class="hint" id="type-hint"></p>
+          </div>
+          <div class="field" id="li-field">
+            <label for="li">Load index</label>
+            <select id="li" name="li"></select>
+            <p class="hint">The number after the size, e.g. <b>112</b> in 265/65R17 112T.</p>
+          </div>
+          <div class="field" id="range-field">
+            <label for="range">Load range</label>
+            <select id="range" name="range"></select>
+            <p class="hint">The letter (C, D or E) or ply rating on the sidewall. It sets the highest pressure and load; at a given pressure every range carries the same.</p>
+          </div>
+          <details class="inline-help">
+            <summary>Where do I find these on the tyre?</summary>
+            <div class="diagram" data-diagram="markings"></div>
+            <figure class="inline-photo" data-image="markings"></figure>
+          </details>
+        </fieldset>
+
+        <fieldset>
+          <legend>2. Load on each axle</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="frontKg">Front axle</label>
+              <div class="with-unit"><input id="frontKg" name="frontKg" type="number" inputmode="numeric" min="0" step="10" placeholder="e.g. 1250"><span>kg</span></div>
+            </div>
+            <div class="field">
+              <label for="rearKg">Rear axle</label>
+              <div class="with-unit"><input id="rearKg" name="rearKg" type="number" inputmode="numeric" min="0" step="10" placeholder="e.g. 1450"><span>kg</span></div>
+            </div>
+          </div>
+          <p class="hint">Best: weigh each axle, loaded for the trip, on a weighbridge. Worst case: the maximum axle loads on the vehicle's VIN or compliance plate. Each tyre carries half its axle.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>3. Road pressure from the vehicle maker</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="placardFront">Front</label>
+              <div class="with-unit"><input id="placardFront" name="placardFront" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+            </div>
+            <div class="field">
+              <label for="placardRear">Rear</label>
+              <div class="with-unit"><input id="placardRear" name="placardRear" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+            </div>
+          </div>
+          <p class="hint">On the tyre placard, usually on the driver's door pillar, or in the owner's manual. Use the loaded figure if it gives one. Leave blank to use only the load tables.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>4. Terrain</legend>
+          <div class="terrain-grid" id="terrain-grid" role="radiogroup" aria-label="Terrain"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>5. What you plan to run</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="planFront">Front</label>
+              <div class="with-unit"><input id="planFront" name="planFront" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+            </div>
+            <div class="field">
+              <label for="planRear">Rear</label>
+              <div class="with-unit"><input id="planRear" name="planRear" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit-text">bar</span></div>
+            </div>
+          </div>
+          <button type="button" class="small-button" id="use-bottom">Use the bottom of the range</button>
+          <div class="field">
+            <label for="speed">Fastest you expect to drive like this</label>
+            <div class="with-unit"><input id="speed" name="speed" type="number" inputmode="numeric" min="0" step="5" placeholder="e.g. 30"><span>km/h</span></div>
+          </div>
+          <div class="field">
+            <span class="label">Tyres</span>
+            <div class="choice-row">
+              <label><input type="radio" name="tube" value="tubeless" checked> Tubeless</label>
+              <label><input type="radio" name="tube" value="tube"> Tube type</label>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" name="beadlock" id="beadlock"> Beadlock wheels</label>
+          <label class="check"><input type="checkbox" name="towing" id="towing"> Towing, or sustained high speed on tar</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>6. Pumping back up <small>(optional)</small></legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="flow">Compressor flow</label>
+              <div class="with-unit"><input id="flow" name="flow" type="number" inputmode="decimal" min="0" step="1" placeholder="e.g. 72"><select id="flowUnit" name="flowUnit" aria-label="Flow unit"><option value="lpm">L/min</option><option value="cfm">CFM</option></select></div>
+            </div>
+            <div class="field">
+              <label for="duty">Duty cycle</label>
+              <div class="with-unit"><input id="duty" name="duty" type="number" inputmode="numeric" min="1" max="100" step="5" placeholder="100"><span>%</span></div>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" name="freeFlow" id="freeFlow" checked> That flow is the "free flow" (0 psi) figure</label>
+          <div class="field">
+            <label for="altitude">Altitude where you'll pump up</label>
+            <div class="with-unit"><input id="altitude" name="altitude" type="number" inputmode="numeric" step="50" placeholder="0"><span>m</span></div>
+            <p class="hint">Your phone's map or compass app shows it. The coast is 0 m; Gauteng is about 1 500–1 800 m.</p>
+          </div>
+        </fieldset>
+      </form>
+
+      <section class="results" id="results" aria-labelledby="results-title" aria-live="polite">
+        <h2 id="results-title">Your pressures</h2>
+        <div id="results-body"></div>
+
+        <aside id="disclaimer" class="disclaimer" aria-labelledby="disclaimer-title">
+          <h2 id="disclaimer-title">Disclaimer</h2>
+          <p><strong>A starting point, not a safe-pressure guarantee.</strong> Tyre pressure off-road depends on your exact tyre, load, terrain, speed and driving. Lowering pressure can unseat a bead, damage a sidewall or overheat a tyre. You choose your pressures and you're responsible for them.</p>
+          <p>Figures come from the sources linked on each card, as published; check your own tyre maker's data for your exact tyre. The load tables are reproduced from a tyre maker's guide and haven't been checked against SANS 1550, which South African law refers to.</p>
+          <p>Reinflate to road pressure before driving on tar.</p>
+        </aside>
+      </section>
+    </div>
+
+    <section class="explainers" aria-labelledby="explain-title">
+      <h2 id="explain-title">Why the numbers work like this</h2>
+
+      <details class="explainer" open>
+        <summary>The load tables set the floor</summary>
+        <p>A tyre's load table gives the load it may carry at each pressure. Find the load on one tyre (half the axle), then the lowest pressure that carries it: that's the least the tyre needs. South African law (reg 238) doesn't allow a wheel on a public road, gravel roads included, to carry more than SANS 1550 allows for its tyre, judged at the cold pressure. This page assumes SANS 1550 matches the tables used here; that hasn't been checked yet.</p>
+        <p><strong>The tables stop at a lowest pressure</strong>: 1.5 bar for passenger-type tyres, 2.4 bar for LT tyres. Below that, nobody publishes what the tyre can carry, so this page shows no floor there. It only shows what tyre makers say about speed.</p>
+        <p class="read-more" data-rules="table-method table-lowest-pressure law-reg238 toyo-load-index"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Contact patch: why airing down helps in sand</summary>
+        <p>A tyre flattens until the pressure over its footprint balances the air pressure inside it. So the footprint is roughly load ÷ pressure: drop the pressure by a third and the footprint grows by about half. It grows mostly in length, which is what floats you over soft sand.</p>
+        <div class="diagram" data-diagram="footprint"></div>
+        <p class="read-more" data-rules="nhtsa-contact-patch bfg-low-traction"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Flex makes heat: why speed has to come down</summary>
+        <p>The lower the pressure, the more the tyre squashes and the more its sidewall flexes on every turn of the wheel. Flexing makes heat, and heat is what destroys tyres. That's why every maker that allows low pressures ties them to low speeds.</p>
+        <div class="diagram" data-diagram="deflection"></div>
+        <figure class="inline-photo" data-image="deflated"></figure>
+        <p class="read-more" data-rules="nhtsa-deflection-heat bfg-air-carries-load bfg-speed-load etrto-underinflation"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Speed and pressure go together</summary>
+        <p>Military trucks with central tyre inflation make the link explicit: each lower pressure setting comes with a lower top speed. These are big truck tyres, so the numbers aren't for your 4x4, but the pattern is the same one BFGoodrich gives for 4x4 tyres: below 1.5 bar, 20 km/h or less.</p>
+        <div class="diagram" data-diagram="ctis"></div>
+        <p class="read-more" data-rules="army-ctis-modes bfg-below-1-5 bfg-au-20psi"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Beads, rims and side slopes</summary>
+        <p>The tyre's bead sits on the rim's bead seat, held by the flange on the outside and, on a hump rim, a small hump on the inside. ETRTO recommends hump rims for tubeless radial tyres up to load index 121, which covers most 4x4 tyres. At low pressure, a hard sideways push (a side slope, a rut, a sharp turn) can roll the bead over the hump and into the well, and the tyre loses its air. BFGoodrich says to run road pressure across steep side slopes. Beadlocks clamp the bead, but they don't change what the air carries, and Ford doesn't approve them on the road.</p>
+        <div class="diagram" data-diagram="bead"></div>
+        <figure class="inline-photo" data-image="beadlock"></figure>
+        <p class="read-more" data-rules="etrto-hump-rims bfg-side-slopes ford-beadlock etrto-underinflation"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Warm tyres read higher</summary>
+        <p>Set and check pressures cold. After driving, a reading 20% or more above the cold figure is normal. Never let air out of warm tyres to get back to the cold number. If you pump up while the tyres are warm, check again once they've cooled.</p>
+        <div class="diagram" data-diagram="hotcold"></div>
+        <figure class="inline-photo" data-image="gauge"></figure>
+        <p class="read-more" data-rules="etrto-hot-pressure law-reg238"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Corrugations</summary>
+        <p>No tyre or vehicle maker found gives a corrugation pressure, so this page doesn't either. Research on log trucks found that lower tyre pressures reduce how corrugations form on gravel roads and improve the ride, but those were truck tyres within their makers' load and speed tables, not a figure for a 4x4.</p>
+        <figure class="inline-photo" data-image="corrugations"></figure>
+        <p class="read-more" data-rules="watkins-gravel bfg-same-as-road"></p>
+      </details>
+
+      <details class="explainer">
+        <summary>Pumping back up: the physics</summary>
+        <p>The air you need is the tyre's air volume × the pressure you're adding ÷ the air pressure around you. Inland there's less air pressure, so the same tyre needs a little more pumping. Compressors are often rated at "free flow" with nothing to push against; into a tyre at 2–3 bar they deliver less, so real times are longer.</p>
+        <figure class="inline-photo" data-image="compressor"></figure>
+        <p class="read-more" data-rules="calc-free-air calc-air-volume calc-altitude ford-off-road"></p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>A starting point, not a guarantee. <a href="sources.html">Sources, gaps and photo credits</a>.</p>
+      <p>&copy; <span id="year"></span> PsyPhin</p>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/tables.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/diagrams.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol === "https:") {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    }
+  </script>
+</body>
+</html>

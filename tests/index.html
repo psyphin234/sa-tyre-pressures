@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tests: 4x4 Tyre Pressures</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; margin: 20px; }
+    .ok { color: #15803d; }
+    .bad { color: #b91c1c; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1 id="summary">Running…</h1>
+  <ul id="out"></ul>
+  <script src="../js/data.js"></script>
+  <script src="../js/tables.js"></script>
+  <script src="../js/images.js"></script>
+  <script src="../js/calc.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      const C = window.TYRE_CALC;
+      const D = window.TYRE_DATA;
+      const T = window.TYRE_TABLES;
+      const out = document.getElementById("out");
+      let pass = 0, fail = 0;
+      function test(name, fn) {
+        let ok = false, msg = "";
+        try { const r = fn(); ok = r === true; if (!ok) msg = " → " + JSON.stringify(r); } catch (e) { msg = " → threw " + e.message; }
+        const li = document.createElement("li");
+        li.className = ok ? "ok" : "bad";
+        li.textContent = (ok ? "PASS " : "FAIL ") + name + msg;
+        out.appendChild(li);
+        ok ? pass++ : fail++;
+      }
+      const near = (a, b, tol) => Math.abs(a - b) <= tol || { got: a, want: b };
+      const LB = C.KG_PER_LB;
+
+      // ---------------- data integrity
+      test("every rule's sources exist", () => {
+        const bad = D.rules.flatMap((r) => r.sources.filter((s) => !D.sources[s]).map((s) => r.id + ":" + s));
+        return bad.length === 0 || bad;
+      });
+      test("rule ids are unique", () => new Set(D.rules.map((r) => r.id)).size === D.rules.length);
+      test("every rule has a category, title, summary and checked date", () => {
+        const cats = ["law", "standard", "tyre-maker", "vehicle-maker", "engineering", "calculation"];
+        const bad = D.rules.filter((r) => !cats.includes(r.category) || !r.title || !r.summary || !/^\d{4}-\d\d-\d\d$/.test(r.checked)).map((r) => r.id);
+        return bad.length === 0 || bad;
+      });
+      test("every outside-sourced rule (not a calculation) cites a source", () => {
+        const bad = D.rules.filter((r) => r.category !== "calculation" && !r.sources.length).map((r) => r.id);
+        return bad.length === 0 || bad;
+      });
+      test("every terrain's rules exist", () => {
+        const ids = new Set(D.rules.map((r) => r.id));
+        const bad = D.terrains.flatMap((t) => t.ruleIds.concat(t.lowerTo ? [t.lowerTo] : []).filter((id) => !ids.has(id)));
+        return bad.length === 0 || bad;
+      });
+      test("every terrain has a photo with a credit", () => {
+        const bad = D.terrains.filter((t) => {
+          const i = window.TYRE_IMAGES.find((x) => x.key === t.image);
+          return !i || !i.author || !i.license || !i.page;
+        }).map((t) => t.id);
+        return bad.length === 0 || bad;
+      });
+      test("every tyre type points at a table it can read", () => {
+        const bad = [];
+        D.tyreSizes.forEach((s) => s.types.forEach((t) => {
+          const choice = { sizeId: s.id, typeId: t.id, li: t.defaultLi };
+          if (!C.loadCurve(choice)) bad.push(s.id + "/" + t.id);
+        }));
+        return bad.length === 0 || bad;
+      });
+      test("every load index offered has a table row", () => {
+        const bad = [];
+        D.tyreSizes.forEach((s) => s.types.forEach((t) => (t.loadIndices || []).forEach((li) => { if (!T[t.table].rowsLb[li]) bad.push(t.table + " " + li); })));
+        return bad.length === 0 || bad;
+      });
+      test("table rows rise with pressure and end at the load index's load", () => {
+        const bad = [];
+        ["etrto-sl", "etrto-xl"].forEach((id) => Object.entries(T[id].rowsLb).forEach(([li, row]) => {
+          if (row.some((v, i) => i && v < row[i - 1])) bad.push(id + " " + li + " not rising");
+          if (Math.abs(row[row.length - 1] * LB - T.loadIndexKg[li]) > 1.5) bad.push(id + " " + li + " top");
+        }));
+        ["tra-lt", "tra-flotation"].forEach((id) => Object.entries(T[id].sizes).forEach(([size, s]) => {
+          s.ranges.forEach((r) => {
+            const lb = s.single.find(([psi]) => psi === r.maxPsi)[1];
+            if (Math.abs(lb * LB - T.loadIndexKg[r.li]) > 1.5) bad.push(size + " " + r.range);
+          });
+        }));
+        return bad.length === 0 || bad;
+      });
+      test("Michelin 7.50R16 top axle load = 2 x load index 116", () => T["michelin-750r16"].axleKg.slice(-1)[0][1] === 2 * T.loadIndexKg[116]);
+
+      // ---------------- load tables
+      test("ETRTO SL 112 at 36 psi carries 1 120 kg", () => near(C.loadAt(C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 }), C.psiToKpa(36)), 1120, 1));
+      test("ETRTO SL 112: 745 kg per tyre needs exactly 22 psi (lowest column)", () => {
+        const need = C.requiredPressure(C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 }), 1642 * LB);
+        return need.status === "belowTable" || need;
+      });
+      test("ETRTO SL 112: 900 kg per tyre needs 28.x psi (straight line between 28 and 29)", () => {
+        // 28 psi = 1984 lb (899.9 kg), 29 psi = 2061 lb (934.9 kg)
+        const need = C.requiredPressure(C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 }), 900);
+        const psi = C.kpaToPsi(need.kpa);
+        return (need.status === "ok" && psi > 28 && psi < 28.05) || { status: need.status, psi };
+      });
+      test("ETRTO SL 112: 1 200 kg per tyre is overloaded", () => C.requiredPressure(C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 }), 1200).status === "overload");
+      test("LT265/75R16 E: 3 415 lb at 80 psi; lowest published 35 psi", () => {
+        const c = C.loadCurve({ sizeId: "lt265-75r16", typeId: "lt", range: "E" });
+        return (near(c.points.slice(-1)[0][1], 3415 * LB, 0.5) === true && near(C.kpaToPsi(c.points[0][0]), 35, 0.01) === true) || c.points;
+      });
+      test("LT265/75R16 range C stops at 50 psi", () => {
+        const c = C.loadCurve({ sizeId: "lt265-75r16", typeId: "lt", range: "C" });
+        return near(C.kpaToPsi(c.points.slice(-1)[0][0]), 50, 0.01);
+      });
+      test("LT265/75R16: 700 kg per tyre is below the table (carried at 35 psi)", () => {
+        const need = C.requiredPressure(C.loadCurve({ sizeId: "lt265-75r16", typeId: "lt", range: "E" }), 700);
+        return (need.status === "belowTable" && near(C.kpaToPsi(need.kpa), 35, 0.01) === true) || need;
+      });
+      test("Michelin 7.50R16: 800 kg per tyre (1 600 kg axle) needs 47 psi", () => {
+        const need = C.requiredPressure(C.loadCurve({ sizeId: "750r16", typeId: "michelin" }), 800);
+        return near(C.kpaToPsi(need.kpa), 47, 0.01);
+      });
+      test("31x10.50R15LT C: lowest published pressure 25 psi, top 50 psi", () => {
+        const c = C.loadCurve({ sizeId: "31x1050r15", typeId: "flotation", range: "C" });
+        return (near(C.kpaToPsi(c.points[0][0]), 25, 0.01) === true && near(C.kpaToPsi(c.points.slice(-1)[0][0]), 50, 0.01) === true) || c.points;
+      });
+
+      // ---------------- road pressure and bands
+      test("road pressure = placard when the placard covers the load", () => {
+        const r = C.roadPressure(240, { kpa: 200, status: "ok" });
+        return (r.kpa === 240 && !r.raisedForLoad) || r;
+      });
+      test("road pressure is raised when the load needs more than the placard", () => {
+        const r = C.roadPressure(200, { kpa: 260, status: "ok" });
+        return (r.kpa === 260 && r.raisedForLoad) || r;
+      });
+      const curveSl = C.loadCurve({ sizeId: "265-65r17", typeId: "sl", li: 112 });
+      const need600 = C.requiredPressure(curveSl, 600); // below table
+      const need900 = C.requiredPressure(curveSl, 900); // ~1.94 bar
+      test("band: road pressure", () => C.assessPressure(240, need900, 240, "sand").band === "road");
+      test("band: below placard, load carried", () => C.assessPressure(200, need900, 240, "sand").band === "belowPlacard");
+      test("band: below what the load needs", () => C.assessPressure(170, need900, 240, "sand").band === "belowLoad");
+      test("band: below the tables", () => C.assessPressure(140, need600, 240, "sand").band === "belowTable");
+      test("below 1.5 bar: 20 km/h (BFGoodrich UK)", () => C.assessPressure(140, need600, 240, "gravel").maxKmh === 20);
+      test("at 1.5 bar: no speed cap from the below-1.5 rule", () => C.assessPressure(150, need600, 240, "gravel").maxKmh === null);
+      test("below 20 psi also flags BFGoodrich Australia", () => C.assessPressure(130, need600, 240, "gravel").flags.includes("bfg-au-20psi"));
+      test("sand below 1.5 bar flags BFGoodrich's sand minimum", () => C.assessPressure(140, need600, 240, "sand").flags.includes("bfg-sand-min"));
+      test("below-load is not for public roads", () => C.assessPressure(170, need900, 240, "sand").publicRoad === false);
+
+      // ---------------- terrain ranges
+      test("sand range: 2.4 → 1.9 → 1.5 bar", () => {
+        const r = C.terrainRange("sand", 240);
+        return JSON.stringify(r.steps.map(Math.round)) === "[240,190,150]" || r.steps;
+      });
+      test("gravel range stays at road pressure (no citable lower figure)", () => {
+        const r = C.terrainRange("gravel", 240);
+        return (r.bottomKpa === 240 && r.sourced === false) || r;
+      });
+      test("towing on tar, ETRTO SL: +20 to +50 kPa, capped at 320 kPa", () => {
+        const h = C.hardDriving({ table: "etrto-sl" }, 290);
+        return (h.fromKpa === 310 && h.toKpa === 320) || h;
+      });
+      test("towing advice not applied to LT tyres", () => C.hardDriving({ table: "tra-lt" }, 300) === null);
+
+      // ---------------- physics
+      test("atmosphere: 101.3 kPa at sea level, about 82 kPa at 1 750 m", () => (near(C.atmosphereKpa(0), 101.325, 0.01) === true && near(C.atmosphereKpa(1750), 82.3, 0.5) === true) || [C.atmosphereKpa(0), C.atmosphereKpa(1750)]);
+      test("volume method x 0.86 reproduces Michelin's 57 L for the 7.50R16", () => {
+        const est = C.torusLitres(8.3 * 25.4, ((32.4 - 16) / 2) * 25.4, 16) * 0.86;
+        return near(est, 57, 1);
+      });
+      test("7.50R16 uses the published 57 L", () => C.tyreVolume(C.findSize("750r16").geometry).litres === 57);
+      test("reinflation: 57 L from 150 to 250 kPa at sea level = 56 L free air per tyre", () => {
+        const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 56.3 * 2, dutyPercent: 100 });
+        return (near(r.perAxle[0].perTyreL, 56.25, 0.1) === true && near(r.runMin, 1, 0.01) === true) || r;
+      });
+      test("reinflation: a 50% duty cycle doubles the elapsed time", () => {
+        const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 50, dutyPercent: 50 });
+        return near(r.elapsedMin, r.runMin * 2, 1e-9);
+      });
+
+      // ---------------- formatting
+      test("formats 240 kPa as 2.4 bar / 240 kPa / 35 psi", () => C.fmtPressure(240, "bar") === "2.4 bar" && C.fmtPressure(240, "kpa") === "240 kPa" && C.fmtPressure(240, "psi") === "35 psi");
+      test("parses 1,5 bar (comma decimal)", () => C.parsePressure("1,5", "bar") === 150);
+
+      document.getElementById("summary").textContent = fail ? `${fail} FAILED, ${pass} passed` : `ALL PASSED (${pass})`;
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "4x4 Tyre Pressures (PsyPhin)",
+  "short_name": "Tyre Pressures",
+  "description": "A starting range for 4x4 tyre pressures from tyre-maker load tables and published guidance. Works offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020203",
+  "theme_color": "#020203",
+  "icons": [
+    { "src": "favicon-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "favicon-96x96.png", "sizes": "96x96", "type": "image/png" }
+  ]
+}

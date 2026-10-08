@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sources | 4x4 Tyre Pressures | PsyPhin</title>
+  <meta name="description" content="Every rule, table and figure the 4x4 tyre pressure calculator uses, with its source, the exact quote, what isn't known yet, and photo credits.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#020203">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon-96x96.png" type="image/png" sizes="96x96">
+  <link rel="icon" href="favicon-192x192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="construction" role="alert">
+    <strong>Under construction.</strong> Not finished or checked yet. The numbers may be wrong: don't rely on this page for real trips.
+  </div>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="back-link" href="https://psyphin.co.za/#tools"><span class="back-link-arrow" aria-hidden="true">&larr;</span> <span class="back-link-label"><span class="back-link-more">More </span>PsyPhin tools</span> <span class="back-link-domain">psyphin.co.za</span></a>
+      <div class="header-end">
+        <nav class="nav" aria-label="Site">
+          <a href="index.html">Calculator</a>
+          <a href="sources.html" aria-current="page">Sources</a>
+        </nav>
+        <a class="brand" href="https://psyphin.co.za/" aria-label="PsyPhin home"><img src="brand-64.png" alt="" width="32" height="32"></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap sources-page">
+    <section class="intro">
+      <h1>Sources</h1>
+      <p class="lede">Every rule the calculator uses, with the exact words of its source. Only tyre makers, vehicle makers, standards bodies, South African law and engineering research are used. Where nothing citable exists, it's listed under <a href="#gaps">What isn't known</a> instead of being filled with a guess.</p>
+      <p class="muted" id="checked"></p>
+      <p><a href="#rules">Rules</a> · <a href="#tables">Load tables</a> · <a href="#gaps">What isn't known</a> · <a href="#source-list">Source documents</a> · <a href="#credits">Photo credits</a></p>
+    </section>
+
+    <h2 id="rules">Rules</h2>
+    <div id="rule-groups"></div>
+
+    <h2 id="tables">Load tables</h2>
+    <div id="table-info"></div>
+
+    <h2 id="gaps">What isn't known</h2>
+    <ul id="gap-list" class="source-groups"></ul>
+
+    <h2 id="source-list">Source documents</h2>
+    <ul id="source-docs" class="source-list"></ul>
+
+    <h2 id="credits">Photo credits</h2>
+    <p class="muted">All photos are from Wikimedia Commons under the licences shown; they were resized for this site. Fonts: Inter and Rajdhani, SIL Open Font License (files in <code>fonts/</code>).</p>
+    <ul id="credit-list" class="credit-list"></ul>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>A starting point, not a guarantee. <a href="index.html">Back to the calculator</a>.</p>
+      <p>&copy; <span id="year"></span> PsyPhin</p>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/tables.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/sources.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol === "https:") {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    }
+  </script>
+</body>
+</html>
