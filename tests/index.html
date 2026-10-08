@@ -222,6 +222,11 @@
         const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 56.3 * 2, dutyPercent: 100 });
         return (near(r.perAxle[0].perTyreL, 56.25, 0.1) === true && near(r.runMin, 1, 0.01) === true) || r;
       });
+      test("reinflation: moving between four tyres adds three moves", () => {
+        const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }, { fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 50, dutyPercent: 100, switchMin: 1.5 });
+        return (r.tyres === 4 && r.moveMin === 4.5 && near(r.totalMin, r.runMin + 4.5, 1e-9) === true) || r;
+      });
+      test("reinflation: no moving time when it's 0", () => C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 50, dutyPercent: 100, switchMin: 0 }).moveMin === 0);
       test("reinflation: a 50% duty cycle doubles the elapsed time", () => {
         const r = C.reinflation({ volumeL: 57, axles: [{ fromKpa: 150, toKpa: 250 }], altitudeM: 0, flowLpm: 50, dutyPercent: 50 });
         return near(r.elapsedMin, r.runMin * 2, 1e-9);

@@ -383,7 +383,7 @@
    * from fromKpa to toKpa gauge, and the time at flowLpm.
    * axles: [{ fromKpa, toKpa }] for front and rear (two tyres each).
    */
-  function reinflation({ volumeL, axles, altitudeM, flowLpm, dutyPercent }) {
+  function reinflation({ volumeL, axles, altitudeM, flowLpm, dutyPercent, switchMin }) {
     const atm = atmosphereKpa(altitudeM);
     const perAxle = axles.map((a) => {
       const perTyre = Math.max(0, (volumeL * (a.toKpa - a.fromKpa)) / atm);
@@ -392,7 +392,11 @@
     const totalL = perAxle.reduce((s, a) => s + a.axleL, 0);
     const runMin = flowLpm > 0 ? totalL / flowLpm : null;
     const duty = dutyPercent > 0 && dutyPercent < 100 ? dutyPercent / 100 : 1;
-    return { atmKpa: atm, perAxle, totalL, runMin, elapsedMin: runMin != null ? runMin / duty : null, duty };
+    const tyres = perAxle.length * 2;
+    // Moving the hose to the next tyre: once between each pair of tyres.
+    const moveMin = switchMin > 0 ? switchMin * (tyres - 1) : 0;
+    const elapsedMin = runMin != null ? runMin / duty : null;
+    return { atmKpa: atm, perAxle, totalL, runMin, elapsedMin, duty, tyres, moveMin, totalMin: elapsedMin != null ? elapsedMin + moveMin : null };
   }
 
   /*

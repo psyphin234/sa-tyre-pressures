@@ -140,7 +140,7 @@
       );
     } else if (t.id === "mud") {
       headline = lowers ? "Lower if you need to, down to " + b : "Keep road pressure";
-      lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} (20 psi) is the lowest BFGoodrich (South Africa) publishes for mud.`));
+      lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} is the lowest BFGoodrich (South Africa) publishes for mud.`));
       lines.push(el("p", null, "There's no single best pressure: thick mud on a soft base needs lower, watery mud on a firm base can stay higher, and too low can cut traction. Keep it slow."));
     } else if (!lowers) {
       headline = "Keep " + tp;
@@ -192,6 +192,7 @@
       flowLpm: num("flow") != null ? num("flow") * (f.flowUnit.value === "cfm" ? CFM_TO_LPM : 1) : null,
       freeFlow: f.freeFlow.checked,
       duty: num("duty"),
+      switchMin: num("switchMin") != null ? num("switchMin") : 0,
       altitude: num("altitude") || 0,
     };
   }
@@ -466,7 +467,7 @@
       .map((a) => ({ name: a.name, fromKpa: a.plan != null && a.plan < a.road.kpa ? a.plan : a.road.kpa, toKpa: a.road.kpa }));
     if (!axles.length || axles.every((a) => a.toKpa <= a.fromKpa))
       return card("Pumping back up", "card--pump", el("p", { class: "muted" }, "Enter a planned pressure below road pressure to see how much air and time it takes to pump back up."), UI.sourcesLink(["calc-free-air", "calc-air-volume"]));
-    const r = C.reinflation({ volumeL: vol.litres, axles, altitudeM: st.altitude, flowLpm: st.flowLpm, dutyPercent: st.duty });
+    const r = C.reinflation({ volumeL: vol.litres, axles, altitudeM: st.altitude, flowLpm: st.flowLpm, dutyPercent: st.duty, switchMin: st.switchMin });
     const lines = [
       el("p", null, `Air in one ${m.sizeLabel} tyre: about ${Math.round(vol.litres)} L`, vol.published ? " (published by the tyre maker)." : " (estimated from its size)."),
       el(
@@ -474,21 +475,18 @@
         null,
         r.perAxle.map((a) => el("li", null, `${a.name}: ${fmt(a.fromKpa)} → ${fmt(a.toKpa)} needs about ${Math.round(a.perTyreL)} L of free air per tyre (${Math.round(a.axleL)} L for the axle).`))
       ),
-      el("p", null, el("strong", null, `Total: about ${Math.round(r.totalL)} L`), ` at ${Math.round(st.altitude)} m, where the air pressure is about ${Math.round(r.atmKpa)} kPa.`),
+      el("p", null, el("strong", null, `Total: about ${Math.round(r.totalL)} L`), ` at ${Math.round(st.altitude)} m, where the air pressure is about ${(r.atmKpa / 100).toFixed(2)} bar.`),
     ];
     if (r.runMin != null) {
       const mins = (x) => (x < 1 ? "under a minute" : `about ${Math.round(x)} min`);
-      lines.push(
-        el(
-          "p",
-          { class: "big" },
-          `Pumping time for all four tyres: ${st.freeFlow ? "at least " : ""}${mins(r.runMin)}`,
-          r.duty < 1 ? `, or ${st.freeFlow ? "at least " : ""}${mins(r.elapsedMin)} including rests at a ${Math.round(r.duty * 100)}% duty cycle` : "",
-          "."
-        )
-      );
+      const atLeast = st.freeFlow ? "at least " : "";
+      lines.push(el("p", { class: "big" }, `Time for all four tyres: ${atLeast}${mins(r.totalMin)}.`));
+      const parts = [`pumping ${mins(r.runMin)}`];
+      if (r.duty < 1) parts.push(`rests for the compressor ${mins(r.elapsedMin - r.runMin)} (${Math.round(r.duty * 100)}% duty cycle)`);
+      if (r.moveMin > 0) parts.push(`moving between tyres ${mins(r.moveMin)} (${r.tyres - 1} moves of ${st.switchMin} min)`);
+      lines.push(el("p", null, "That's " + parts.join(", ") + "."));
       const perTyre = r.runMin / 4;
-      lines.push(el("p", null, `That's ${perTyre < 1 ? "under a minute" : "about " + Math.round(perTyre * 10) / 10 + " min"} of pumping per tyre on average${r.duty < 1 ? ", plus rests" : ""}.`));
+      lines.push(el("p", null, `Pumping alone is ${perTyre < 1 ? "under a minute" : "about " + Math.round(perTyre * 10) / 10 + " min"} per tyre on average.`));
       if (st.freeFlow) lines.push(el("p", { class: "note" }, "Free-flow ratings are measured with nothing to push against. Into a tyre at 2–3 bar a compressor delivers less, so expect longer."));
     } else lines.push(el("p", { class: "muted" }, "Enter your compressor's flow (step 6) for a time."));
     lines.push(el("p", { class: "note" }, "The air comes out warm and the pressure drops a little as it cools: check again once the tyres are cold."));

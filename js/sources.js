@@ -51,8 +51,9 @@
 
   // Load tables: what's in them and where they came from.
   const tableIds = ["etrto-sl", "etrto-xl", "tra-lt", "tra-flotation", "michelin-750r16"];
+  const bar = (psi) => (Math.round(psi * 0.0689476 * 20) / 20).toFixed(2).replace(/0$/, "");
   document.getElementById("table-info").replaceChildren(
-    el("p", null, "Loads per tyre at each pressure, typed out of the source as published (pounds and psi), checked row by row against the page and by script (every row rises with pressure and ends at its load index's rated load). The calculator converts them to kg and kPa, and reads between two published pressures in a straight line."),
+    el("p", null, "Loads per tyre at each pressure, typed out of the source as published (pounds and psi; shown here in bar), checked row by row against the page and by script (every row rises with pressure and ends at its load index's rated load). The calculator converts them to kg and kPa, and reads between two published pressures in a straight line."),
     el(
       "ul",
       { class: "source-list" },
@@ -61,9 +62,9 @@
         let what;
         if (t.rowsLb) {
           const lis = Object.keys(t.rowsLb).map(Number);
-          what = `load indices ${Math.min(...lis)}–${Math.max(...lis)}, ${t.psi[0]}–${t.psi[t.psi.length - 1]} psi`;
-        } else if (t.sizes) what = Object.keys(t.sizes).join(", ") + ` (from ${Object.values(t.sizes)[0].single[0][0]} psi)`;
-        else what = `axle loads, ${t.axleKg[0][0]}–${t.axleKg[t.axleKg.length - 1][0]} psi`;
+          what = `load indices ${Math.min(...lis)}–${Math.max(...lis)}, ${bar(t.psi[0])}–${bar(t.psi[t.psi.length - 1])} bar`;
+        } else if (t.sizes) what = Object.keys(t.sizes).join(", ") + ` (from ${bar(Object.values(t.sizes)[0].single[0][0])} bar)`;
+        else what = `axle loads, ${bar(t.axleKg[0][0])}–${bar(t.axleKg[t.axleKg.length - 1][0])} bar`;
         return el("li", null, el("strong", null, t.label + ": "), what + ". ", t.where + ". ", externalLink(D.sources[t.source].url, "Source"));
       })
     )

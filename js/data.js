@@ -207,7 +207,7 @@
       category: "standard",
       title: "The tables stop at a lowest pressure",
       summary:
-        "Published tables start at 22 psi (1.5 bar) for ETRTO passenger tyres, 35 psi (2.4 bar) for TRA LT-metric tyres, 25 psi (1.7 bar) for TRA flotation tyres and 36 psi (2.5 bar) for Michelin's 7.50R16 table. Nothing in them says what a tyre can carry below that, so this site shows no load floor below the lowest published pressure.",
+        "Published tables start at about 1.5 bar for ETRTO passenger tyres, 2.4 bar for TRA LT-metric tyres, 1.7 bar for TRA flotation tyres and 2.5 bar for Michelin's 7.50R16 table. Nothing in them says what a tyre can carry below that, so this site shows no load floor below the lowest published pressure.",
       sources: ["toyo2020", "michelinXForceS"],
       checked: CHECKED,
     },
@@ -236,7 +236,7 @@
       category: "tyre-maker",
       title: "Michelin 7.50R16 table is per axle",
       summary:
-        "Michelin's X Force S table gives the load per axle (two tyres) at each pressure, from 1 300 kg at 36 psi to 2 500 kg at 80 psi. The tyre's load index 116 means 1 250 kg per tyre, which matches 2 500 kg per axle. Michelin also publishes the tyre's air volume: 57 litres.",
+        "Michelin's X Force S table gives the load per axle (two tyres) at each pressure, from 1 300 kg at 2.5 bar to 2 500 kg at 5.5 bar. The tyre's load index 116 means 1 250 kg per tyre, which matches 2 500 kg per axle. Michelin also publishes the tyre's air volume: 57 litres.",
       quote: "The inflation pressure must always be appropriate for the load per tyre, the speed of travel and the work to be done.",
       sources: ["michelinXForceS"],
       checked: CHECKED,
@@ -288,7 +288,7 @@
       category: "standard",
       title: "Towing or sustained high speed (passenger-type tyres)",
       summary:
-        "For passenger-car tyres under hard driving (sustained high speed, towing), ETRTO recommends 20–50 kPa (0.2–0.5 bar) above the normal cold pressure, unless the vehicle handbook says otherwise, without going over the tyre's maximum: 320 kPa up to speed symbol T, 350 kPa for H, V, W, Y, Reinforced (XL) and ZR tyres.",
+        "For passenger-car tyres under hard driving (sustained high speed, towing), ETRTO recommends 0.2–0.5 bar above the normal cold pressure, unless the vehicle handbook says otherwise, without going over the tyre's maximum: 3.2 bar up to speed symbol T, 3.5 bar for H, V, W, Y, Reinforced (XL) and ZR tyres.",
       quote:
         "When the car is subjected to hard driving conditions (e.g. sustained high speed, towing a trailer or caravan etc.), it is recommended that cold inflation pressure be increased by between 20 and 50kPa while respecting the maximum inflation pressure of the tyre (320kPa for sizes having a Speed Symbol up to T, 350kPa for sizes having a Speed Symbol H, V, W or Y, Reinforced Tyres and ZR marked tyres) and unless specific guidance is given in the vehicle handbook",
       sources: ["etrtoRec2024"],
@@ -352,14 +352,14 @@
       params: { bar: 1.5, maxKmh: 20 },
       notes: [
         "BFGoodrich's own sand and mud tips (next rules) are stricter: do not go below 1.5 bar.",
-        "BFGoodrich Australia puts it differently: below 20 psi (1.38 bar), 25 km/h or less.",
+        "BFGoodrich Australia puts it differently: below about 1.4 bar, 25 km/h or less.",
       ],
     },
     {
       id: "bfg-au-20psi",
       category: "tyre-maker",
-      title: "BFGoodrich Australia: below 20 psi, 25 km/h or less",
-      summary: "BFGoodrich Australia: pressures lower than 20 psi (1.38 bar) may be used off-road at 25 km/h or less, when the tyre has adequate load-carrying capacity.",
+      title: "BFGoodrich Australia: below about 1.4 bar, 25 km/h or less",
+      summary: "BFGoodrich Australia: pressures lower than about 1.4 bar may be used off-road at 25 km/h or less, when the tyre has adequate load-carrying capacity.",
       quote:
         "Pressures lower than 20psi may be used off-road provided speeds are reduced to 25kph or less, when the tyre has adequate load-carrying capacity.",
       sources: ["bfgAuFaq"],
@@ -407,8 +407,8 @@
     {
       id: "bfg-africa-mud",
       category: "tyre-maker",
-      title: "Mud (BFGoodrich Africa): not below 20 psi",
-      summary: "BFGoodrich's South African site: there's no single best mud pressure, but as a rule of thumb not below 20 psi (about 1.4 bar) and not faster than 20 km/h.",
+      title: "Mud (BFGoodrich Africa): not below about 1.4 bar",
+      summary: "BFGoodrich's South African site: there's no single best mud pressure, but as a rule of thumb not below about 1.4 bar and not faster than 20 km/h.",
       quote: "A general rule of thumb is to not go below 20psi and not travel faster than 20km/h.",
       sources: ["bfgAfrica"],
       checked: CHECKED,
@@ -463,7 +463,7 @@
       category: "tyre-maker",
       title: "Cooper's terrain ranges (LT tyres only)",
       summary:
-        "Cooper Tires Australia publishes a pressure range per terrain for light-truck (LT) construction tyres: sand 18–26 psi, fast or smooth gravel 28–34 psi, slow or rough gravel 26–32 psi, mud 22–28 psi, rocky gravel and rocks 22–28 psi, and on bitumen the vehicle placard. Heavier loads need the higher end. The figures are for an average range of sizes, not your exact tyre, and Cooper says they shouldn't be used for passenger or light-duty tyres.",
+        "Cooper Tires Australia publishes a pressure range per terrain for light-truck (LT) construction tyres: sand 1.25–1.8 bar, fast or smooth gravel 1.95–2.35 bar, slow or rough gravel 1.8–2.2 bar, mud 1.5–1.95 bar, rocky gravel and rocks 1.5–1.95 bar, and on bitumen the vehicle placard. (Cooper publishes them in psi.) Heavier loads need the higher end. The figures are for an average range of sizes, not your exact tyre, and Cooper says they shouldn't be used for passenger or light-duty tyres.",
       quote:
         "All pressures stated are suggested for light truck construction tyres only and should not be advised to any person driving on passenger or light duty construction tyres. … lowering tyre pressures below the manufacturer's recommended pressure for your vehicle is at your own risk and judgement, and doing so could cause over-heating and long-term tyre damage. So, you must drive slowly over obstacles and re-inflate your tyres to proper levels once your vehicle is returned to normal road applications and conditions.",
       sources: ["cooperAu", "cooperAu2022"],
@@ -472,7 +472,7 @@
         psi: { sand: [18, 26], fastGravel: [28, 34], roughGravel: [26, 32], mud: [22, 28], rock: [22, 28], bitumen: [32, 38] },
       },
       notes: [
-        "Ranges from the current web page. Cooper's March 2022 PDF guide is a little lower for gravel and rocks: fast gravel 28–32, slow/rough gravel 24–28, rocks 20–26 psi.",
+        "Ranges from the current web page. Cooper's March 2022 PDF guide is a little lower for gravel and rocks: fast gravel 1.95–2.2, slow/rough gravel 1.65–1.95, rocks 1.4–1.8 bar.",
         "The calculator never shows the top of a Cooper range above your road pressure.",
         "Cooper's guide also says: \"Narrow commercial-style tyres require higher pressures.\" (2022 PDF, p. 8)",
       ],
@@ -482,11 +482,11 @@
       category: "tyre-maker",
       title: "Rocks: very slow, and not too low",
       summary:
-        "Cooper's rock range assumes a very slow pace in low range, without much heat in the tyre. Lower pressure helps the tyre wrap over obstacles without impact damage; below about 20 psi there's a risk of pushing the tyre off the rim, so 22 psi is a practical minimum for most vehicles.",
+        "Cooper's rock range assumes a very slow pace in low range, without much heat in the tyre. Lower pressure helps the tyre wrap over obstacles without impact damage; below about 1.4 bar there's a risk of pushing the tyre off the rim, so about 1.5 bar is a practical minimum for most vehicles.",
       quote: "Pressures below around 20 PSI increase the risk of pushing the tyre off the rim.",
       sources: ["cooperAu", "cooperAu2022"],
       checked: CHECKED,
-      notes: ["The 2022 PDF puts it at \"around 18 PSI and below\", with 20 psi as the minimum."],
+      notes: ["The 2022 PDF puts the bead risk at about 1.25 bar and below, with about 1.4 bar as the minimum."],
     },
     {
       id: "cooper-corrugations",
@@ -516,7 +516,7 @@
       category: "tyre-maker",
       title: "Leaving the tar: 20% less pressure, 20% less speed",
       summary:
-        "Toyo Tires Australia publishes an off-road instructor's rule: when you go from bitumen to dirt, drop tyre pressure by 20% and speed by 20%. From 36 psi that's about 29 psi, and from 100 km/h a maximum of 80 km/h. Never drive faster than 80 km/h on dirt.",
+        "Toyo Tires Australia publishes an off-road instructor's rule: when you go from bitumen to dirt, drop tyre pressure by 20% and speed by 20%. From 2.5 bar that's about 2.0 bar, and from 100 km/h a maximum of 80 km/h. Never drive faster than 80 km/h on dirt.",
       quote:
         "when you make the transfer from bitumen to dirt, drop your tyre pressure 20 per cent, and reduce your speed 20 per cent. So if you were running 36psi, drop your tyre pressure down to 29psi … You should never go faster than 80km/h on dirt.",
       sources: ["toyoAu20"],
@@ -593,7 +593,7 @@
       category: "engineering",
       title: "Pressure and speed go together (military trucks)",
       summary:
-        "Military trucks with central tyre inflation pair each pressure with a top speed. FMTV example: Highway 60 psi / 88 km/h, Cross-country 37 psi / 64 km/h, Sand 22 psi / 19 km/h, Emergency 16 psi / 8 km/h. These are big truck tyres, so the numbers don't apply to a 4x4; the pattern does.",
+        "Military trucks with central tyre inflation pair each pressure with a top speed. FMTV example: Highway 4.1 bar / 88 km/h, Cross-country 2.55 bar / 64 km/h, Sand 1.5 bar / 19 km/h, Emergency 1.1 bar / 8 km/h. These are big truck tyres, so the numbers don't apply to a 4x4; the pattern does.",
       sources: ["armyTm366"],
       checked: CHECKED,
       params: {
@@ -611,7 +611,7 @@
       category: "engineering",
       title: "A military 4x4 below 1.5 bar (Humvee manual)",
       summary:
-        "The US Army's Humvee manual takes its 37x12.50R16.5 LT radial tyres well below 1.5 bar: 12 psi (0.83 bar) front and 16 psi (1.1 bar) rear in sand, and 12 psi front, 20 psi (1.38 bar) rear for mud, sand and snow, at 15 mph (24 km/h) at most. Loaded, the same vehicles run about 20–42 psi depending on model. It's a military vehicle on its own tyres and wheels, so the numbers aren't for your 4x4, but it shows a vehicle maker's manual going under 1 bar at low speed.",
+        "The US Army's Humvee manual takes its 37x12.50R16.5 LT radial tyres well below 1.5 bar: 0.83 bar front and 1.1 bar rear in sand, and 0.83 bar front, 1.38 bar rear for mud, sand and snow, at 24 km/h (15 mph) at most. Loaded, the same vehicles run about 1.4–2.9 bar depending on model. It's a military vehicle on its own tyres and wheels, so the numbers aren't for your 4x4, but it shows a vehicle maker's manual going under 1 bar at low speed.",
       quote:
         "Reduce tire inflation to 12 psi (83 kPa) front and 16 psi (110 kPa) rear to increase traction when operating in sand. … MUD, SAND, AND SNOW … 12 [psi front] 20 [psi rear] (15 mph [48 kph] max. speed)",
       sources: ["armyTm280"],
@@ -619,7 +619,7 @@
       params: { sandFrontPsi: 12, sandRearPsi: 16, mssFrontPsi: 12, mssRearPsi: 20, maxMph: 15, maxKmh: 24 },
       notes: [
         "The manual prints \"15 mph [48 kph]\", but 15 mph is 24 km/h (48 km/h is 30 mph). This site uses the lower figure, 24 km/h.",
-        "The table's column layout is hard to read in the web copy; front and rear are as reconstructed from it. The 12/16 psi sand figures are stated in words in para 2-32.",
+        "The table's column layout is hard to read in the web copy; front and rear are as reconstructed from it. The 0.83/1.1 bar (12/16 psi) sand figures are stated in words in para 2-32.",
       ],
     },
     {
@@ -627,7 +627,7 @@
       category: "engineering",
       title: "Lower pressure, fewer corrugations (log trucks)",
       summary:
-        "US Forest Service trials ran loaded log trucks at reduced pressures within the tyre makers' load and speed tables. Washboarding (corrugation) of the gravel roads dropped noticeably and drivers' ride improved; earlier studies found no washboarding when empty trucks' drive tyres were at 25 psi. Trucks needed tubeless radial tyres, and highway speed was limited because of casing heat.",
+        "US Forest Service trials ran loaded log trucks at reduced pressures within the tyre makers' load and speed tables. Washboarding (corrugation) of the gravel roads dropped noticeably and drivers' ride improved; earlier studies found no washboarding when empty trucks' drive tyres were at about 1.7 bar. Trucks needed tubeless radial tyres, and highway speed was limited because of casing heat.",
       quote:
         "The Soper-Wheeler test also experienced a noticeable reduction in washboarding of the unpaved roads. … Ride quality for the truck operator, especially in the loaded truck, improved in all three tests. … Trucks must be equipped with tubeless radial tires for operation at lower pressures. Travel at highway speeds may need to be limited because tire casing heat buildup could be detrimental on a sustained high-speed haul.",
       sources: ["watkins1991"],
@@ -649,7 +649,7 @@
       id: "nokian-flotation",
       category: "tyre-maker",
       title: "Deep snow: Nokian lowers pressure for flotation",
-      summary: "Nokian's Hakkapeliitta 44, an LT475/70R17 winter tyre made for Arctic Trucks' expedition 4x4s, has a maximum pressure of 240 kPa and is run at about 160 kPa (1.6 bar) for flotation in snow.",
+      summary: "Nokian's Hakkapeliitta 44, an LT475/70R17 winter tyre made for Arctic Trucks' expedition 4x4s, has a maximum pressure of 2.4 bar and is run at about 1.6 bar for flotation in snow.",
       quote: "Max pressure: 240 kPa, in flotation use approx. 160 kPa",
       sources: ["nokianH44"],
       checked: CHECKED,
@@ -670,7 +670,7 @@
       category: "calculation",
       title: "Rock on passenger tyres: Toyo's 20% rule",
       summary:
-        "No tyre maker publishes a rock pressure for passenger-type tyres (Cooper's rock range is for LT tyres only). The calculator uses Toyo's 20 per cent rule for leaving the tar as a cautious starting point on rocky tracks, at a crawl. BFGoodrich says to air down conservatively on climbs, and Cooper warns that below about 20 psi a tyre can be pushed off the rim.",
+        "No tyre maker publishes a rock pressure for passenger-type tyres (Cooper's rock range is for LT tyres only). The calculator uses Toyo's 20 per cent rule for leaving the tar as a cautious starting point on rocky tracks, at a crawl. BFGoodrich says to air down conservatively on climbs, and Cooper warns that below about 1.4 bar a tyre can be pushed off the rim.",
       sources: ["toyoAu20", "bfgAfrica", "cooperAu"],
       checked: CHECKED,
       notes: ["Toyo's rule is written for dirt roads, not rock: this is the site's own application of it."],
@@ -679,7 +679,7 @@
       id: "nexen-rocks",
       category: "tyre-maker",
       title: "Nexen: lower isn't always better on rocks",
-      summary: "Nexen: there are diminishing returns to lowering pressure past a comfortable point, with the risk of the tyre slipping off the rim; beadlocks help. It advises against going below 11–15 psi unless you're an experienced off-roader and have asked a tyre fitter, and that's for its heavy-duty, dual-sidewall mud-terrain tyre.",
+      summary: "Nexen: there are diminishing returns to lowering pressure past a comfortable point, with the risk of the tyre slipping off the rim; beadlocks help. It advises against going below about 0.75–1.0 bar unless you're an experienced off-roader and have asked a tyre fitter, and that's for its heavy-duty, dual-sidewall mud-terrain tyre.",
       quote: "There are diminishing returns to lowering air pressures past a comfortable point … Airing down below 11-15 PSI is not recommended unless you are a capable off-road expert and have consulted a tire installer.",
       sources: ["nexen2018"],
       checked: CHECKED,
@@ -688,7 +688,7 @@
       id: "nhtsa-temperature",
       category: "engineering",
       title: "Colder air, lower pressure",
-      summary: "Check pressures cold, after the vehicle has stood for several hours. Every 10°F (about 5.5°C) drop in air temperature gives about 1 psi (0.07 bar) less in the tyre.",
+      summary: "Check pressures cold, after the vehicle has stood for several hours. Every 5.5°C (10°F) drop in air temperature gives about 0.07 bar less in the tyre.",
       quote:
         "Pressures should be checked when the tires are cold, i.e., when the vehicle has not been driven for several hours, and using an accurate gauge. It should be noted that every 10°F drop in ambient temperature results in about one psi drop in tire inflation pressure.",
       sources: ["nhtsaPneumaticTire"],
@@ -764,14 +764,14 @@
         "With the same air in the tyre, absolute pressure (gauge + atmosphere) rises in step with absolute temperature (°C + 273). A tyre set to 2.4 bar at 15°C reads about 2.5 bar at 25°C, and 20% higher after driving means the air inside has warmed by about 40°C.",
       sources: ["nhtsaPneumaticTire"],
       checked: CHECKED,
-      notes: ["Ignores the small change in the tyre's volume. Agrees with NHTSA's rule of thumb of about 1 psi per 10°F."],
+      notes: ["Ignores the small change in the tyre's volume. Agrees with NHTSA's rule of thumb of about 0.07 bar per 5.5°C."],
     },
     {
       id: "calc-altitude",
       category: "calculation",
       title: "Atmospheric pressure falls with altitude",
       summary:
-        "Gauges read pressure above the local atmosphere, which is lower inland: about 101 kPa at the coast and about 82 kPa at 1 750 m. Atmospheric pressure from the U.S. Standard Atmosphere 1976 (troposphere): p = 101.325 × (1 − 2.25577×10⁻⁵ × h)^5.25588 kPa, h in metres.",
+        "Gauges read pressure above the local atmosphere, which is lower inland: about 1.01 bar at the coast and about 0.82 bar at 1 750 m. Atmospheric pressure from the U.S. Standard Atmosphere 1976 (troposphere): p = 1.01325 × (1 − 2.25577×10⁻⁵ × h)^5.25588 bar, h in metres.",
       sources: ["usStdAtm1976"],
       checked: CHECKED,
       params: { p0Kpa: 101.325, k: 2.25577e-5, n: 5.25588 },
@@ -927,7 +927,7 @@
     { id: "gap-sans1550", title: "SANS 1550 not read", text: "SANS 1550 is a paid standard, so it hasn't been checked that its load tables match the ETRTO and TRA tables used here. Reg 238 refers to SANS 1550." },
     { id: "gap-below-tables", title: "No load data below the tables", text: "No standard or tyre maker found publishes what a tyre can carry below the lowest pressure in its table (2.4 bar for LT tyres, 1.5 bar for passenger tyres). This site shows no floor there, only the makers' speed limits." },
     { id: "gap-terrain", title: "Deep snow, and rock on passenger tyres", text: "No civilian tyre or vehicle maker publishes deep-snow pressures, so the sand figures are used for deep snow off-road. No tyre maker publishes a rock pressure for passenger-type tyres (Cooper's is LT only), so Toyo's 20% dirt-road rule is used as a cautious start." },
-    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "For LT tyres Cooper goes down to 18 psi (about 1.25 bar) in sand; for passenger-type tyres the lowest published figure is BFGoodrich Africa's 1.4 bar (1.5 bar on its UK site), though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
+    { id: "gap-sand-low", title: "Soft sand below 1.5 bar", text: "For LT tyres Cooper goes down to about 1.25 bar in sand; for passenger-type tyres the lowest published figure is BFGoodrich Africa's 1.4 bar (1.5 bar on its UK site), though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
     { id: "gap-speed", title: "Speed limits between road pressure and 1.5 bar", text: "BFGoodrich says to slow down when you lower pressure but gives no figure above 1.5 bar." },
     { id: "gap-beadlock-law", title: "Beadlocks on SA roads", text: "Whether beadlock wheels are allowed on SA public roads hasn't been checked." },
     { id: "gap-vehicle-handbooks", title: "SA-market owner's manuals", text: "Only a US Ford Ranger manual was read. SA editions of the Hilux, Land Cruiser, Fortuner, Ranger and Defender manuals may give figures." },
