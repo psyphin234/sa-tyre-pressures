@@ -143,6 +143,12 @@
             (t.id === "sand" ? ` Toyo suggests about ${toyoSpeed.sandAvgKmh} km/h on average in sand. Rest the tyres now and then: sand builds heat.` : ` Back to road pressure before any snowy road.`)
         )
       );
+      // Simple shows the riverbed crossing here; Advanced has it in the contact-patch explainer.
+      if (t.id === "sand" && mode === "simple") {
+        const river = el("figure", { class: "card-photo card-photo--wide" });
+        UI.photo(river, "riverbed");
+        lines.push(river);
+      }
     } else if (t.id === "mud") {
       headline = lowers ? "Lower if you need to, down to " + b : "Keep road pressure";
       lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} is the lowest BFGoodrich (South Africa) publishes for mud.`));
