@@ -79,4 +79,4 @@ The Michelin 7.50R16 table is per **axle**, typed from Michelin Australia's page
 
 ## psyphin.co.za card
 
-A card for this site is prepared on the local branch `tyres-card` in `E:\Claude_projects\psyphin.co.za` (not pushed, not on `main`). The owner decides when it goes on the home page.
+The card is live in psyphin.co.za's Tools section since 2026-10-08 (`projects.js` there), with the amber "Under construction" tag. Keep the tag, this site's banner and its noindex until the owner says the site is ready.
