@@ -5,7 +5,7 @@
  * tests/run.ps1 checks that every local file referenced by the pages is in
  * FILES.
  */
-const VERSION = "tyres-2026-10-08-14";
+const VERSION = "tyres-2026-10-08-15";
 const FILES = [
   "./",
   "index.html",
@@ -40,6 +40,7 @@ const FILES = [
   "img/mud.jpg", "img/mud-thumb.jpg",
   "img/rock.jpg", "img/rock-thumb.jpg",
   "img/snow.jpg", "img/snow-thumb.jpg",
+  "img/snowroad.jpg", "img/snowroad-thumb.jpg",
   "img/markings.jpg",
   "img/gauge.jpg",
   "img/compressor.jpg",

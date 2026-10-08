@@ -241,7 +241,7 @@
       flags.push("bfg-below-1-5");
       if (planKpa < psiToKpa(au.psi)) flags.push("bfg-au-20psi");
     }
-    const lowest = terrainId === "sand" || terrainId === "mud" || terrainId === "rock" ? lowestPublished(terrainId, cls) : null;
+    const lowest = ["sand", "mud", "rock", "deepsnow"].includes(terrainId) ? lowestPublished(terrainId, cls) : null;
     if (lowest && planKpa < lowest.kpa - 0.5) flags.push("below-published:" + lowest.ruleId);
     if (band === "belowLoad" || band === "belowTable") flags.push("bfg-speed-load");
     const publicRoad = band === "road" || band === "belowPlacard";
@@ -269,6 +269,7 @@
     const spec = t[cls === "lt" ? "lt" : "passenger"];
     const flat = (sourced) => ({ terrain: t, topKpa: roadKpa, bottomKpa: roadKpa, steps: [roadKpa], sourced, kind: spec ? spec.kind : null, ruleId: null });
     if (!spec) return flat(false);
+    if (spec.kind === "keep") return { ...flat(true), ruleId: spec.rule };
     let top;
     let bottom;
     let stepBar = null;
@@ -317,7 +318,7 @@
    * if the tyre still carries the load and you slow down.
    * Returns the range with { floorKpa, raised, belowFloor }.
    */
-  const PUBLIC_ROAD_TERRAINS = ["tar", "gravel", "corrugations"];
+  const PUBLIC_ROAD_TERRAINS = ["tar", "gravel", "corrugations", "snow"];
   function applyLoadFloor(range, floorKpa) {
     if (!range) return range;
     const base = { ...range, floorKpa: floorKpa == null ? null : floorKpa, raised: false, belowFloor: false };

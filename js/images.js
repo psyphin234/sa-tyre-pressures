@@ -124,6 +124,21 @@ window.TYRE_IMAGES = [
     "title": "Mitsubishi Shogun SUV 4x4 In The Snow (cropped).jpg"
   },
   {
+    "key": "snowroad",
+    "file": "img/snowroad.jpg",
+    "thumb": "img/snowroad-thumb.jpg",
+    "w": 1000,
+    "h": 666,
+    "alt": "A packed-snow road between snow-laden trees",
+    "caption": "Snow-covered road near Sosonka, Ukraine.",
+    "author": "George Chernilevsky",
+    "authorUrl": null,
+    "license": "Public domain",
+    "licenseUrl": null,
+    "page": "https://commons.wikimedia.org/wiki/File:Snowy_road_Sosonka_2013_G1.jpg",
+    "title": "Snowy road Sosonka 2013 G1.jpg"
+  },
+  {
     "key": "markings",
     "file": "img/markings.jpg",
     "thumb": null,

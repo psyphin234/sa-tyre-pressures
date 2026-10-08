@@ -76,7 +76,7 @@
    * labelled field-practice note.
    */
   function goingLower(terrain, cls) {
-    if (terrain !== "sand" && terrain !== "mud") return null;
+    if (terrain !== "sand" && terrain !== "mud" && terrain !== "deepsnow") return null;
     const lowest = C.lowestPublished(terrain, cls);
     const below = UI.ruleById("bfg-below-1-5").params;
     const hm = UI.ruleById("army-hmmwv-sand").params;
@@ -86,8 +86,8 @@
         "li",
         null,
         UI.categoryTag("engineering"),
-        terrain === "sand"
-          ? ` The US Army's Humvee manual runs its 37-inch tyres at ${fmtExact(C.psiToKpa(hm.sandFrontPsi))} front and ${fmtExact(C.psiToKpa(hm.sandRearPsi))} rear in sand, at ${hm.maxKmh} km/h at most. Military tyres and wheels: not a figure for your 4x4.`
+        terrain === "sand" || terrain === "deepsnow"
+          ? ` The US Army's Humvee manual runs its 37-inch tyres at ${fmtExact(C.psiToKpa(hm.sandFrontPsi))} front and ${fmtExact(C.psiToKpa(hm.sandRearPsi))} rear in sand (${fmtExact(C.psiToKpa(hm.mssFrontPsi))} / ${fmtExact(C.psiToKpa(hm.mssRearPsi))} for mud, sand and snow), at ${hm.maxKmh} km/h at most. Military tyres and wheels: not a figure for your 4x4.`
           : ` The US Army's Humvee manual uses ${fmtExact(C.psiToKpa(hm.mssFrontPsi))} front and ${fmtExact(C.psiToKpa(hm.mssRearPsi))} rear for mud, sand and snow, at ${hm.maxKmh} km/h at most. Military tyres and wheels: not a figure for your 4x4.`
       ),
     ];
@@ -120,23 +120,35 @@
       headline = "Keep road pressure";
       if (t.id === "rock") lines.push(el("p", null, "Cooper's rock figures are for LT tyres only, and no figure was found for passenger-type tyres. Go very slowly, and if you need more grip on a climb, lower cautiously: a tyre can puncture halfway up."));
       else lines.push(el("p", null, t.summary));
-    } else if (t.id === "sand") {
-      headline = lowers ? "Lower step by step, down to " + b : "Keep road pressure";
-      lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `${b} is the lowest Cooper publishes for LT tyres in sand.` : `${b} is the lowest a tyre maker publishes for passenger-type tyres.`));
+    } else if (t.id === "snow") {
+      headline = "Keep road pressure";
+      lines.push(el("p", { class: "answer-sub" }, "Bridgestone: letting air out doesn't help grip on snow or ice, and can damage the tyres."));
+      lines.push(el("p", null, "Cold air lowers tyre pressure (about 0.07 bar for every 5.5°C), so check the tyres cold, at the temperature you'll drive in, and top up to the placard figure."));
+    } else if (t.id === "sand" || t.id === "deepsnow") {
+      const sandRule = UI.ruleById("bfg-africa-sand").params;
+      headline = lowers ? (t.id === "deepsnow" ? "Off-road only: lower step by step, down to " : "Lower step by step, down to ") + b : "Keep road pressure";
+      if (t.id === "deepsnow") lines.push(el("p", { class: "answer-sub" }, "No civilian tyre maker publishes deep-snow pressures, so these are your tyres' sand figures: deep soft snow is a flotation problem like sand."));
+      else lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `${b} is the lowest Cooper publishes for LT tyres in sand.` : `${b} is the lowest BFGoodrich (South Africa) publishes for sand.`));
       lines.push(
         el(
           "p",
           null,
-          `Let air out ${fmt(C.barToKpa(UI.ruleById("bfg-sand").params.stepBar))} at a time until the tyres float on the sand. Below ${fmt(C.barToKpa(below.bar))}, drive ${below.maxKmh} km/h or slower; Toyo suggests about ${toyoSpeed.sandAvgKmh} km/h on average in sand. Rest the tyres now and then: sand builds heat.`
+          `Let air out ${fmt(C.barToKpa(sandRule.stepBar))} at a time until the tyres float. At ${fmt(C.barToKpa(sandRule.minBar))}, drive ${sandRule.maxKmhAtMin} km/h or slower` +
+            (r.kind === "cooper" ? `, and slower still below that.` : `.`) +
+            (t.id === "sand" ? ` Toyo suggests about ${toyoSpeed.sandAvgKmh} km/h on average in sand. Rest the tyres now and then: sand builds heat.` : ` Back to road pressure before any snowy road.`)
         )
       );
     } else if (t.id === "mud") {
       headline = lowers ? "Lower if you need to, down to " + b : "Keep road pressure";
-      lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} is the lowest a tyre maker publishes for passenger-type tyres.`));
+      lines.push(el("p", { class: "answer-sub" }, r.kind === "cooper" ? `Cooper's range for LT tyres in mud.` : `${b} (20 psi) is the lowest BFGoodrich (South Africa) publishes for mud.`));
       lines.push(el("p", null, "There's no single best pressure: thick mud on a soft base needs lower, watery mud on a firm base can stay higher, and too low can cut traction. Keep it slow."));
     } else if (!lowers) {
       headline = "Keep " + tp;
       lines.push(el("p", null, "That's what your load needs, so there's no room to go lower here."));
+    } else if (t.id === "rock" && r.kind === "toyo20") {
+      headline = `Crawl, and drop about 20%: down to ${b}`;
+      lines.push(el("p", { class: "answer-sub" }, "No tyre maker publishes a rock pressure for passenger-type tyres, so this is Toyo's 20 per cent rule for leaving the tar, as a cautious start."));
+      lines.push(el("p", null, `Air down conservatively (BFGoodrich), especially before a climb: a tyre can puncture halfway up. Below about ${fmt(C.psiToKpa(20))} a tyre can be pushed off the rim (Cooper).`));
     } else if (t.id === "rock") {
       headline = `Very slow, low range: ${b}–${tp}`;
       lines.push(el("p", { class: "answer-sub" }, "Cooper's range for LT tyres on rock."));
@@ -404,7 +416,7 @@
       const lowFlag = a.assess.flags.find((f) => f.startsWith("below-published:"));
       if (lowFlag) {
         const lowest = C.lowestPublished(terrainId, m.cls);
-        lines.push(el("p", { class: "note note--fail" }, `Below ${fmt(lowest.kpa)}, the lowest a tyre maker publishes for ${CLASS_NAME[m.cls]} on ${terrainId === "rock" ? "rock" : terrainId}.`));
+        lines.push(el("p", { class: "note note--fail" }, `Below ${fmt(lowest.kpa)}, the lowest a tyre maker publishes for ${CLASS_NAME[m.cls]} on ${D.terrains.find((x) => x.id === terrainId).name.toLowerCase()}.`));
       }
       if (st.speed != null && a.assess.maxKmh && st.speed > a.assess.maxKmh)
         lines.push(el("p", { class: "note note--fail" }, `You plan ${st.speed} km/h; the limit at this pressure is ${a.assess.maxKmh} km/h.`));
@@ -470,11 +482,12 @@
         el(
           "p",
           { class: "big" },
-          `Pumping time: ${st.freeFlow ? "at least " : ""}${mins(r.runMin)}`,
+          `Pumping time for all four tyres: ${st.freeFlow ? "at least " : ""}${mins(r.runMin)}`,
           r.duty < 1 ? `, or ${st.freeFlow ? "at least " : ""}${mins(r.elapsedMin)} including rests at a ${Math.round(r.duty * 100)}% duty cycle` : "",
           "."
         )
       );
+      lines.push(el("p", null, `That's about ${r.runMin / 4 < 1 ? "under a minute" : Math.round((r.runMin / 4) * 10) / 10 + " min"} of pumping per tyre on average${r.duty < 1 ? ", plus rests" : ""}.`));
       if (st.freeFlow) lines.push(el("p", { class: "note" }, "Free-flow ratings are measured with nothing to push against. Into a tyre at 2–3 bar a compressor delivers less, so expect longer."));
     } else lines.push(el("p", { class: "muted" }, "Enter your compressor's flow (step 6) for a time."));
     lines.push(el("p", { class: "note" }, "The air comes out warm and the pressure drops a little as it cools: check again once the tyres are cold."));

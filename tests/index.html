@@ -149,22 +149,22 @@
       test("below 1.5 bar: 20 km/h (BFGoodrich UK)", () => C.assessPressure(140, need600, 240, "gravel").maxKmh === 20);
       test("at 1.5 bar: no speed cap from the below-1.5 rule", () => C.assessPressure(150, need600, 240, "gravel").maxKmh === null);
       test("below 20 psi also flags BFGoodrich Australia", () => C.assessPressure(130, need600, 240, "gravel").flags.includes("bfg-au-20psi"));
-      test("passenger tyres in sand below 1.5 bar: flagged below BFGoodrich's sand minimum", () => C.assessPressure(140, need600, 240, "sand", "passenger").flags.includes("below-published:bfg-sand"));
+      test("passenger tyres in sand below 1.4 bar: flagged below BFGoodrich Africa's minimum", () => C.assessPressure(130, need600, 240, "sand", "passenger").flags.includes("below-published:bfg-africa-sand"));
       test("below-load is not for public roads", () => C.assessPressure(170, need900, 240, "sand").publicRoad === false);
 
       // ---------------- terrain ranges
-      test("passenger sand: 2.4 → 1.9 → 1.5 bar (BFGoodrich steps and floor)", () => {
+      test("passenger sand: BFGoodrich Africa, 0.3 bar steps down to 1.4 bar", () => {
         const r = C.terrainRange("sand", 240, "passenger");
-        return JSON.stringify(r.steps.map(Math.round)) === "[240,190,150]" || r.steps;
+        return JSON.stringify(r.steps.map(Math.round)) === "[240,210,180,150,140]" || r.steps;
       });
-      test("LT sand: Cooper 18–26 psi, top capped at 26 psi, BFGoodrich 0.5 bar steps down to 18 psi", () => {
+      test("LT sand: Cooper 18–26 psi, top capped at 26 psi, 0.3 bar steps down to 18 psi", () => {
         const r = C.terrainRange("sand", 260, "lt");
         return (Math.round(r.topKpa) === 179 && Math.round(r.bottomKpa) === 124 && r.steps.length === 3) || r;
       });
-      test("LT sand: lowest published is Cooper's 18 psi; passenger: BFGoodrich's 1.5 bar", () => Math.round(C.lowestPublished("sand", "lt").kpa) === 124 && C.lowestPublished("sand", "passenger").kpa === 150);
-      test("passenger mud: road pressure to 1.5 bar, no steps (BFGoodrich gives none for mud)", () => {
+      test("LT sand: lowest published is Cooper's 18 psi; passenger: BFGoodrich Africa's 1.4 bar", () => Math.round(C.lowestPublished("sand", "lt").kpa) === 124 && C.lowestPublished("sand", "passenger").kpa === 140);
+      test("passenger mud: road pressure to 20 psi (BFGoodrich Africa), no steps", () => {
         const r = C.terrainRange("mud", 240, "passenger");
-        return JSON.stringify(r.steps.map(Math.round)) === "[240,150]" || r.steps;
+        return JSON.stringify(r.steps.map(Math.round)) === "[240,138]" || r.steps;
       });
       test("LT gravel: Cooper 28–34 psi, capped at road pressure", () => {
         const r = C.terrainRange("gravel", 220, "lt");
@@ -178,12 +178,16 @@
         const r = C.terrainRange("corrugations", 260, "lt");
         return (Math.round(r.topKpa) === 221 && Math.round(r.bottomKpa) === 179) || r;
       });
-      test("LT rock: Cooper 22–28 psi; passenger rock: no figure", () => {
+      test("LT rock: Cooper 22–28 psi; passenger rock: Toyo's 20% (2.6 → 2.08 bar)", () => {
         const lt = C.terrainRange("rock", 260, "lt");
         const pc = C.terrainRange("rock", 260, "passenger");
-        return (Math.round(lt.bottomKpa) === 152 && pc.sourced === false && pc.bottomKpa === 260) || [lt, pc];
+        return (Math.round(lt.bottomKpa) === 152 && pc.kind === "toyo20" && Math.round(pc.bottomKpa) === 208) || [lt, pc];
       });
-      test("snow: no figure for either tyre class", () => C.terrainRange("snow", 240, "lt").sourced === false && C.terrainRange("snow", 240, "passenger").sourced === false);
+      test("snow on a road: keep road pressure, sourced (Bridgestone)", () => {
+        const r = C.terrainRange("snow", 240, "passenger");
+        return (r.sourced && r.bottomKpa === 240 && r.ruleId === "bridgestone-snow") || r;
+      });
+      test("deep snow uses the sand figures", () => JSON.stringify(C.terrainRange("deepsnow", 240, "passenger").steps) === JSON.stringify(C.terrainRange("sand", 240, "passenger").steps) && C.terrainRange("deepsnow", 260, "lt").bottomKpa === C.terrainRange("sand", 260, "lt").bottomKpa);
       test("load floor: gravel range raised to what the load needs (public roads)", () => {
         const r = C.applyLoadFloor(C.terrainRange("gravel", 240, "passenger"), 210);
         return (r.raised && r.bottomKpa === 210 && r.topKpa === 240) || r;
@@ -194,7 +198,7 @@
       });
       test("load floor in sand is flagged, not raised (off-road)", () => {
         const r = C.applyLoadFloor(C.terrainRange("sand", 240, "passenger"), 200);
-        return (!r.raised && r.belowFloor && r.bottomKpa === 150) || r;
+        return (!r.raised && r.belowFloor && r.bottomKpa === 140) || r;
       });
       test("no load floor leaves the range alone", () => {
         const r = C.applyLoadFloor(C.terrainRange("gravel", 240, "passenger"), null);
@@ -223,10 +227,10 @@
         return near(r.elapsedMin, r.runMin * 2, 1e-9);
       });
 
-      test("field practice never sets a range bound (sand stops at 1.5 bar / Cooper's 18 psi)", () => {
+      test("field practice never sets a range bound (sand stops at 1.4 bar / Cooper's 18 psi)", () => {
         const p = C.terrainRange("sand", 240, "passenger");
         const l = C.terrainRange("sand", 240, "lt");
-        return (p.bottomKpa === 150 && Math.round(l.bottomKpa) === 124) || [p, l];
+        return (p.bottomKpa === 140 && Math.round(l.bottomKpa) === 124) || [p, l];
       });
       test("only the owner-approved field-practice rule exists", () => {
         const fp = D.rules.filter((r) => r.category === "field-practice").map((r) => r.id);

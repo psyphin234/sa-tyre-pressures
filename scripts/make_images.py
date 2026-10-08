@@ -14,13 +14,14 @@ CHOSEN = [
   ("mud", "mud-track-at-venture-4x4-near-three-holes-panorami", "A muddy, rutted 4x4 track beside long grass", "Mud track at a 4x4 venue.", None),
   ("rock", "npld-2016-4x4-touring-31122752081", "An off-road buggy crawling over large boulders", "Rock crawling, BLM El Centro, California.", None),
   ("snow", "mitsubishi-shogun-suv-4x4-in-the-snow-cropped", "A silver Mitsubishi Shogun (Pajero) SUV standing in snow", "4x4 in snow.", None),
+  ("snowroad", "snowy-road-sosonka-2013-g1", "A packed-snow road between snow-laden trees", "Snow-covered road near Sosonka, Ukraine.", None),
   ("markings", "tyremarkings", "A drawing of a tyre sidewall with its markings numbered", "Sidewall markings (drawn on a truck tyre).", None),
   ("gauge", "porsche-tire-pressure-gauge-9207945919", "A dial tyre pressure gauge reading in bar and psi", "A dial gauge reads in bar and psi.", None),
   ("compressor", "compressor-tire-pump-tyre-pump-edited-2020-4990679", "A small 12 V tyre compressor with a gauge and coiled air hose", "A portable 12 V compressor.", "https://www.mechanicalcaveman.com/"),
   ("beadlock", "beadlock1", "A wheel with a bolted beadlock ring clamping the tyre's outer bead", "A beadlock ring bolted over the outer bead.", None),
   ("deflated", "deflated-car-tire", "A car tyre with almost no air, its sidewall bulging out at the bottom", "With too little air the sidewall bulges and flexes on every turn.", None),
 ]
-TERRAIN_KEYS = {"tar", "gravel", "corrugations", "sand", "mud", "rock", "snow"}
+TERRAIN_KEYS = {"tar", "gravel", "corrugations", "sand", "mud", "rock", "snow", "snowroad"}
 os.makedirs(os.path.join(proj, "img"), exist_ok=True)
 out = []
 for key, slug, alt, caption, author_url in CHOSEN:
