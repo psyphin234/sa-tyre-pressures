@@ -11,8 +11,8 @@ OWN = {
   "rock": ("Pics/rock.jpeg", "A white double-cab bakkie climbing a steep, rocky slope among aloes and bare trees", "Rocky climb, Brits, North West."),
   "corrugations": ("Pics/corrugations.jpeg", "A rutted, rippled sandy dirt track running between thorn trees", "Rough, rutted track, Alldays, Limpopo."),
   "riverbed": ("Pics/sand and river.png", "Aerial view of a convoy of 4x4s crossing a wide sandy riverbed with shallow channels of water", "A convoy crossing a sandy riverbed."),
-  "snow": ("Pics/Snow Deep.jpeg", "A snow-covered mountain track with deep wheel ruts, between snowy peaks", "Deep snow on a mountain track."),
-  "snowroad": ("Pics/Snow_Ice.jpeg", "An icy, partly snow-covered mountain road winding between snowy slopes", "Snow and ice on a mountain road."),
+  "snow": ("Pics/Snow Deep.jpeg", "AI image: a snow-covered mountain track with deep wheel ruts, between snowy peaks", "Deep snow on a mountain track.", "AI image"),
+  "snowroad": ("Pics/Snow_Ice.jpeg", "AI image: an icy, partly snow-covered mountain road winding between snowy slopes", "Snow and ice on a mountain road.", "AI image"),
   "gravel": ("Pics/Gravel.jpg", "A long, straight gravel road through dry veld towards flat-topped hills", "Gravel road outside Carnarvon towards Prieska, Northern Cape."),
   "mud": ("Pics/mud.jpg", "A white Toyota Hilux with mud-caked tyres climbing a muddy red-earth track", "Hilux in the mud, Bass Lake, Free State."),
   "sand": ("Pics/DeepSand.jpg", "Two 4x4s on the crest of a red sand dune, with footprints in the sand and mountains behind", "Red dunes, Amam Dunes, Northern Cape."),
@@ -60,6 +60,8 @@ for key, slug, alt, caption, author_url in CHOSEN:
         "key": key, "file": fname, "thumb": tname, "w": full.width, "h": full.height,
         "alt": alt, "caption": caption,
         "author": html.unescape(m["artist"]).strip(), "authorUrl": author_url, "own": bool(own),
+        # "Photo", or "AI image" for pictures the owner generated rather than photographed
+        "creditLabel": (own[3] if own and len(own) > 3 else "Photo"),
         "license": m["license"], "licenseUrl": m["licenseUrl"] or None,
         "page": m["page"], "title": m["title"],
     })

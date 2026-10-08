@@ -79,7 +79,7 @@
   document.getElementById("credit-list").replaceChildren(
     ...(window.TYRE_IMAGES || []).map((i) =>
       i.own
-        ? el("li", null, el("strong", null, i.caption + " "), "Photo by PsyPhin, used on this site with permission.")
+        ? el("li", null, el("strong", null, i.caption + " "), i.creditLabel === "AI image" ? "AI image made by PsyPhin (not a photograph)." : "Photo by PsyPhin, used on this site with permission.")
         : el(
         "li",
         null,
