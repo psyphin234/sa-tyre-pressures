@@ -1,6 +1,6 @@
 # 4x4 Tyre Pressures
 
-Static calculator that gives a starting tyre-pressure **range** for a 4x4 by tyre, axle load and terrain, part of the PsyPhin site. Planned home: **https://tyres.psyphin.co.za/** (GitHub Pages; `CNAME` here plus an Afrihost `tyres` CNAME record → `psyphin234.github.io`, the same pattern as towing.psyphin.co.za; see the psyphin.co.za CLAUDE.md).
+Static calculator that gives a starting tyre-pressure **range** for a 4x4 by tyre, axle load and terrain, part of the PsyPhin site. Repo `psyphin234/sa-tyre-pressures` (public), GitHub Pages from `main` / root. **For testing it lives at https://psyphin.co.za/sa-tyre-pressures/** (inherited from the psyphin234.github.io user site, because this repo has no `CNAME`). Planned home: **https://tyres.psyphin.co.za/**. To move there, as with towing: add the Afrihost `tyres` CNAME → `psyphin234.github.io`, set the custom domain in Settings → Pages (GitHub commits a `CNAME` file; `git pull` it), and turn on Enforce HTTPS once the certificate is issued. Don't add a `CNAME` before the DNS record exists, or the site redirects to an address that doesn't resolve. Push to `main` to deploy; check with `gh api repos/psyphin234/sa-tyre-pressures/pages/builds/latest`.
 
 **Status: UNDER CONSTRUCTION.** Every page carries the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise. No GoatCounter yet (add it like the towing site when it launches).
 
@@ -61,3 +61,7 @@ The Michelin 7.50R16 table is per **axle**, typed from Michelin Australia's page
 
 - Brand is written **PsyPhin**. Commit identity: `74655215+psyphin234@users.noreply.github.com` (set globally). Never commit a personal email.
 - The repo will be public: no personal names or private notes in committed files.
+
+## psyphin.co.za card
+
+A card for this site is prepared on the local branch `tyres-card` in `E:\Claude_projects\psyphin.co.za` (not pushed, not on `main`). The owner decides when it goes on the home page.
