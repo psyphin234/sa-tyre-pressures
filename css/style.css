@@ -72,6 +72,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Faint circuit-trace pattern behind the top of the page, the same as
+   psyphin.co.za's (css/style.css there); it fades out downwards. */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1100px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none'%3E%3Cg stroke='%233fb6ff' stroke-opacity='0.09' stroke-width='1'%3E%3Cpath d='M0 40h46l18 18h44M108 58v42l18 18h54M24 180v-44l18-18h34M180 22h-34L124 0M76 118v-20l-14-14H0M146 180v-26l12-12h22'/%3E%3C/g%3E%3Cg fill='%233fb6ff' fill-opacity='0.16'%3E%3Ccircle cx='108' cy='58' r='2.2'/%3E%3Ccircle cx='76' cy='118' r='2.2'/%3E%3Ccircle cx='146' cy='22' r='2.2'/%3E%3Ccircle cx='146' cy='154' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+}
+
 a {
   color: var(--accent);
 }
@@ -1204,3 +1220,188 @@ input[type="checkbox"] {
   font-size: 0.92rem;
   color: var(--text-muted);
 }
+
+
+/* ------------------------------------------------------------ gauges and speed signs */
+.dials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+}
+
+.dial {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 300px;
+}
+
+.dial .diagram-svg:first-child {
+  max-width: 260px;
+  flex: 1 1 200px;
+}
+
+.dial .diagram-svg + .diagram-svg {
+  width: 84px;
+  flex: none;
+}
+
+.dial-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 110px;
+}
+
+.g-zone { fill: none; stroke-width: 16; }
+.gz-road { stroke: rgba(74, 222, 128, 0.55); }
+.gz-loadok { stroke: rgba(63, 182, 255, 0.5); }
+.gz-belowload { stroke: rgba(248, 113, 113, 0.6); }
+.gz-nodata { stroke: rgba(123, 133, 144, 0.45); }
+.g-tick { stroke: var(--text-muted); stroke-width: 1.5; }
+.g-range { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.g-road { stroke: var(--text); stroke-width: 3; }
+.g-needle-shape { fill: var(--warn); }
+.g-hub { fill: var(--surface-2); stroke: var(--warn); stroke-width: 3; }
+.g-value { fill: var(--text); font: 700 22px var(--font-display); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.g-needle--move { transition: transform 0.9s cubic-bezier(0.3, 1.35, 0.5, 1); }
+
+.sign-ring { fill: #d7261e; }
+.sign-face { fill: #ffffff; }
+.sign-num { fill: #111111; font: 700 30px var(--font-display); }
+.sign-word { fill: #111111; font: 700 15px var(--font-display); }
+
+/* ------------------------------------------------------------ Simple: try a pressure */
+.slider-box {
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 6px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  min-height: 32px;
+}
+
+.slider-value {
+  font: 700 1.3rem var(--font-display);
+  color: var(--accent);
+  min-width: 70px;
+  text-align: right;
+}
+
+.slider-pics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-pics .diagram-svg:first-child {
+  flex: 1 1 auto;
+  max-width: 520px;
+}
+
+.slider-pics .diagram-svg + .diagram-svg {
+  width: 84px;
+  flex: none;
+}
+
+.lt-sand { fill: #c8a165; opacity: 0.55; }
+
+/* ------------------------------------------------------------ icons, timeline */
+.before-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.before-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 2px;
+}
+
+.ic { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ic-dash { stroke: var(--warn); }
+
+.pt-pump { fill: var(--accent); }
+.pt-rest { fill: rgba(123, 133, 144, 0.5); }
+.pt-move { fill: var(--warn); }
+.pt-label { fill: #04111f; font: 700 12px var(--font-body); }
+
+/* ------------------------------------------------------------ explainer animations */
+.d-bead--ghost { fill: none; stroke: var(--accent); stroke-dasharray: 3 3; }
+.anim-bead { animation: bead-slide 4.5s ease-in-out infinite; }
+@keyframes bead-slide {
+  0%, 15% { transform: translate(0, 0); }
+  45% { transform: translate(64px, -10px); }
+  70%, 88% { transform: translate(150px, 38px); }
+  100% { transform: translate(0, 0); }
+}
+.anim-push { animation: push 4.5s ease-in-out infinite; }
+@keyframes push {
+  0%, 10% { transform: translateX(-16px); opacity: 0.3; }
+  30%, 70% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-16px); opacity: 0.3; }
+}
+
+.cor-road { fill: #b88b55; opacity: 0.7; }
+.cor-body { fill: var(--surface-2); stroke: var(--text-muted); stroke-width: 2; }
+.anim-road { animation: road-scroll 0.9s linear infinite; }
+@keyframes road-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-30px); }
+}
+.anim-bounce-hard { animation: bounce-hard 0.45s ease-in-out infinite alternate; }
+@keyframes bounce-hard {
+  from { transform: translateY(0); }
+  to { transform: translateY(-9px); }
+}
+.anim-bounce-soft { animation: bounce-soft 0.45s ease-in-out infinite alternate; }
+@keyframes bounce-soft {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1.5px); }
+}
+
+.th-tube { fill: var(--surface-2); stroke: var(--text-muted); stroke-width: 2; }
+.th-bulb { fill: var(--fail); }
+.th-fill { fill: var(--fail); transform: scaleY(0.85); }
+.anim-mercury { animation: mercury 5s ease-in-out infinite alternate; }
+@keyframes mercury {
+  from { transform: scaleY(0.35); }
+  to { transform: scaleY(0.85); }
+}
+.anim-gauge-needle { transform: rotate(110deg); animation: warm-needle 5s ease-in-out infinite alternate; }
+@keyframes warm-needle {
+  from { transform: rotate(60deg); }
+  to { transform: rotate(110deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-bead,
+  .anim-push,
+  .anim-road,
+  .anim-bounce-hard,
+  .anim-bounce-soft,
+  .anim-mercury,
+  .anim-gauge-needle {
+    animation: none;
+  }
+  .g-needle--move {
+    transition: none;
+  }
+}
+.cor-strut { stroke: var(--text-muted); stroke-width: 5; stroke-linecap: round; }

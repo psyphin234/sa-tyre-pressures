@@ -274,6 +274,15 @@
       test("the LT button makes a plain size LT", () => C.curveForTyped(P("265/65R17"), true, null).table === "tra-lt");
       test("7.50R16 uses Michelin's table", () => C.curveForTyped(P("7.50R16"), false, null).table === "michelin-750r16");
 
+      // ---------------- speed signs
+      test("speed sign: none at road pressure", () => C.speedCap(240, 240, "sand") === null);
+      test("speed sign: sand at 1.4 bar is 25 (BFGoodrich Africa)", () => C.speedCap(140, 240, "sand").kmh === 25);
+      test("speed sign: below 1.4 bar is 20 (BFGoodrich)", () => C.speedCap(125, 240, "sand").kmh === 20);
+      test("speed sign: gravel lowered is 80 (Toyo)", () => C.speedCap(190, 240, "gravel").kmh === 80);
+      test("speed sign: mud lowered is 20 (BFGoodrich)", () => C.speedCap(200, 240, "mud").kmh === 20);
+      test("speed sign: rock is Crawl (Cooper)", () => C.speedCap(190, 240, "rock").text === "Crawl");
+      test("speed sign: sand above 1.5 bar just says Slow", () => C.speedCap(200, 240, "sand").text === "Slow");
+
       // ---------------- formatting
       test("formats 240 kPa as 2.4 bar / 240 kPa / 35 psi", () => C.fmtPressure(240, "bar") === "2.4 bar" && C.fmtPressure(240, "kpa") === "240 kPa" && C.fmtPressure(240, "psi") === "35 psi");
       test("parses 1,5 bar (comma decimal)", () => C.parsePressure("1,5", "bar") === 150);

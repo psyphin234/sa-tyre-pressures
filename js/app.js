@@ -22,6 +22,24 @@
   // "simple" (default): placard + terrain only. "advanced" (#advanced, #example): everything.
   let mode = "simple";
   let lastRanges = [null, null];
+  // Gauge needles swing from their last reading to the new one.
+  const needleAngles = {};
+  let pendingNeedles = [];
+  function animateNeedles() {
+    pendingNeedles.forEach(({ key, needle, angle }) => {
+      const from = needleAngles[key] != null ? needleAngles[key] : 0;
+      needle.style.transform = `rotate(${from}deg)`;
+      needle.getBoundingClientRect(); // apply the start angle before animating
+      needle.classList.add("g-needle--move");
+      needle.style.transform = `rotate(${angle}deg)`;
+      needleAngles[key] = angle;
+    });
+    pendingNeedles = [];
+  }
+
+  // Simple's "try a pressure" slider: remembered per terrain while the page is open.
+  let sliderKpa = null;
+  let sliderTerrain = null;
 
   // ------------------------------------------------------------ setup
 
@@ -393,16 +411,24 @@
 
   function planCard(m, st) {
     const withPlan = m.axles.filter((a) => a.assess);
-    const diagram = el("div", { class: "diagram ladders" });
+    const diagram = el("div", { class: "diagram dials" });
     const shown = m.axles.filter((a) => a.need && a.need.status !== "noLoad" && a.need.status !== "overload");
     if (shown.length) {
       const bfg = C.barToKpa(UI.ruleById("bfg-below-1-5").params.bar);
-      const maxKpa = Math.max(300, ...shown.map((a) => Math.max(a.road.kpa || 0, a.plan || 0, a.need.kpa || 0) + 40));
-      shown.forEach((a) =>
+      const maxKpa = Math.ceil(Math.max(300, ...shown.map((a) => Math.max(a.road.kpa || 0, a.plan || 0, a.need.kpa || 0) + 40)) / 50) * 50;
+      shown.forEach((a) => {
+        const g = G.gauge({ name: a.name, roadKpa: a.road.kpa, floorKpa: a.need.kpa, tableMinKpa: a.need.tableMinKpa, planKpa: a.plan, status: a.need.status, range: a.range }, { fmt, bfgKpa: bfg, maxKpa });
+        pendingNeedles.push({ key: a.name, needle: g.needle, angle: g.angle });
+        const cap = C.speedCap(a.plan, a.road.kpa, terrainId);
         diagram.appendChild(
-          G.ladder({ name: a.name, roadKpa: a.road.kpa, floorKpa: a.need.kpa, tableMinKpa: a.need.tableMinKpa, planKpa: a.plan, status: a.need.status, range: a.range }, { fmt, bfgKpa: bfg, maxKpa })
-        )
-      );
+          el(
+            "div",
+            { class: "dial" },
+            g.svg,
+            cap ? G.speedSign(cap.text, cap.kmh ? "km/h max" : cap.text === "Crawl" ? "low range" : "no figure") : el("p", { class: "dial-note" }, a.plan != null ? "Road pressure: normal speed limits." : "Enter a planned pressure.")
+          )
+        );
+      });
       const sw = (cls, label) => el("li", null, el("span", { class: "swatch " + cls }), label);
       diagram.appendChild(
         el(
@@ -412,9 +438,9 @@
           sw("z-loadok", "load carried (tables)"),
           sw("z-belowload", "below what the load needs"),
           sw("z-nodata", "below the tables: no data"),
-          sw("swatch--plan", "your plan"),
-          sw("swatch--range", "terrain range"),
-          sw("swatch--bfg", "below " + fmt(bfg) + ": " + UI.ruleById("bfg-below-1-5").params.maxKmh + " km/h max (BFGoodrich)")
+          sw("swatch--plan", "needle: your plan"),
+          sw("swatch--range", "outer arc: terrain range"),
+          sw("swatch--bfg", "red line: " + fmt(bfg) + " (BFGoodrich)")
         )
       );
     }
@@ -500,6 +526,10 @@
       lines.push(el("p", null, `Pumping alone is ${perTyre < 1 ? "under a minute" : "about " + Math.round(perTyre * 10) / 10 + " min"} per tyre on average.`));
       if (st.freeFlow) lines.push(el("p", { class: "note" }, "Free-flow ratings are measured with nothing to push against. Into a tyre at 2–3 bar a compressor delivers less, so expect longer."));
     } else lines.push(el("p", { class: "muted" }, "Enter your compressor's flow (step 6) for a time."));
+    if (r.totalMin != null) {
+      const tl = G.pumpTimeline(r, st.switchMin);
+      if (tl) lines.push(el("div", { class: "diagram" }, tl));
+    }
     lines.push(el("p", { class: "note" }, "The air comes out warm and the pressure drops a little as it cools: check again once the tyres are cold."));
     return card("Pumping back up", "card--pump", lines, UI.sourcesLink(["calc-free-air", "calc-air-volume", "calc-altitude"]));
   }
@@ -517,6 +547,57 @@
   }
 
   // ------------------------------------------------------------ simple mode
+
+  // Tyre radius and tread width (mm) for the live tyre: from the typed size, else 265/65R17.
+  function tyreDims(tyre) {
+    const pz = tyre && tyre.parsed;
+    if (pz && pz.kind === "metric" && !pz.oddAspect) return { radiusMm: (pz.rimIn * 25.4) / 2 + (pz.widthMm * pz.aspect) / 100, widthMm: pz.widthMm, label: pz.label };
+    if (pz && pz.kind === "flotation") return { radiusMm: (pz.overallIn * 25.4) / 2, widthMm: pz.sectionWidthIn * 25.4, label: pz.label };
+    if (pz && pz.label === "7.50R16") return { radiusMm: (32.4 * 25.4) / 2, widthMm: 8.3 * 25.4, label: pz.label };
+    return { radiusMm: (17 * 25.4) / 2 + 265 * 0.65, widthMm: 265, label: null };
+  }
+
+  /*
+   * "Try a pressure": drag down from road pressure and watch the tyre flatten,
+   * the footprint grow and the speed sign change. Front axle figures.
+   */
+  function pressureSlider(t, r, tyre, perTyreKg, floorKpa) {
+    if (!r || r.bottomKpa >= r.topKpa - 1) return null;
+    const top = r.topKpa;
+    const bottom = r.bottomKpa;
+    const min = Math.max(80, Math.floor((bottom - 40) / 5) * 5);
+    if (sliderTerrain !== t.id || sliderKpa == null || sliderKpa > top || sliderKpa < min) sliderKpa = bottom;
+    sliderTerrain = t.id;
+    const dims = tyreDims(tyre);
+    const wheelKg = perTyreKg || 650;
+    const live = el("div", { class: "slider-live" });
+    const input = el("input", { type: "range", min: String(min), max: String(Math.round(top)), step: "5", value: String(Math.round(sliderKpa)), "aria-label": "Try a pressure" });
+    const out = el("output", { class: "slider-value" });
+    const draw = () => {
+      const kpa = parseFloat(input.value);
+      sliderKpa = kpa;
+      out.textContent = fmt(kpa);
+      const cap = C.speedCap(kpa, top, t.id);
+      const notes = [];
+      if (kpa < bottom - 0.5) {
+        notes.push(el("p", { class: "note note--warn" }, `Below ${fmt(bottom)}, the lowest published for ${t.name.toLowerCase()}.` + (t.id === "sand" ? " That's field-practice territory: walking pace, gentle turns, and the bead can come off the rim." : " No tyre maker publishes a figure this low.")));
+      } else notes.push(el("p", { class: "note" }, "Within the range above."));
+      if (floorKpa != null && kpa < floorKpa - 0.5) notes.push(el("p", { class: "note note--fail" }, `Below ${fmt(floorKpa)}, what your weight needs on these tyres according to their load table.`));
+      live.replaceChildren(
+        el(
+          "div",
+          { class: "slider-pics" },
+          G.liveTyre({ kpa, wheelKg, radiusMm: dims.radiusMm, widthMm: dims.widthMm, fmt }),
+          cap ? G.speedSign(cap.text, cap.kmh ? "km/h max" : cap.text === "Crawl" ? "low range" : "no figure") : null
+        ),
+        ...notes,
+        el("p", { class: "muted small" }, `Drawn for ${dims.label ? "a " + dims.label + " tyre" : "a 265/65R17 tyre (type your size above to use yours)"} carrying ${Math.round(wheelKg)} kg${perTyreKg ? "" : " (an example: add your weight above)"}. Footprint ≈ load ÷ pressure.`)
+      );
+    };
+    input.addEventListener("input", draw);
+    draw();
+    return el("div", { class: "slider-box" }, el("h4", null, "Try a pressure"), el("div", { class: "slider-row" }, el("span", { class: "muted small" }, fmt(min)), input, el("span", { class: "muted small" }, fmt(top)), out), live);
+  }
 
   /*
    * Simple's optional tyre, typed as on the sidewall. The typed marks (LT, two
@@ -604,6 +685,7 @@
     );
     const headline = advice.headline;
     const notes = advice.lines;
+    const slider = pressureSlider(t, axles[0].r, tyre, perTyreKg, floor);
     const loadLines = [];
     if (tyre && tyre.table === "michelin-750r16" && axles.some((a) => a.r.kind === "cooper"))
       loadLines.push(el("p", { class: "note" }, "Cooper says narrow commercial-style tyres like this one need higher pressures than its ranges, which are for average LT sizes."));
@@ -622,11 +704,11 @@
     const subAt = notes.findIndex((n) => n && n.classList && n.classList.contains("answer-sub"));
     notes.splice(subAt + 1, 0, ...loadLines);
     const before = [
-      ["Reinflate before the tar", "back to road pressure before you drive on tar."],
-      ["Carry a gauge and a compressor", "check pressures cold, and pump back up before the road."],
-      ["Set pressures cold", "first thing in the morning, or after at least an hour parked. Warm tyres read 20% or more higher, so never let air out to reach a cold figure. Air down warm tyres and they'll drop a little more as they cool."],
+      ["Reinflate before the tar", "back to road pressure before you drive on tar.", "tar"],
+      ["Carry a gauge and a compressor", "check pressures cold, and pump back up before the road.", "gauge"],
+      ["Set pressures cold", "first thing in the morning, or after at least an hour parked. Warm tyres read 20% or more higher, so never let air out to reach a cold figure. Air down warm tyres and they'll drop a little more as they cool.", "thermo"],
     ];
-    if (lowers) before.splice(1, 0, ["Side slopes", "go back to road pressure before crossing a steep slope, or a tyre can come off the rim."]);
+    if (lowers) before.splice(1, 0, ["Side slopes", "go back to road pressure before crossing a steep slope, or a tyre can come off the rim.", "slope"]);
     const ids = t.ruleIds.concat(["bfg-reinflate", "ford-off-road", "etrto-hot-pressure", "toyo-cold", "nhtsa-temperature", "calc-temperature"]);
     return [
       card(
@@ -636,8 +718,9 @@
         el("p", { class: "answer-headline" }, headline),
         answer,
         notes,
+        slider,
         el("h4", null, "Before you go"),
-        el("ul", { class: "before-list" }, before.map(([b, rest]) => el("li", null, el("strong", null, b), ": " + rest))),
+        el("ul", { class: "before-list" }, before.map(([b, rest, ic]) => el("li", null, G.icon(ic), el("span", null, el("strong", null, b), ": " + rest)))),
         UI.sourcesLink(ids)
       ),
       toAdvanced,
@@ -673,7 +756,9 @@
     }
     const m = compute(st);
     lastRanges = m.axles.map((a) => a.range);
+    pendingNeedles = [];
     body.replaceChildren(loadCard(m), terrainCard(m, st), planCard(m, st), safetyCard(m, st), pumpCard(m, st), gapsCard());
+    animateNeedles();
     renderDynamicDiagrams(m);
     save();
   }
@@ -687,7 +772,7 @@
       d.replaceChildren(G.footprint(wheelKg, pressures, { fmt }), el("p", { class: "diagram-caption" }, `One tyre carrying ${Math.round(wheelKg)} kg${heavier ? " (your heavier axle)" : " (example)"}. Area ≈ load ÷ pressure.`));
     });
     const rise = UI.ruleById("etrto-hot-pressure").params.warmRiseFraction;
-    document.querySelectorAll('[data-diagram="hotcold"]').forEach((d) => d.replaceChildren(G.hotCold(road, rise, fmt)));
+    document.querySelectorAll('[data-diagram="hotcold"]').forEach((d) => d.replaceChildren(G.warmUp(road, rise, fmt)));
     const alt = readState().altitude;
     const setC = 20;
     const temps = [0, 10, 20, 30, 40];
@@ -718,7 +803,7 @@
 
   function renderStatic() {
     const ctisRule = UI.ruleById("army-ctis-modes");
-    const map = { markings: () => G.markings(), deflection: () => G.deflection(), bead: () => G.bead(), ctis: () => G.ctis(ctisRule.params.modes) };
+    const map = { markings: () => G.markings(), deflection: () => G.deflection(), bead: () => G.beadAnimated(), ctis: () => G.ctis(ctisRule.params.modes), corrugation: () => G.corrugation() };
     document.querySelectorAll("[data-diagram]").forEach((d) => {
       const f = map[d.dataset.diagram];
       if (f) d.replaceChildren(f());

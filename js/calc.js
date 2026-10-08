@@ -331,6 +331,36 @@
     return { ...base, topKpa: top, bottomKpa: floorKpa, steps, raised: true };
   }
 
+  /*
+   * What goes on the speed sign for a pressure on a terrain. At or above road
+   * pressure: nothing (normal limits). Otherwise, from the sources:
+   *   rock                -> "Crawl" (Cooper: very slow, low range)
+   *   below 1.4 bar       -> 20 (BFGoodrich: below 1.5 bar, 20 km/h)
+   *   1.4-1.5 bar in sand -> 25 (BFGoodrich Africa: 25 km/h at 1.4 bar)
+   *   1.4-1.5 bar         -> 20 (BFGoodrich: below 1.5 bar)
+   *   mud                 -> 20 (BFGoodrich: not over 20 km/h in mud)
+   *   gravel, corrugations-> 80 (Toyo: never over 80 km/h on dirt)
+   *   anything else       -> "Slow" (BFGoodrich: lower pressure, lower speed)
+   * Returns { text, kmh (number or null), ruleId } or null.
+   */
+  function speedCap(planKpa, roadKpa, terrainId) {
+    if (planKpa == null || (roadKpa != null && planKpa >= roadKpa - 0.5)) return null;
+    const below15 = rule("bfg-below-1-5").params;
+    const africa = rule("bfg-africa-sand").params;
+    if (terrainId === "rock") return { text: "Crawl", kmh: null, ruleId: "cooper-rocks" };
+    if (planKpa < barToKpa(africa.minBar) - 0.5) return { text: String(below15.maxKmh), kmh: below15.maxKmh, ruleId: "bfg-below-1-5" };
+    if (planKpa < barToKpa(below15.bar) - 0.5) {
+      if (terrainId === "sand" || terrainId === "deepsnow") return { text: String(africa.maxKmhAtMin), kmh: africa.maxKmhAtMin, ruleId: "bfg-africa-sand" };
+      return { text: String(below15.maxKmh), kmh: below15.maxKmh, ruleId: "bfg-below-1-5" };
+    }
+    if (terrainId === "mud") return { text: String(rule("bfg-mud").params.maxKmh), kmh: rule("bfg-mud").params.maxKmh, ruleId: "bfg-mud" };
+    if (terrainId === "gravel" || terrainId === "corrugations") {
+      const t = rule("toyo-20-percent").params.maxKmh;
+      return { text: String(t), kmh: t, ruleId: "toyo-20-percent" };
+    }
+    return { text: "Slow", kmh: null, ruleId: "bfg-speed-load" };
+  }
+
   // ETRTO hard-driving extra (towing, sustained high speed): passenger-type tyres only.
   function hardDriving(type, roadKpa) {
     if (!type || (type.table !== "etrto-sl" && type.table !== "etrto-xl") || roadKpa == null) return null;
@@ -457,6 +487,7 @@
     terrainRange,
     lowestPublished,
     applyLoadFloor,
+    speedCap,
     hardDriving,
     atmosphereKpa,
     tyreVolume,

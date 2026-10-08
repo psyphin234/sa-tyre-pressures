@@ -25,64 +25,6 @@
   }
   const text = (x, y, str, cls, extra) => s("text", { x, y, class: cls || "d-text", ...(extra || {}) }, str);
 
-  // ------------------------------------------------------------ pressure ladder
-  /*
-   * One vertical bar for one axle showing where the planned pressure sits.
-   * a: { name, roadKpa, floorKpa, tableMinKpa, planKpa, status, range }
-   * opts: { fmt, bfgKpa, maxKpa } (maxKpa keeps both axles on one scale).
-   * The legend is HTML (app.js), so it stays readable on a phone.
-   */
-  function ladder(a, opts) {
-    const W = 300;
-    const H = 300;
-    const top = 14;
-    const bottom = H - 34;
-    const maxKpa = opts.maxKpa;
-    const minKpa = 50;
-    const y = (kpa) => bottom - ((Math.max(minKpa, Math.min(maxKpa, kpa)) - minKpa) / (maxKpa - minKpa)) * (bottom - top);
-    const nodes = [];
-    for (let k = 100; k <= maxKpa; k += 50) {
-      nodes.push(s("line", { x1: 52, x2: W - 6, y1: y(k), y2: y(k), class: k % 100 === 0 ? "d-grid" : "d-grid d-grid--minor" }));
-      if (k % 100 === 0) nodes.push(text(46, y(k) + 4, opts.fmt(k), "d-axis", { "text-anchor": "end" }));
-    }
-    if (opts.bfgKpa) nodes.push(s("line", { x1: 52, x2: W - 6, y1: y(opts.bfgKpa), y2: y(opts.bfgKpa), class: "d-line-fail" }));
-    const bx = 120;
-    const bw = 36;
-    const zone = (fromKpa, toKpa, cls) => {
-      if (fromKpa == null || toKpa == null || toKpa <= fromKpa) return null;
-      return s("rect", { x: bx, width: bw, y: y(toKpa), height: Math.max(0, y(fromKpa) - y(toKpa)), class: cls });
-    };
-    nodes.push(zone(minKpa, a.tableMinKpa, "z-nodata"));
-    if (a.status === "ok") nodes.push(zone(a.tableMinKpa, a.floorKpa, "z-belowload"));
-    nodes.push(zone(a.floorKpa, a.roadKpa, "z-loadok"));
-    nodes.push(zone(a.roadKpa, maxKpa, "z-road"));
-    nodes.push(s("rect", { x: bx, y: top, width: bw, height: bottom - top, class: "d-frame" }));
-    if (a.range && a.range.bottomKpa < a.range.topKpa - 1) {
-      nodes.push(s("path", { d: `M${bx + bw + 4} ${y(a.range.topKpa)} h7 V${y(a.range.bottomKpa)} h-7`, class: "d-bracket" }));
-    }
-    // markers, labels on the right; nudge a label down if two collide
-    const used = [];
-    const mark = (kpa, label, cls) => {
-      if (kpa == null) return;
-      let ly = y(kpa) + 4;
-      used.forEach((other) => {
-        if (Math.abs(other - ly) < 14) ly = other + 14;
-      });
-      used.push(ly);
-      nodes.push(s("line", { x1: bx - 4, x2: bx + bw + 4, y1: y(kpa), y2: y(kpa), class: cls }));
-      nodes.push(text(bx + bw + 16, ly, label, "d-small"));
-    };
-    mark(a.roadKpa, "road " + opts.fmt(a.roadKpa), "d-mark");
-    if (a.floorKpa != null && Math.abs(a.floorKpa - a.roadKpa) > 6) mark(a.floorKpa, (a.status === "belowTable" ? "table starts " : "load needs ") + opts.fmt(a.floorKpa), "d-mark d-mark--floor");
-    if (a.planKpa != null) {
-      const py = y(a.planKpa);
-      nodes.push(s("path", { d: `M${bx - 2} ${py} l-12 -8 v16 z`, class: "d-plan" }));
-      nodes.push(text(bx - 16, py + 4, opts.fmt(a.planKpa), "d-small d-strong", { "text-anchor": "end" }));
-    }
-    nodes.push(text(bx + bw / 2, H - 10, a.name, "d-text d-strong", { "text-anchor": "middle" }));
-    return svg(W, H, `${a.name} axle: where your planned pressure sits`, nodes);
-  }
-
   // ------------------------------------------------------------ footprint
   /*
    * Footprint area ≈ load ÷ pressure (rule nhtsa-contact-patch), drawn for a
@@ -190,33 +132,6 @@
     );
   }
 
-  // ------------------------------------------------------------ hot vs cold
-  function hotCold(coldKpa, rise, fmt) {
-    const W = 520;
-    const H = 170;
-    const warm = coldKpa * (1 + rise);
-    const gauge = (cx, kpa, label, cls) =>
-      s(
-        "g",
-        null,
-        s("circle", { cx, cy: 78, r: 54, class: "d-gauge" }),
-        s("path", { d: `M${cx - 40} 104 A 48 48 0 1 1 ${cx + 40} 104`, class: "d-gauge-arc" }),
-        s("line", { x1: cx, y1: 78, x2: cx + 38 * Math.cos(Math.PI * (1.15 - (kpa / (warm * 1.25)) * 1.3)), y2: 78 - 38 * Math.sin(Math.PI * (1.15 - (kpa / (warm * 1.25)) * 1.3)), class: "d-needle " + cls }),
-        s("circle", { cx, cy: 78, r: 5, class: "d-hub" }),
-        text(cx, 152, label + ": " + fmt(kpa), "d-text d-strong", { "text-anchor": "middle" })
-      );
-    return svg(
-      W,
-      H,
-      `Cold ${fmt(coldKpa)} can read about ${fmt(warm)} warm. That is normal; don't let air out of warm tyres.`,
-      gauge(130, coldKpa, "Cold", "d-needle--cold"),
-      s("path", { d: "M215 78 H295", class: "d-arrow" }),
-      s("path", { d: "M295 78 l-10 -6 v12 z", class: "d-arrowhead" }),
-      text(255, 66, "+" + Math.round(rise * 100) + "% or more", "d-small", { "text-anchor": "middle" }),
-      gauge(390, warm, "Warm", "d-needle--warm")
-    );
-  }
-
   // ------------------------------------------------------------ CTIS staircase
   function ctis(modes) {
     const W = 520;
@@ -262,5 +177,289 @@
     return svg(W, H, "Reading a tyre sidewall: LT265/75R16 123/120Q", nodes);
   }
 
-  root.TYRE_DIAGRAMS = { ladder, footprint, deflection, bead, hotCold, ctis, markings };
+
+  // ============================================================ gauges, signs, live tyre, timelines, animations
+  // Polar helpers for the semicircular gauge: angle 0 = left (lowest), 180 = right.
+  const RAD = Math.PI / 180;
+  function polar(cx, cy, r, deg) {
+    return [cx - r * Math.cos(deg * RAD), cy - r * Math.sin(deg * RAD)];
+  }
+  function arcPath(cx, cy, r, fromDeg, toDeg) {
+    const [x1, y1] = polar(cx, cy, r, fromDeg);
+    const [x2, y2] = polar(cx, cy, r, toDeg);
+    return `M${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${toDeg - fromDeg > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  }
+
+  /*
+   * A tyre-gauge dial for one axle. a: { name, roadKpa, floorKpa, tableMinKpa,
+   * planKpa, status, range }. opts: { fmt, maxKpa, bfgKpa }. The needle points
+   * at the planned pressure; app.js animates it from the previous reading.
+   * Returns { svg, needle, angle }.
+   */
+  function gauge(a, opts) {
+    const W = 260;
+    const H = 200;
+    const cx = W / 2;
+    const cy = 140;
+    const r = 105;
+    const max = opts.maxKpa;
+    const deg = (kpa) => Math.max(0, Math.min(180, (kpa / max) * 180));
+    const nodes = [];
+    const zone = (from, to, cls) => {
+      if (from == null || to == null || to <= from + 0.5) return;
+      nodes.push(s("path", { d: arcPath(cx, cy, r, deg(from), deg(to)), class: "g-zone " + cls }));
+    };
+    zone(0, a.tableMinKpa, "gz-nodata");
+    if (a.status === "ok") zone(a.tableMinKpa, a.floorKpa, "gz-belowload");
+    zone(a.floorKpa != null ? a.floorKpa : a.tableMinKpa, a.roadKpa, "gz-loadok");
+    zone(a.roadKpa, max, "gz-road");
+    // ticks every 0.5 bar, numbers every 1 bar
+    for (let k = 0; k <= max + 0.1; k += 50) {
+      const big = k % 100 === 0;
+      const [x1, y1] = polar(cx, cy, r - 14, deg(k));
+      const [x2, y2] = polar(cx, cy, r - (big ? 26 : 20), deg(k));
+      nodes.push(s("line", { x1, y1, x2, y2, class: "g-tick" }));
+      if (big) {
+        const [tx, ty] = polar(cx, cy, r - 38, deg(k));
+        nodes.push(text(tx, ty + 4, String(k / 100), "d-small", { "text-anchor": "middle" }));
+      }
+    }
+    // the terrain range as a thin outer arc
+    if (a.range && a.range.bottomKpa < a.range.topKpa - 1) nodes.push(s("path", { d: arcPath(cx, cy, r + 9, deg(a.range.bottomKpa), deg(a.range.topKpa)), class: "g-range" }));
+    // BFGoodrich's 1.5 bar line
+    if (opts.bfgKpa) {
+      const [x1, y1] = polar(cx, cy, r - 8, deg(opts.bfgKpa));
+      const [x2, y2] = polar(cx, cy, r + 14, deg(opts.bfgKpa));
+      nodes.push(s("line", { x1, y1, x2, y2, class: "d-line-fail" }));
+    }
+    // road pressure marker
+    if (a.roadKpa != null) {
+      const [x1, y1] = polar(cx, cy, r - 8, deg(a.roadKpa));
+      const [x2, y2] = polar(cx, cy, r + 14, deg(a.roadKpa));
+      nodes.push(s("line", { x1, y1, x2, y2, class: "g-road" }));
+    }
+    const angle = a.planKpa != null ? deg(a.planKpa) : deg(a.roadKpa || 0);
+    // the needle is drawn pointing left (angle 0) and rotated about the hub
+    const needle = s(
+      "g",
+      { class: "g-needle", style: `transform-origin:${cx}px ${cy}px` },
+      s("path", { d: `M${cx} ${cy - 4} L${cx - r + 18} ${cy} L${cx} ${cy + 4} Z`, class: "g-needle-shape" })
+    );
+    nodes.push(needle);
+    nodes.push(s("circle", { cx, cy, r: 9, class: "g-hub" }));
+    nodes.push(text(cx, cy + 34, a.planKpa != null ? opts.fmt(a.planKpa) : opts.fmt(a.roadKpa), "g-value", { "text-anchor": "middle" }));
+    nodes.push(text(cx, cy + 54, a.name, "d-small", { "text-anchor": "middle" }));
+    const el = svg(W, H, `${a.name} axle gauge: planned ${a.planKpa != null ? opts.fmt(a.planKpa) : "not set"}, road pressure ${opts.fmt(a.roadKpa)}`, nodes);
+    return { svg: el, needle, angle };
+  }
+
+  // A round South African speed-limit sign. text: "20" | "80" | "Slow" | "Crawl".
+  function speedSign(textValue, caption) {
+    const numeric = /^\d+$/.test(textValue);
+    return svg(
+      96,
+      118,
+      numeric ? `Speed limit ${textValue} km/h` : textValue,
+      s("circle", { cx: 48, cy: 48, r: 44, class: "sign-ring" }),
+      s("circle", { cx: 48, cy: 48, r: 33, class: "sign-face" }),
+      text(48, numeric ? 60 : 54, textValue, numeric ? "sign-num" : "sign-word", { "text-anchor": "middle" }),
+      text(48, 112, caption || (numeric ? "km/h max" : ""), "d-small", { "text-anchor": "middle" })
+    );
+  }
+
+  /*
+   * The tyre at a given pressure, side view and footprint from below. The
+   * footprint area is load ÷ pressure (rule nhtsa-contact-patch), held at the
+   * tread width; its length gives how far the tyre flattens.
+   * o: { kpa, wheelKg, radiusMm, widthMm, fmt }
+   */
+  function liveTyre(o) {
+    const W = 520;
+    const H = 230;
+    const EXAGGERATE = 2.5; // the flattening is only a few cm: drawn larger so it shows
+    const areaM2 = (o.wheelKg * 9.81) / (o.kpa * 1000);
+    const lengthMm = Math.min((areaM2 * 1e6) / o.widthMm, o.radiusMm * 1.2);
+    // A circle cut flat by the ground over the footprint length.
+    const halfMm = lengthMm / 2;
+    const deflMm = o.radiusMm - Math.sqrt(Math.max(0, o.radiusMm * o.radiusMm - halfMm * halfMm));
+    const k = 80 / o.radiusMm; // px per mm, side view
+    const R = o.radiusMm * k;
+    const d = Math.min(deflMm * k * EXAGGERATE, R * 0.45);
+    const h = Math.sqrt(Math.max(0, R * R - (R - d) * (R - d)));
+    const ground = 190;
+    const cx = 130;
+    const cy = ground - (R - d);
+    const tyre = `M${(cx - h).toFixed(1)} ${ground} A ${R.toFixed(1)} ${R.toFixed(1)} 0 1 1 ${(cx + h).toFixed(1)} ${ground} Z`;
+    // footprint from below, at its own (larger) scale
+    const kf = 0.42; // px per mm
+    const fx = 360;
+    const fy = 110;
+    const fw = o.widthMm * kf;
+    const fl = lengthMm * kf;
+    const nodes = [
+      s("rect", { x: 0, y: ground, width: 262, height: 24, class: "lt-sand" }),
+      s("circle", { cx, cy: ground - R, r: R, class: "d-ghost" }),
+      s("path", { d: tyre, class: "d-tyre" }),
+      s("circle", { cx, cy, r: R * 0.55, class: "d-rim" }),
+      s("circle", { cx, cy, r: 6, class: "d-hub" }),
+      s("path", { d: `M${cx - h} ${ground + 7} V${ground + 13} H${cx + h} V${ground + 7}`, class: "d-bracket" }),
+      text(cx, 222, "Side view (flattening drawn 2.5× for clarity)", "d-small", { "text-anchor": "middle" }),
+      text(fx, 18, "Footprint, from below", "d-small", { "text-anchor": "middle" }),
+      s("rect", { x: fx - fw / 2, y: fy - fl / 2, width: fw, height: fl, rx: Math.min(14, fw / 4), class: "d-patch" }),
+    ];
+    for (let i = -2; i <= 2; i++) nodes.push(s("line", { x1: fx + (i * fw) / 6, x2: fx + (i * fw) / 6, y1: fy - fl / 2 + 6, y2: fy + fl / 2 - 6, class: "d-tread" }));
+    nodes.push(text(fx, 222, `≈ ${Math.round(lengthMm / 10)} cm long · ${Math.round(areaM2 * 10000)} cm²`, "d-small d-strong", { "text-anchor": "middle" }));
+    return svg(W, H + 4, `At ${o.fmt(o.kpa)} one tyre carrying ${Math.round(o.wheelKg)} kg has a footprint of about ${Math.round(areaM2 * 10000)} square centimetres, about ${Math.round(lengthMm / 10)} cm long`, nodes);
+  }
+
+  /*
+   * Pumping back up as a timeline: pumping per tyre, compressor rests and
+   * moving to the next tyre. r: result of C.reinflation; switchMin per move.
+   */
+  function pumpTimeline(r, switchMin) {
+    const W = 560;
+    const H = 96;
+    const total = r.totalMin || 0;
+    if (!(total > 0)) return null;
+    const x0 = 10;
+    const span = W - 20;
+    const px = (min) => (min / total) * span;
+    const pumpEach = r.runMin / r.tyres;
+    const restEach = (r.elapsedMin - r.runMin) / r.tyres;
+    const nodes = [];
+    let x = x0;
+    for (let i = 0; i < r.tyres; i++) {
+      const pw = px(pumpEach);
+      nodes.push(s("rect", { x, y: 30, width: Math.max(1, pw), height: 26, class: "pt-pump" }));
+      nodes.push(text(x + pw / 2, 47, String(i + 1), "pt-label", { "text-anchor": "middle" }));
+      x += pw;
+      if (restEach > 0.001) {
+        const rw = px(restEach);
+        nodes.push(s("rect", { x, y: 30, width: rw, height: 26, class: "pt-rest" }));
+        x += rw;
+      }
+      if (i < r.tyres - 1 && switchMin > 0) {
+        const mw = px(switchMin);
+        nodes.push(s("rect", { x, y: 30, width: mw, height: 26, class: "pt-move" }));
+        x += mw;
+      }
+    }
+    nodes.push(text(x0, 20, "0", "d-small"));
+    nodes.push(text(W - 10, 20, Math.round(total) + " min", "d-small", { "text-anchor": "end" }));
+    const lg = [
+      ["pt-pump", "pumping (tyre 1–4)"],
+      ["pt-rest", "compressor resting"],
+      ["pt-move", "moving to the next tyre"],
+    ];
+    lg.forEach(([cls, label], i) => {
+      nodes.push(s("rect", { x: 10 + i * 180, y: 72, width: 12, height: 12, class: cls }));
+      nodes.push(text(28 + i * 180, 82, label, "d-small"));
+    });
+    return svg(W, H, `Pumping all four tyres takes about ${Math.round(total)} minutes`, nodes);
+  }
+
+  // The bead diagram, with the bead animated sliding over the hump into the well.
+  function beadAnimated() {
+    const base = bead();
+    const g = s(
+      "g",
+      { class: "anim-bead" },
+      s("rect", { x: 82, y: 98, width: 40, height: 22, rx: 8, class: "d-bead d-bead--moving" })
+    );
+    const arrow = s("g", { class: "anim-push" }, s("path", { d: "M30 150 H120", class: "d-arrow" }), s("path", { d: "M120 150 l-10 -6 v12 z", class: "d-arrowhead" }));
+    // hide the static left bead and arrow; the animated ones replace them
+    base.querySelectorAll(".d-bead")[0].setAttribute("class", "d-bead d-bead--ghost");
+    base.querySelectorAll(".d-arrow")[0].remove();
+    base.querySelectorAll(".d-arrowhead")[0].remove();
+    base.appendChild(arrow);
+    base.appendChild(g);
+    return base;
+  }
+
+  /*
+   * Corrugations: the same rippled road under a hard tyre (bounces over every
+   * ripple) and a softer one (flattens over them). Ripples scroll; tyres bob.
+   */
+  function corrugation() {
+    const W = 520;
+    const H = 250;
+    const ripple = (y) => {
+      let d = `M-60 ${y}`;
+      for (let x = -60; x <= W + 60; x += 30) d += ` q7.5 -8 15 0 q7.5 8 15 0`;
+      return s("g", { class: "anim-road" }, s("path", { d: d + ` V${y + 30} H-60 Z`, class: "cor-road" }));
+    };
+    const lane = (y, hard, label) => {
+      const cx = 160;
+      const R = 34;
+      const flat = hard ? 0 : 7;
+      const body = s("rect", { x: cx - 70, y: y - 92, width: 260, height: 26, rx: 6, class: "cor-body" });
+      const tyre = hard
+        ? s("circle", { cx, cy: y - R, r: R, class: "d-tyre" })
+        : s("path", {
+            d: `M${cx - 16} ${y} C${cx - 30} ${y} ${cx - R - 3} ${y - 14} ${cx - R} ${y - R + flat} A ${R} ${R} 0 0 1 ${cx + R} ${y - R + flat} C${cx + R + 3} ${y - 14} ${cx + 30} ${y} ${cx + 16} ${y} Z`,
+            class: "d-tyre",
+          });
+      return s(
+        "g",
+        null,
+        ripple(y),
+        s("g", { class: hard ? "anim-bounce-hard" : "anim-bounce-soft" }, s("line", { x1: cx, y1: y - R + flat / 2, x2: cx, y2: y - 70, class: "cor-strut" }), body, tyre, s("circle", { cx, cy: y - R + flat / 2, r: 14, class: "d-rim" })),
+        text(360, y - 52, label, "d-text d-strong")
+      );
+    };
+    return svg(
+      W,
+      H,
+      "Corrugations: a hard tyre bounces over every ripple; a softer tyre flattens over them and the ride is smoother",
+      lane(110, true, "Hard tyre: bounces"),
+      lane(230, false, "Softer tyre: soaks it up")
+    );
+  }
+
+  /*
+   * Warm-up: a thermometer and a gauge rising together, from the cold
+   * pressure to ETRTO's normal 20% warmer.
+   */
+  function warmUp(coldKpa, rise, fmt) {
+    const W = 520;
+    const H = 190;
+    const warm = coldKpa * (1 + rise);
+    const g = (cx) =>
+      s(
+        "g",
+        null,
+        s("circle", { cx, cy: 92, r: 60, class: "d-gauge" }),
+        s("path", { d: arcPath(cx, 92, 50, 20, 160), class: "d-gauge-arc" }),
+        s("g", { class: "anim-gauge-needle", style: `transform-origin:${cx}px 92px` }, s("line", { x1: cx, y1: 92, x2: cx - 42, y2: 92, class: "d-needle d-needle--warm" })),
+        s("circle", { cx, cy: 92, r: 5, class: "d-hub" })
+      );
+    return svg(
+      W,
+      H,
+      `Driving warms the air in the tyre: ${fmt(coldKpa)} cold reads about ${fmt(warm)} warm`,
+      // thermometer
+      s("rect", { x: 92, y: 26, width: 22, height: 116, rx: 11, class: "th-tube" }),
+      s("circle", { cx: 103, cy: 152, r: 20, class: "th-bulb" }),
+      s("rect", { x: 98, y: 40, width: 10, height: 112, class: "th-fill anim-mercury", style: "transform-origin:103px 152px" }),
+      text(103, 186, "air in the tyre", "d-small", { "text-anchor": "middle" }),
+      g(330),
+      text(330, 176, `${fmt(coldKpa)} cold → about ${fmt(warm)} warm`, "d-text d-strong", { "text-anchor": "middle" }),
+      text(220, 96, "→", "d-text", { "text-anchor": "middle" })
+    );
+  }
+
+  // Small line icons for the "Before you go" list.
+  const ICONS = {
+    tar: () => [s("path", { d: "M8 22 L11 2 M16 22 L13 2", class: "ic" }), s("path", { d: "M12 5v2 M12 11v2 M12 17v2", class: "ic ic-dash" })],
+    slope: () => [s("path", { d: "M2 20 L22 8 V20 Z", class: "ic" }), s("circle", { cx: 12, cy: 11, r: 3, class: "ic" })],
+    gauge: () => [s("circle", { cx: 12, cy: 13, r: 8, class: "ic" }), s("path", { d: "M12 13 L16 9 M3 22h18", class: "ic" })],
+    thermo: () => [s("path", { d: "M10 4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0Z", class: "ic" }), s("path", { d: "M12 9v8", class: "ic" })],
+  };
+  function icon(name) {
+    const f = ICONS[name];
+    if (!f) return null;
+    return s("svg", { viewBox: "0 0 24 24", class: "icon", "aria-hidden": "true" }, f());
+  }
+
+  root.TYRE_DIAGRAMS = { footprint, deflection, bead, ctis, markings, gauge, speedSign, liveTyre, pumpTimeline, beadAnimated, corrugation, warmUp, icon };
 })(window);
