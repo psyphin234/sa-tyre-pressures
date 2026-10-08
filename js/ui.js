@@ -76,7 +76,14 @@
     }
     figure.replaceChildren(
       el("img", { src: img.file, alt: img.alt, width: img.w, height: img.h, loading: "lazy", decoding: "async" }),
-      el("figcaption", null, img.caption ? img.caption + " " : "", el("span", { class: "credit" }, "Photo: ", externalLink(img.authorUrl || img.page, img.author), ", ", img.licenseUrl ? externalLink(img.licenseUrl, img.license) : img.license))
+      el(
+        "figcaption",
+        null,
+        img.caption ? img.caption + " " : "",
+        img.own
+          ? el("span", { class: "credit" }, "Photo: " + img.author + ".")
+          : el("span", { class: "credit" }, "Photo: ", externalLink(img.authorUrl || img.page, img.author), ", ", img.licenseUrl ? externalLink(img.licenseUrl, img.license) : img.license)
+      )
     );
   }
 

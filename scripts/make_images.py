@@ -4,6 +4,13 @@ from PIL import Image, ImageOps
 # their credits (author, licence, file page) and alt text.
 src, proj = sys.argv[1], sys.argv[2]
 meta = json.load(open(os.path.join(src, "meta.json"), encoding="utf-8"))
+# The owner's own photos (in Pics/, not committed): they replace the Commons
+# photo with the same key. Saved without EXIF, so no GPS or camera data is published.
+OWN = {
+  "hero": ("Pics/Cover.jpeg", "A Toyota Land Cruiser driving across wide white sand dunes under a blue sky", "Land Cruiser on the dunes."),
+  "sand": ("Pics/DeepSand.jpg", "Two 4x4s on the crest of a red sand dune, with footprints in the sand and mountains behind", "Red dunes."),
+}
+
 CHOSEN = [
   # key, source slug, alt text, caption, author link override
   ("hero", "driving-in-south-africa-banner-calvinia", "A gravel road running through Northern Cape veld towards flat-topped mountains near Calvinia", "Gravel road near Calvinia, Northern Cape.", None),
@@ -25,8 +32,14 @@ TERRAIN_KEYS = {"tar", "gravel", "corrugations", "sand", "mud", "rock", "snow", 
 os.makedirs(os.path.join(proj, "img"), exist_ok=True)
 out = []
 for key, slug, alt, caption, author_url in CHOSEN:
-    m = meta[slug]
-    im = ImageOps.exif_transpose(Image.open(os.path.join(src, slug + ".jpg"))).convert("RGB")
+    own = OWN.get(key)
+    if own:
+        im = ImageOps.exif_transpose(Image.open(os.path.join(proj, own[0]))).convert("RGB")
+        alt, caption = own[1], own[2]
+        m = {"artist": "PsyPhin", "license": "Own photo", "licenseUrl": None, "page": None, "title": None}
+    else:
+        m = meta[slug]
+        im = ImageOps.exif_transpose(Image.open(os.path.join(src, slug + ".jpg"))).convert("RGB")
     full = im.copy(); full.thumbnail((1600 if key == "hero" else 1000, 1000))
     fname = f"img/{key}.jpg"
     full.save(os.path.join(proj, fname), quality=78, optimize=True, progressive=True)
@@ -38,7 +51,7 @@ for key, slug, alt, caption, author_url in CHOSEN:
     out.append({
         "key": key, "file": fname, "thumb": tname, "w": full.width, "h": full.height,
         "alt": alt, "caption": caption,
-        "author": html.unescape(m["artist"]).strip(), "authorUrl": author_url,
+        "author": html.unescape(m["artist"]).strip(), "authorUrl": author_url, "own": bool(own),
         "license": m["license"], "licenseUrl": m["licenseUrl"] or None,
         "page": m["page"], "title": m["title"],
     })

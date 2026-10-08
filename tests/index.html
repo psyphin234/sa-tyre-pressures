@@ -59,7 +59,7 @@
       test("every terrain has a photo with a credit", () => {
         const bad = D.terrains.filter((t) => {
           const i = window.TYRE_IMAGES.find((x) => x.key === t.image);
-          return !i || !i.author || !i.license || !i.page;
+          return !i || !i.author || (!i.own && (!i.license || !i.page));
         }).map((t) => t.id);
         return bad.length === 0 || bad;
       });

@@ -78,7 +78,9 @@
 
   document.getElementById("credit-list").replaceChildren(
     ...(window.TYRE_IMAGES || []).map((i) =>
-      el(
+      i.own
+        ? el("li", null, el("strong", null, i.caption + " "), "Photo by PsyPhin, used on this site with permission.")
+        : el(
         "li",
         null,
         el("strong", null, i.caption + " "),
