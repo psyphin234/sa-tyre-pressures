@@ -10,7 +10,7 @@ OWN = {
   "hero": ("Pics/Cover.jpeg", "A Toyota Land Cruiser driving across wide white sand dunes under a blue sky", "Land Cruiser on the dunes."),
   "rock": ("Pics/rock.jpeg", "A white double-cab bakkie climbing a steep, rocky slope among aloes and bare trees", "Rocky climb, Brits, North West."),
   "corrugations": ("Pics/corrugations.jpeg", "A rutted, rippled sandy dirt track running between thorn trees", "Rough, rutted track, Alldays, Limpopo."),
-  "riverbed": ("Pics/sand and river.png", "Aerial view of a convoy of 4x4s crossing a wide sandy riverbed with shallow channels of water", "A convoy crossing a sandy riverbed."),
+  "riverbed": ("Pics/sand and river.png", "Aerial view of a convoy of 4x4s crossing a wide sandy riverbed with shallow channels of water", "A convoy crossing a sandy riverbed, Groot-Letaba, Mpumalanga."),
   "snow": ("Pics/Snow Deep.jpeg", "AI image: a snow-covered mountain track with deep wheel ruts, between snowy peaks", "Deep snow on a mountain track.", "AI image"),
   "snowroad": ("Pics/Snow_Ice.jpeg", "AI image: an icy, partly snow-covered mountain road winding between snowy slopes", "Snow and ice on a mountain road.", "AI image"),
   "gravel": ("Pics/Gravel.jpg", "A long, straight gravel road through dry veld towards flat-topped hills", "Gravel road outside Carnarvon towards Prieska, Northern Cape."),
@@ -34,7 +34,7 @@ CHOSEN = [
   ("compressor", "compressor-tire-pump-tyre-pump-edited-2020-4990679", "A small 12 V tyre compressor with a gauge and coiled air hose", "A portable 12 V compressor.", "https://www.mechanicalcaveman.com/"),
   ("beadlock", "beadlock1", "A wheel with a bolted beadlock ring clamping the tyre's outer bead", "A beadlock ring bolted over the outer bead.", None),
   ("riverbed", None, "", "", None),
-  ("deflated", "deflated-car-tire", "A car tyre with almost no air, its sidewall bulging out at the bottom", "With too little air the sidewall bulges and flexes on every turn.", None),
+  ("deflated", "deflated-car-tire", "A car tyre with almost no air, its sidewall bulging out at the bottom", "With too little air the sidewall bulges and flexes on every turn, and the tyre can then jump off the bead. It's not easy to get it back on without the right tools.", None),
 ]
 TERRAIN_KEYS = {"tar", "gravel", "corrugations", "sand", "mud", "rock", "snow", "snowroad"}
 os.makedirs(os.path.join(proj, "img"), exist_ok=True)
