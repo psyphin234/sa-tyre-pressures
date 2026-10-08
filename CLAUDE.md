@@ -77,6 +77,7 @@ The Michelin 7.50R16 table is per **axle**, typed from Michelin Australia's page
 
 ## Conventions
 
+- **Header:** the same `.brand-bar` as fuel.psyphin.co.za and the towing checker (pill + Calculator/Sources row, `logo.jpg`, blue eyebrow, title, `.subtitle`). Keep the three in step. `brand-64.png` is no longer shown.
 - Brand is written **PsyPhin**. Commit identity: `74655215+psyphin234@users.noreply.github.com` (set globally). Never commit a personal email.
 - The repo will be public: no personal names or private notes in committed files.
 
