@@ -417,34 +417,56 @@
   }
 
   /*
-   * Warm-up: a thermometer and a gauge rising together, from the cold
-   * pressure to ETRTO's normal 20% warmer.
+   * Warm-up: the thermometer shows the temperature of the air in the tyre,
+   * the gauge its pressure. Both rise together, from the cold reading to
+   * ETRTO's normal 20% warmer (warmC: the air temperature that explains that
+   * rise, from the gas law). The marks sit exactly where the animation stops.
    */
-  function warmUp(coldKpa, rise, fmt) {
+  function warmUp(coldKpa, rise, fmt, coldC, warmC) {
     const W = 520;
-    const H = 190;
+    const H = 240;
     const warm = coldKpa * (1 + rise);
-    const g = (cx) =>
-      s(
-        "g",
-        null,
-        s("circle", { cx, cy: 92, r: 60, class: "d-gauge" }),
-        s("path", { d: arcPath(cx, 92, 50, 20, 160), class: "d-gauge-arc" }),
-        s("g", { class: "anim-gauge-needle", style: `transform-origin:${cx}px 92px` }, s("line", { x1: cx, y1: 92, x2: cx - 42, y2: 92, class: "d-needle d-needle--warm" })),
-        s("circle", { cx, cy: 92, r: 5, class: "d-hub" })
-      );
+    // thermometer: the red column runs from 35% (cold) to 85% (warm) of the tube
+    const tubeBottom = 152;
+    const tubeLen = 112;
+    const LOW = 0.35;
+    const HIGH = 0.85;
+    const yAt = (f) => tubeBottom - tubeLen * f;
+    // gauge: the needle (drawn pointing left) turns 60deg (cold) to 110deg (warm)
+    const gx = 350;
+    const gy = 92;
+    const COLD_DEG = 60;
+    const WARM_DEG = 110;
+    const mark = (deg, label) => {
+      const [x1, y1] = polar(gx, gy, 50, deg);
+      const [x2, y2] = polar(gx, gy, 60, deg);
+      const [tx, ty] = polar(gx, gy, 74, deg);
+      return [s("line", { x1, y1, x2, y2, class: "g-tick" }), text(tx, ty + 4, label, "d-small d-strong", { "text-anchor": "middle" })];
+    };
     return svg(
       W,
       H,
-      `Driving warms the air in the tyre: ${fmt(coldKpa)} cold reads about ${fmt(warm)} warm`,
+      `Driving warms the air in the tyre from about ${coldC}°C to about ${warmC}°C, and the gauge goes from ${fmt(coldKpa)} to about ${fmt(warm)}`,
       // thermometer
       s("rect", { x: 92, y: 26, width: 22, height: 116, rx: 11, class: "th-tube" }),
       s("circle", { cx: 103, cy: 152, r: 20, class: "th-bulb" }),
-      s("rect", { x: 98, y: 40, width: 10, height: 112, class: "th-fill anim-mercury", style: "transform-origin:103px 152px" }),
-      text(103, 186, "air in the tyre", "d-small", { "text-anchor": "middle" }),
-      g(330),
-      text(330, 176, `${fmt(coldKpa)} cold → about ${fmt(warm)} warm`, "d-text d-strong", { "text-anchor": "middle" }),
-      text(220, 96, "→", "d-text", { "text-anchor": "middle" })
+      s("rect", { x: 98, y: tubeBottom - tubeLen, width: 10, height: tubeLen, class: "th-fill anim-mercury", style: "transform-origin:103px 152px" }),
+      s("line", { x1: 116, x2: 126, y1: yAt(LOW), y2: yAt(LOW), class: "g-tick" }),
+      text(130, yAt(LOW) + 4, `${coldC}°C`, "d-small d-strong"),
+      s("line", { x1: 116, x2: 126, y1: yAt(HIGH), y2: yAt(HIGH), class: "g-tick" }),
+      text(130, yAt(HIGH) + 4, `≈ ${warmC}°C`, "d-small d-strong"),
+      text(103, 190, "Temperature of", "d-small", { "text-anchor": "middle" }),
+      text(103, 204, "the air inside", "d-small", { "text-anchor": "middle" }),
+      text(225, 96, "→", "d-text", { "text-anchor": "middle" }),
+      // gauge
+      s("circle", { cx: gx, cy: gy, r: 60, class: "d-gauge" }),
+      s("path", { d: arcPath(gx, gy, 50, 20, 160), class: "d-gauge-arc" }),
+      mark(COLD_DEG, fmt(coldKpa)),
+      mark(WARM_DEG, fmt(warm)),
+      s("g", { class: "anim-gauge-needle", style: `transform-origin:${gx}px ${gy}px` }, s("line", { x1: gx, y1: gy, x2: gx - 42, y2: gy, class: "d-needle d-needle--warm" })),
+      s("circle", { cx: gx, cy: gy, r: 5, class: "d-hub" }),
+      text(gx, 176, "Pressure on the gauge", "d-small", { "text-anchor": "middle" }),
+      text(W / 2, 232, `Same air: ${fmt(coldKpa)} at ${coldC}°C becomes about ${fmt(warm)} at about ${warmC}°C`, "d-text d-strong", { "text-anchor": "middle" })
     );
   }
 

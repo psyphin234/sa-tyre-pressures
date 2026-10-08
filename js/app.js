@@ -772,7 +772,9 @@
       d.replaceChildren(G.footprint(wheelKg, pressures, { fmt }), el("p", { class: "diagram-caption" }, `One tyre carrying ${Math.round(wheelKg)} kg${heavier ? " (your heavier axle)" : " (example)"}. Area ≈ load ÷ pressure.`));
     });
     const rise = UI.ruleById("etrto-hot-pressure").params.warmRiseFraction;
-    document.querySelectorAll('[data-diagram="hotcold"]').forEach((d) => d.replaceChildren(G.warmUp(road, rise, fmt)));
+    const coldC = 20;
+    const warmC = Math.round((coldC + C.tempRiseFor(road, road * (1 + rise), coldC, readState().altitude)) / 5) * 5;
+    document.querySelectorAll('[data-diagram="hotcold"]').forEach((d) => d.replaceChildren(G.warmUp(road, rise, fmt, coldC, warmC)));
     const alt = readState().altitude;
     const setC = 20;
     const temps = [0, 10, 20, 30, 40];

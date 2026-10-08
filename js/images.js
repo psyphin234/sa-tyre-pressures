@@ -231,7 +231,7 @@ window.TYRE_IMAGES = [
     "w": 1000,
     "h": 539,
     "alt": "Aerial view of a convoy of 4x4s crossing a wide sandy riverbed with shallow channels of water",
-    "caption": "A convoy crossing a sandy riverbed, Groot-Letaba, Mpumalanga.",
+    "caption": "A convoy crossing a sandy riverbed, Groot-Letaba, Limpopo.",
     "author": "PsyPhin",
     "authorUrl": null,
     "own": true,
