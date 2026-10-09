@@ -240,7 +240,7 @@
       flowLpm: num("flow") != null ? num("flow") * (f.flowUnit.value === "cfm" ? CFM_TO_LPM : 1) : null,
       freeFlow: f.freeFlow.checked,
       duty: num("duty"),
-      switchMin: num("switchMin") != null ? num("switchMin") : 0,
+      switchMin: num("switchSec") != null ? num("switchSec") / 60 : 0,
       altitude: num("altitude") || 0,
     };
   }
@@ -545,7 +545,7 @@
       lines.push(el("p", { class: "big" }, `Time for all four tyres: ${atLeast}${mins(r.totalMin)}.`));
       const parts = [`pumping ${mins(r.runMin)}`];
       if (r.duty < 1) parts.push(`rests for the compressor ${mins(r.elapsedMin - r.runMin)} (${Math.round(r.duty * 100)}% duty cycle)`);
-      if (r.moveMin > 0) parts.push(`moving between tyres ${mins(r.moveMin)} (${r.tyres - 1} moves of ${st.switchMin} min)`);
+      if (r.moveMin > 0) parts.push(`moving between tyres ${r.moveMin < 1 ? Math.round(r.moveMin * 60) + " s" : "about " + Math.round(r.moveMin * 2) / 2 + " min"} (${r.tyres - 1} moves of ${Math.round(st.switchMin * 60)} s)`);
       lines.push(el("p", null, "That's " + parts.join(", ") + "."));
       const perTyre = r.runMin / 4;
       lines.push(el("p", null, `Pumping alone is ${perTyre < 1 ? "under a minute" : "about " + Math.round(perTyre * 10) / 10 + " min"} per tyre on average.`));
