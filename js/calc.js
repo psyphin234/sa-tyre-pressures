@@ -274,9 +274,13 @@
     let bottom;
     let stepBar = null;
     let ruleId;
+    // Cooper's ranges are fixed figures: if road pressure is already at or
+    // below the bottom, there's nothing published to go down to.
+    let publishedLowKpa = null;
     if (spec.kind === "cooper") {
       ruleId = "cooper-lt-terrain";
       const [lo, hi] = rule(ruleId).params.psi[spec.key];
+      publishedLowKpa = psiToKpa(lo);
       top = Math.min(psiToKpa(hi), roadKpa);
       bottom = Math.min(psiToKpa(lo), roadKpa);
       if (spec.steps) stepBar = rule(spec.steps).params.stepBar;
@@ -297,7 +301,7 @@
       for (let p = top; p > bottom + 0.5; p -= step) steps.push(p);
     } else steps.push(top);
     if (bottom < top - 0.5) steps.push(bottom);
-    return { terrain: t, topKpa: top, bottomKpa: bottom, steps, sourced: true, kind: spec.kind, ruleId };
+    return { terrain: t, topKpa: top, bottomKpa: bottom, steps, sourced: true, kind: spec.kind, ruleId, publishedLowKpa };
   }
 
   // Lowest pressure a tyre maker publishes for sand or mud, for this tyre class.

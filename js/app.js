@@ -87,6 +87,9 @@
   const fmt = (kpa) => C.fmtPressure(kpa, "bar");
   // A quoted figure without the site's 0.05 bar rounding (12 psi -> 0.83 bar, not 0.85).
   const fmtExact = (kpa) => (kpa / 100).toFixed(2) + " bar";
+  // Road pressure already at or below the bottom of a published (Cooper) range,
+  // so the range can't go lower. Not when the load floor is what holds it up.
+  const atPublishedLow = (r) => !!r && r.publishedLowKpa != null && !r.raised && r.bottomKpa >= r.topKpa - 1 && r.topKpa < r.publishedLowKpa + 0.5;
 
   /*
    * What's known about going below the lowest published pressure (sand and
@@ -138,6 +141,22 @@
       headline = "Keep road pressure";
       if (t.id === "rock") lines.push(el("p", null, "Cooper's rock figures are for LT tyres only, and no figure was found for passenger-type tyres. Go very slowly, and if you need more grip on a climb, lower cautiously: a tyre can puncture halfway up."));
       else lines.push(el("p", null, t.summary));
+    } else if (ranges.filter(Boolean).every(atPublishedLow)) {
+      const low = fmt(r.publishedLowKpa);
+      const at = r.topKpa > r.publishedLowKpa - 0.5;
+      headline = at ? "Already at the lowest published figure" : "Already below the published figures";
+      lines.push(
+        el(
+          "p",
+          { class: "answer-sub" },
+          `Your road pressure (${tp}) is already ${at ? "at" : "below"} the lowest Cooper publishes for LT tyres on ${t.name.toLowerCase()} (${low}). No tyre maker publishes a lower figure for LT tyres, so the calculator can't tell you how far below that is safe.`
+        )
+      );
+      lines.push(el("p", null, "This doesn't mean you shouldn't go lower: the published figures simply stop here. This happens with big tyres on a light vehicle, where road pressure is already low."));
+      if (t.id === "rock") lines.push(el("p", null, `Go very slowly in low range. Below about ${fmt(C.psiToKpa(20))} a tyre can be pushed off the rim (Cooper).`));
+      else if (t.id === "gravel" || t.id === "corrugations") lines.push(el("p", null, `${dirtMax} km/h at most on dirt.`));
+      else if (t.id === "mud") lines.push(el("p", null, "Keep it slow in mud."));
+      else if (t.id === "deepsnow") lines.push(el("p", { class: "answer-sub" }, "No civilian tyre maker publishes deep-snow pressures, so these are your tyres' sand figures."));
     } else if (t.id === "snow") {
       headline = "Keep road pressure";
       lines.push(el("p", { class: "answer-sub" }, "Bridgestone: letting air out doesn't help grip on snow or ice, and can damage the tyres."));
@@ -357,7 +376,13 @@
     const rows = m.axles.map((a) => {
       if (!a.range) return el("li", null, el("strong", null, a.name + ": "), "enter the placard pressure or the axle load.");
       if (a.range.bottomKpa >= a.range.topKpa - 1)
-        return el("li", null, el("strong", null, a.name + ": "), fmtAll(a.range.topKpa), a.range.sourced ? "" : ", no published figure for going lower");
+        return el(
+          "li",
+          null,
+          el("strong", null, a.name + ": "),
+          fmtAll(a.range.topKpa),
+          !a.range.sourced ? ", no published figure for going lower" : atPublishedLow(a.range) ? `, already at or below the lowest published figure (${fmt(a.range.publishedLowKpa)}), so none to go lower` : ""
+        );
       return el(
         "li",
         null,

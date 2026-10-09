@@ -170,6 +170,10 @@
         const r = C.terrainRange("gravel", 220, "lt");
         return (r.topKpa === 220 && Math.round(r.bottomKpa) === 193) || r;
       });
+      test("LT road pressure below Cooper's range: flat, with Cooper's lowest figure kept", () => {
+        const r = C.terrainRange("gravel", 130, "lt");
+        return (r.topKpa === 130 && r.bottomKpa === 130 && Math.round(r.publishedLowKpa) === 193) || r;
+      });
       test("passenger gravel: Toyo's 20% rule (2.4 → 1.92 bar)", () => {
         const r = C.terrainRange("gravel", 240, "passenger");
         return Math.round(r.bottomKpa) === 192 || r;
