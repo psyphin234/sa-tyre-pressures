@@ -724,7 +724,7 @@
       category: "field-practice",
       title: "Field practice: very soft sand",
       summary:
-        "Experienced drivers, the site's owner among them, often run about 1 bar in soft sand, and go as low as 0.3–0.5 bar in very soft sand at walking pace. No tyre or vehicle maker publishes figures this low: it's experience, not a recommendation. The risks rise sharply down there: the bead coming off the rim, sidewall and rim damage, and heat if you speed up.",
+        "Experienced drivers often run about 1 bar in soft sand, and go as low as 0.3–0.5 bar in very soft sand at walking pace. No tyre or vehicle maker publishes figures this low: it's experience, not a recommendation. The risks rise sharply down there: the bead coming off the rim, sidewall and rim damage, and heat if you speed up.",
       sources: [],
       checked: CHECKED,
       params: { lowBar: 0.3, highBar: 0.5, typicalBar: 1.0 },
