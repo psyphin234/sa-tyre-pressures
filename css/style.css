@@ -794,20 +794,16 @@ input[type="checkbox"] {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0 16px;
+  padding: 0 16px 12px;
   margin-bottom: 10px;
 }
 
-.explainer > summary {
-  cursor: pointer;
-  padding: 14px 0;
+.explainer > h3 {
+  margin: 0;
+  padding: 14px 0 4px;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.15rem;
-}
-
-.explainer[open] {
-  padding-bottom: 12px;
 }
 
 .explainer p {
