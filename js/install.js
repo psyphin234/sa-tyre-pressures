@@ -1,6 +1,6 @@
 /*
  * install.js: optional "Add to home screen". Chrome's own install pop-up is
- * held back (the site is under construction and nobody should be pushed to
+ * held back (the site is still being tested and nobody should be pushed to
  * install it); the visitor can still install from the button in the
  * "Works offline" box. Browsers without an install prompt (Safari on iPhone,
  * Firefox) get short instructions instead. Hidden once installed.

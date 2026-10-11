@@ -2,7 +2,7 @@
 
 Static calculator that gives a starting tyre-pressure **range** for a 4x4 by tyre, axle load and terrain, part of the PsyPhin site. Repo `psyphin234/sa-tyre-pressures` (public), GitHub Pages from `main` / root, live at **https://tyres.psyphin.co.za/** since 2026-10-08 (the `CNAME` file here, committed by GitHub, plus the Afrihost `tyres` CNAME → `psyphin234.github.io`; see the psyphin.co.za CLAUDE.md). The first test address `psyphin.co.za/sa-tyre-pressures/` still served the page (no redirect yet) on 2026-10-08; GitHub normally starts redirecting it to the custom domain. Push to `main` to deploy; check with `gh api repos/psyphin234/sa-tyre-pressures/pages/builds/latest`.
 
-**Status: UNDER CONSTRUCTION.** Every page carries the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.
+**Status: SCENARIO TESTING** (was "Under construction" until 2026-10-12). Every page carries the amber `.construction` banner, now headed "Scenario testing.", and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.
 
 GoatCounter (since 2026-10-08): cookie-free visit counts on index.html and sources.html, just before `</body>`, with the same `window.goatcounter.path` host prefix as the towing site, so visits show as `tyres.psyphin.co.za/…` on the shared dashboard https://psyphin.goatcounter.com/. It never sees inputs; the offline line says visits are counted. Offline visits aren't counted (the service worker only handles this site's own files). Don't add it to tests/.
 
@@ -85,4 +85,4 @@ The Michelin 7.50R16 table is per **axle**, typed from Michelin Australia's page
 
 ## psyphin.co.za card
 
-The card is live in psyphin.co.za's Tools section since 2026-10-08 (`projects.js` there), with the amber "Under construction" tag. Keep the tag, this site's banner and its noindex until the owner says the site is ready.
+The card is live in psyphin.co.za's Tools section since 2026-10-08 (`projects.js` there), with the amber "Scenario testing" tag ("Under construction" until 2026-10-12). Keep the tag, this site's banner and its noindex until the owner says the site is ready.
