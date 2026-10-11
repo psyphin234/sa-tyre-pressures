@@ -192,7 +192,9 @@
 
   /*
    * A tyre-gauge dial for one axle. a: { name, roadKpa, floorKpa, tableMinKpa,
-   * planKpa, status, range }. opts: { fmt, maxKpa, bfgKpa }. The needle points
+   * planKpa, status, range }. opts: { fmt, maxKpa, bfgKpa, field }. field
+   * ({ fromKpa, toKpa }, sand only) is the field-practice band, drawn as a
+   * dashed amber arc below the published range: shown, never a bound. The needle points
    * at the planned pressure; app.js animates it from the previous reading.
    * Returns { svg, needle, angle }.
    */
@@ -226,6 +228,8 @@
     }
     // the terrain range as a thin outer arc
     if (a.range && a.range.bottomKpa < a.range.topKpa - 1) nodes.push(s("path", { d: arcPath(cx, cy, r + 9, deg(a.range.bottomKpa), deg(a.range.topKpa)), class: "g-range" }));
+    // field practice (sand only): from its lowest figure up to the published range
+    if (opts.field && opts.field.toKpa > opts.field.fromKpa + 1) nodes.push(s("path", { d: arcPath(cx, cy, r + 9, deg(opts.field.fromKpa), deg(opts.field.toKpa)), class: "g-field" }));
     // BFGoodrich's 1.5 bar line
     if (opts.bfgKpa) {
       const [x1, y1] = polar(cx, cy, r - 8, deg(opts.bfgKpa));

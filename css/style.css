@@ -1013,6 +1013,7 @@ input[type="checkbox"] {
 .swatch.z-nodata { background: rgba(123, 133, 144, 0.35); }
 .swatch--plan { width: 0; height: 0; border-radius: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid var(--accent); }
 .swatch--range { width: 6px; border: 2px solid var(--accent); border-left: 0; border-radius: 0; }
+.swatch--field { height: 0; width: 18px; border-top: 3px dashed var(--warn); border-radius: 0; }
 .swatch--bfg { height: 0; width: 18px; border-top: 2px dashed var(--fail); border-radius: 0; }
 
 .install {
@@ -1256,6 +1257,7 @@ input[type="checkbox"] {
 .gz-nodata { stroke: rgba(123, 133, 144, 0.45); }
 .g-tick { stroke: var(--text-muted); stroke-width: 1.5; }
 .g-range { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.g-field { fill: none; stroke: var(--warn); stroke-width: 3; stroke-dasharray: 5 4; }
 .g-road { stroke: var(--text); stroke-width: 3; }
 .g-needle-shape { fill: var(--warn); }
 .g-hub { fill: var(--surface-2); stroke: var(--warn); stroke-width: 3; }

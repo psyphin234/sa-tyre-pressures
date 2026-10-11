@@ -440,9 +440,10 @@
     const shown = m.axles.filter((a) => a.need && a.need.status !== "noLoad" && a.need.status !== "overload");
     if (shown.length) {
       const bfg = C.barToKpa(UI.ruleById("bfg-below-1-5").params.bar);
+      const fp = terrainId === "sand" ? UI.ruleById("field-practice-sand").params : null;
       const maxKpa = Math.ceil(Math.max(300, ...shown.map((a) => Math.max(a.road.kpa || 0, a.plan || 0, a.need.kpa || 0) + 40)) / 50) * 50;
       shown.forEach((a) => {
-        const g = G.gauge({ name: a.name, roadKpa: a.road.kpa, floorKpa: a.need.kpa, tableMinKpa: a.need.tableMinKpa, planKpa: a.plan, status: a.need.status, range: a.range }, { fmt, bfgKpa: bfg, maxKpa });
+        const g = G.gauge({ name: a.name, roadKpa: a.road.kpa, floorKpa: a.need.kpa, tableMinKpa: a.need.tableMinKpa, planKpa: a.plan, status: a.need.status, range: a.range }, { fmt, bfgKpa: bfg, maxKpa, field: fp && a.range ? { fromKpa: C.barToKpa(fp.lowBar), toKpa: a.range.bottomKpa } : null });
         pendingNeedles.push({ key: a.name, needle: g.needle, angle: g.angle });
         const cap = C.speedCap(a.plan, a.road.kpa, terrainId);
         diagram.appendChild(
@@ -465,6 +466,7 @@
           sw("z-nodata", "below the tables: no data"),
           sw("swatch--plan", "needle: your plan"),
           sw("swatch--range", "outer arc: terrain range"),
+          fp ? sw("swatch--field", "dashed orange: field practice, " + fmt(C.barToKpa(fp.lowBar)) + " up (no maker publishes this)") : null,
           sw("swatch--bfg", "red line: " + fmt(bfg) + " (BFGoodrich)")
         )
       );
