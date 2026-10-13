@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tyres.psyphin.co.za/sitemap.xml
