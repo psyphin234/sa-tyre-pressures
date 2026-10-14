@@ -798,6 +798,14 @@ input[type="checkbox"] {
   margin-bottom: 10px;
 }
 
+details.explainer > summary {
+  cursor: pointer;
+  padding: 14px 0 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
 .explainer > h3 {
   margin: 0;
   padding: 14px 0 4px;
