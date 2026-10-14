@@ -2,7 +2,7 @@
 
 Static calculator that gives a starting tyre-pressure **range** for a 4x4 by tyre, axle load and terrain, part of the PsyPhin site. Repo `psyphin234/sa-tyre-pressures` (public), GitHub Pages from `main` / root, live at **https://tyres.psyphin.co.za/** since 2026-10-08 (the `CNAME` file here, committed by GitHub, plus the Afrihost `tyres` CNAME → `psyphin234.github.io`; see the psyphin.co.za CLAUDE.md). The first test address `psyphin.co.za/sa-tyre-pressures/` still served the page (no redirect yet) on 2026-10-08; GitHub normally starts redirecting it to the custom domain. Push to `main` to deploy; check with `gh api repos/psyphin234/sa-tyre-pressures/pages/builds/latest`.
 
-**Status: SCENARIO TESTING** (was "Under construction" until 2026-10-12). Every page carries the amber `.construction` banner, now headed "Scenario testing.", and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.
+**Status: finished** (owner, 2026-10-14; was "Scenario testing" from 2026-10-12, "Under construction" before). `noindex` removed from every page 2026-10-14, so Google may list them. The amber `.construction` banner, headed "Scenario testing.", stays until the owner says otherwise.
 
 GoatCounter (since 2026-10-08): cookie-free visit counts on index.html and sources.html, just before `</body>`, with the same `window.goatcounter.path` host prefix as the towing site, so visits show as `tyres.psyphin.co.za/…` on the shared dashboard https://psyphin.goatcounter.com/. It never sees inputs; the offline line says visits are counted. Offline visits aren't counted (the service worker only handles this site's own files). Don't add it to tests/.
 
@@ -85,8 +85,8 @@ The Michelin 7.50R16 table is per **axle**, typed from Michelin Australia's page
 
 ## psyphin.co.za card
 
-The card is live in psyphin.co.za's Tools section since 2026-10-08 (`projects.js` there), with the amber "Scenario testing" tag ("Under construction" until 2026-10-12). Keep the tag, this site's banner and its noindex until the owner says the site is ready.
+The card is live in psyphin.co.za's Tools section since 2026-10-08 (`projects.js` there), with the amber "Scenario testing" tag ("Under construction" until 2026-10-12). Keep the tag and this site's banner until the owner says otherwise (the noindex was removed 2026-10-14).
 
 ## Search (SEO)
 
-Set up 2026-10-13, following the [Runbook: SEO for Small Sites & Tools](https://claude.ai/code/artifact/0e4d5503-7f20-4cb5-a25b-840f4caa3545). The `<title>` leads with the tool's name and adds the words people search for; the meta description is at most 155 characters (Google cuts the rest). `index.html` has Open Graph tags (image: the psyphin.co.za card image), a `WebApplication` JSON-LD block (keep its description the same as the meta description), and the footer's "More 4x4 tools" line links the winch, ropes and towing tools, which link back. `robots.txt` and `sitemap.xml` are at the site root: **update the sitemap's `lastmod` when a page's content changes.** Still `noindex`: the sitemap already lists both pages, so going live is just deleting the meta tags.
+Set up 2026-10-13, following the [Runbook: SEO for Small Sites & Tools](https://claude.ai/code/artifact/0e4d5503-7f20-4cb5-a25b-840f4caa3545). The `<title>` leads with the tool's name and adds the words people search for; the meta description is at most 155 characters (Google cuts the rest). `index.html` has Open Graph tags (image: the psyphin.co.za card image), a `WebApplication` JSON-LD block (keep its description the same as the meta description), and the footer's "More 4x4 tools" line links the winch, ropes and towing tools, which link back. `robots.txt` and `sitemap.xml` are at the site root: **update the sitemap's `lastmod` when a page's content changes.** Indexable since 2026-10-14 (the `noindex` meta tags were removed).
