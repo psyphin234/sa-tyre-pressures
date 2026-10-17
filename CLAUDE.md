@@ -58,7 +58,7 @@ tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every f
 - **Sourced numbers live in `data.js`** (a rule's `params`) or `tables.js`. `calc.js`, `app.js` and the HTML read them from there; don't hard-code 1.5 bar, 20 km/h etc.
 - Every result card ends with one sources link (`sourcesLink()`) to the rules it used.
 - Speed signs come from `C.speedCap()`: rock = Crawl (Cooper), below 1.4 bar = 20 (BFGoodrich), 1.4–1.5 bar in sand = 25 (BFGoodrich Africa), mud = 20, gravel/corrugations = 80 (Toyo), else Slow. Don't invent numbers for the signs.
-- Background: the same faint circuit-trace `body::before` layer as psyphin.co.za (and towing, and fuel's dark mode); change them together.
+- Background: the same circuit-trace `body::before` layer as psyphin.co.za (and towing, and fuel's dark mode); change them together.
 - Rule `category` drives the tag: law | standard | tyre-maker | vehicle-maker | engineering | calculation. Calculation rules are this site's own physics and must say so.
 - Keep claims that aren't in a source out of rule summaries; put interpretations in `notes`, starting "Not from the regulation:" (or similar) when it's about the law.
 - **Offline:** any new file must be added to `FILES` in `sw.js`, and `VERSION` bumped whenever anything changes, or visitors keep the old copy. `tests/run.ps1` fails if a referenced file isn't cached.
