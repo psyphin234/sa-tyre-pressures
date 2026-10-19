@@ -5,7 +5,7 @@
  * tests/run.ps1 checks that every local file referenced by the pages is in
  * FILES.
  */
-const VERSION = "tyres-2026-10-17-1";
+const VERSION = "tyres-2026-10-19-1";
 const FILES = [
   "./",
   "index.html",
@@ -21,9 +21,9 @@ const FILES = [
   "js/app.js",
   "js/sources.js",
   "js/install.js",
+  "js/circuit.js",
+  "js/fx.js",
   "fonts/inter-latin-var.woff2",
-  "fonts/rajdhani-600-latin.woff2",
-  "fonts/rajdhani-700-latin.woff2",
   "brand-64.png",
   "logo.jpg",
   "favicon.ico",

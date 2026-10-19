@@ -8,6 +8,6 @@
 
 Open `index.html` (try `index.html#example`). Tests: `powershell -ExecutionPolicy Bypass -File tests\run.ps1`.
 
-Photos: Wikimedia Commons, credited on each photo and on the Sources page. Fonts: Inter and Rajdhani (SIL Open Font License).
+Photos: Wikimedia Commons, credited on each photo and on the Sources page. Fonts: Inter (self-hosted) and Sora (Google Fonts), both SIL Open Font License.
 
 Part of [PsyPhin](https://psyphin.co.za/).

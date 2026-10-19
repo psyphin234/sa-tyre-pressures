@@ -8,6 +8,10 @@ GoatCounter (since 2026-10-08): cookie-free visit counts on index.html and sourc
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Everything runs in the browser; inputs are only kept in the visitor's own `localStorage`.
 
+## Look (since 2026-10-19, owner's request)
+
+"Deep space", the same as psyphin.co.za and the other tools: navy `--bg`, Sora for headings (from Google Fonts: the only file not self-hosted, so offline the headings fall back to Inter; Rajdhani and its files were removed), cyan accent, the circuit board from `js/circuit.js` (identical on every PsyPhin site; copy changes across). Like the towing checker, **nothing moves behind the text**: `<html data-circuit="still">` (both pages) draws the board once, dimmed. The header (`brand-bar--hero`) has `js/fx.js`'s **tyre hologram** on `canvas.hero-fx` (owner asked for "nice graphics/animations" here): a tyre rolling on tar, airing down (air hissing from the valve, the gauge needle dropping, the tyre squashing with its sidewalls glowing warm, the footprint bracket and the top-view contact patch growing), rolling on sand, then pumped back up by a compressor; steps ROAD / AIR DOWN / SAND / PUMP UP along the top, a 9.6 s loop that ends where it starts and opens on the SAND step (owner's call, 2026-10-19: it looks best and is the most relevant; the page's default terrain is sand too). The gauge has green (road) and amber (aired) bands but **no numbers**, so it can't be read as a result; it sits below the pill and the Calculator/Sources links; faint and unlabelled behind the text on narrow screens; drawn once, aired down on sand, under prefers-reduced-motion. `fx.js` also gives the diagrams a **build-in** the first time each scrolls into view (footprints grow one after another, the CTIS bars rise, the pumping timeline fills left to right; a diagram redrawn later in the same place, matched by the start of its aria-label, just shows), and the aired-down tyre's heat spots pulse. Everything else is the **"deep space finish" block at the end of style.css, inside `@media screen`** (print unchanged): glass fieldsets, cards and explainers with HUD corner brackets, glowing headings with a bar and rule, the mode switch and chosen terrain lit, focus glow, explainer fade-ins (not the form: it scrolls in its own column). The tag `before-redesign` marks the state before.
+
 ## Source policy (non-negotiable)
 
 - Only **tyre makers, vehicle makers, standards bodies (ETRTO/TRA), SA law and engineering research**. No forum, club, retailer, blog or "everyone runs 1 bar" figures, however common.
@@ -30,10 +34,12 @@ js/ui.js          DOM helpers: el(), rule links ("Read more"), category tags, ph
 js/app.js         Wires the form to calc.js and renders the cards; #example loads a made-up example
 js/sources.js     Builds sources.html from data.js
 js/install.js     Holds back Chrome's automatic install pop-up; optional "Add to home screen" button in the Works offline box
-css/style.css     All styles; colours at the top (match psyphin.co.za / towing). Dark only, like the other tools
+css/style.css     All styles; colours at the top (match psyphin.co.za / towing), the deep space finish at the end. Dark only, like the other tools
+js/circuit.js     The circuit board behind the page (identical on every PsyPhin site)
+js/fx.js          The header's tyre hologram, the diagrams' build-in and the explainers' fade-ins (index.html only)
 sw.js             Service worker: caches every file on first visit (offline-first). Bump VERSION on every change
 manifest.webmanifest  Installable app; icons icon-192/512 and icon-maskable-512 (plus apple-touch-icon) are made by scripts/make_icons.py from psyphin.co.za's psyphin-logo-black.jpg
-fonts/            Inter + Rajdhani woff2 (self-hosted for offline; OFL licences alongside)
+fonts/            Inter woff2 (self-hosted for offline; OFL licence alongside). Sora comes from Google Fonts
 img/              Photos (Wikimedia Commons, credited) and terrain thumbnails
 scripts/          Python tools that extracted the tables from the Toyo PDF and prepared the photos
 tests/index.html  Browser tests for data integrity and calc.js
@@ -58,7 +64,7 @@ tests/run.ps1     Runs the tests in headless Edge and checks sw.js lists every f
 - **Sourced numbers live in `data.js`** (a rule's `params`) or `tables.js`. `calc.js`, `app.js` and the HTML read them from there; don't hard-code 1.5 bar, 20 km/h etc.
 - Every result card ends with one sources link (`sourcesLink()`) to the rules it used.
 - Speed signs come from `C.speedCap()`: rock = Crawl (Cooper), below 1.4 bar = 20 (BFGoodrich), 1.4–1.5 bar in sand = 25 (BFGoodrich Africa), mud = 20, gravel/corrugations = 80 (Toyo), else Slow. Don't invent numbers for the signs.
-- Background: the same circuit-trace `body::before` layer as psyphin.co.za (and towing, and fuel's dark mode); change them together.
+- Background: the same layers as psyphin.co.za and the other tools (`body::before` tile as the fallback, `js/circuit.js` canvases, `body::after` light); change them together.
 - Rule `category` drives the tag: law | standard | tyre-maker | vehicle-maker | engineering | calculation. Calculation rules are this site's own physics and must say so.
 - Keep claims that aren't in a source out of rule summaries; put interpretations in `notes`, starting "Not from the regulation:" (or similar) when it's about the law.
 - **Offline:** any new file must be added to `FILES` in `sw.js`, and `VERSION` bumped whenever anything changes, or visitors keep the old copy. `tests/run.ps1` fails if a referenced file isn't cached.

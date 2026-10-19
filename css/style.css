@@ -6,42 +6,32 @@
   font-display: swap;
   src: url("../fonts/inter-latin-var.woff2") format("woff2");
 }
-@font-face {
-  font-family: "Rajdhani";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../fonts/rajdhani-600-latin.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Rajdhani";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("../fonts/rajdhani-700-latin.woff2") format("woff2");
-}
 
 :root {
-  --bg: #020203;
-  --surface: #111418;
-  --surface-2: #181c21;
-  --border: #262c33;
-  --text: #e6ebef;
-  --text-muted: #9aa4ae;
-  --accent: #3fb6ff;
-  --accent-strong: #1e8fff;
+  --bg: #040817;
+  --surface: #0b1330;
+  --surface-2: #101a3c;
+  --glass: rgba(11, 19, 48, 0.58);
+  --glass-2: rgba(16, 26, 60, 0.6);
+  --border: rgba(120, 170, 255, 0.16);
+  --text: #eaf2ff;
+  --text-muted: #a8b7d6;
+  --accent: #4cc9ff;
+  --accent-strong: #2f6bff;
+  --accent-glow: rgba(76, 201, 255, 0.35);
+  --violet: #7c5cff;
 
-  --pass: #4ade80;
-  --warn: #fbbf24;
-  --fail: #f87171;
-  --info: #3fb6ff;
-  --nodata: #7b8590;
+  --pass: #2ee6a6;
+  --warn: #ffc857;
+  --fail: #ff5d73;
+  --info: #4cc9ff;
+  --nodata: #7487ad;
 
-  --law: #3fb6ff;
+  --law: #4cc9ff;
   --standard: #2dd4bf;
   --maker: #c084fc;
   --engineering: #fb923c;
-  --calc: #9aa4ae;
+  --calc: #a8b7d6;
 
   --construction: #fbbf24;
   --construction-ink: #1a1405;
@@ -49,7 +39,7 @@
   --radius: 14px;
   --max-width: 1100px;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Sora", "Inter", system-ui, sans-serif;
 }
 
 *,
@@ -70,18 +60,56 @@ body {
   font-size: 1rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Circuit-trace pattern, the same on psyphin.co.za and every PsyPhin tool
-   (change them together). Fixed behind the whole page so it shows all
-   the way down. */
-body::before {
+/* Fixed layers behind the whole page, the same on every PsyPhin site (change them
+   together): a glowing circuit board and slow-drifting pools of blue and violet
+   light. js/circuit.js (identical on every site) draws the circuit on two canvases
+   (.circuit-fx) and adds .fx-circuit to <html>, which hides the static fallback
+   tile in body::before. Here (owner's request, 2026-10-19) both are dimmer than
+   on the other sites and still: the pages set <html data-circuit="still">, so
+   circuit.js draws the board once with no pulses, and the light doesn't drift,
+   so nothing moves behind the text. */
+body::before,
+body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none'%3E%3Cg stroke='%233fb6ff' stroke-opacity='0.136' stroke-width='1'%3E%3Cpath d='M0 40h46l18 18h44M108 58v42l18 18h54M24 180v-44l18-18h34M180 22h-34L124 0M76 118v-20l-14-14H0M146 180v-26l12-12h22'/%3E%3C/g%3E%3Cg fill='%233fb6ff' fill-opacity='0.256'%3E%3Ccircle cx='108' cy='58' r='2.2'/%3E%3Ccircle cx='76' cy='118' r='2.2'/%3E%3Ccircle cx='146' cy='22' r='2.2'/%3E%3Ccircle cx='146' cy='154' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+body::before {
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='-20' y='-20' width='220' height='220'%3E%3CfeGaussianBlur stdDeviation='1.8' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3Cg filter='url(%23g)'%3E%3Cg stroke='%233fb6ff' stroke-opacity='0.18' stroke-width='1.1'%3E%3Cpath d='M0 40h46l18 18h44M108 58v42l18 18h54M24 180v-44l18-18h34M180 22h-34L124 0M76 118v-20l-14-14H0M146 180v-26l12-12h22'/%3E%3C/g%3E%3Cg stroke='%235cc8ff' stroke-opacity='0.38'%3E%3Ccircle cx='108' cy='58' r='2.6'/%3E%3Ccircle cx='76' cy='118' r='2.6'/%3E%3Ccircle cx='146' cy='22' r='2.6'/%3E%3Ccircle cx='146' cy='154' r='2.6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.fx-circuit body::before {
+  display: none;
+}
+
+body::after {
+  z-index: -2;
+  inset: -20%;
+  background:
+    radial-gradient(38% 32% at 82% 8%, rgba(47, 107, 255, 0.18), transparent 70%),
+    radial-gradient(30% 28% at 10% 40%, rgba(124, 92, 255, 0.1), transparent 70%),
+    radial-gradient(34% 30% at 70% 85%, rgba(0, 180, 255, 0.07), transparent 70%);
+}
+
+.circuit-fx {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+::selection {
+  background: rgba(76, 201, 255, 0.35);
+  color: #fff;
 }
 
 a {
@@ -147,7 +175,7 @@ img {
 /* ------------------------------------------------------------ header / footer */
 .site-header {
   border-bottom: 1px solid var(--border);
-  background: rgba(2, 2, 3, 0.92);
+  background: rgba(4, 8, 23, 0.92);
   position: sticky;
   top: 0;
   z-index: 5;
@@ -170,9 +198,11 @@ img {
   flex-wrap: wrap;
   gap: 4px 10px;
   padding: 8px 16px 8px 12px;
-  border: 1px solid rgba(61, 155, 255, 0.45);
+  border: 1px solid rgba(76, 201, 255, 0.35);
   border-radius: 999px;
-  background: rgba(61, 155, 255, 0.08);
+  background: rgba(10, 20, 52, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: var(--text);
   font-size: 15px;
   font-weight: 600;
@@ -194,9 +224,9 @@ img {
 }
 
 .back-link:hover {
-  background: rgba(61, 155, 255, 0.16);
+  background: rgba(76, 201, 255, 0.14);
   border-color: var(--accent);
-  box-shadow: 0 0 18px rgba(61, 155, 255, 0.25);
+  box-shadow: 0 0 22px rgba(76, 201, 255, 0.3);
 }
 
 .back-link:hover .back-link-arrow {
@@ -553,7 +583,7 @@ input[type="checkbox"] {
   font-size: 0.9rem;
   color: var(--accent);
   background: transparent;
-  border: 1px solid rgba(61, 155, 255, 0.45);
+  border: 1px solid rgba(76, 201, 255, 0.45);
   border-radius: 999px;
   padding: 6px 14px;
   min-height: 36px;
@@ -562,7 +592,7 @@ input[type="checkbox"] {
 }
 
 .small-button:hover {
-  background: rgba(61, 155, 255, 0.12);
+  background: rgba(76, 201, 255, 0.12);
 }
 
 .inline-help summary {
@@ -863,25 +893,25 @@ details.explainer > summary {
 .d-mark--floor { stroke: var(--warn); }
 .d-plan { fill: var(--accent); }
 .d-bracket { fill: none; stroke: var(--accent); stroke-width: 2; }
-.z-road { fill: rgba(74, 222, 128, 0.35); }
-.z-loadok { fill: rgba(63, 182, 255, 0.3); }
-.z-belowload { fill: rgba(248, 113, 113, 0.4); }
-.z-nodata { fill: rgba(123, 133, 144, 0.35); }
+.z-road { fill: rgba(46, 230, 166, 0.35); }
+.z-loadok { fill: rgba(76, 201, 255, 0.3); }
+.z-belowload { fill: rgba(255, 93, 115, 0.4); }
+.z-nodata { fill: rgba(116, 135, 173, 0.35); }
 
 .d-patch { fill: var(--surface-2); stroke: var(--accent); stroke-width: 2; }
 .d-tread { stroke: var(--border); stroke-width: 3; }
 
-.d-tyre { fill: #2a2f36; stroke: var(--text-muted); stroke-width: 2; }
+.d-tyre { fill: #16224a; stroke: var(--text-muted); stroke-width: 2; }
 .d-ghost { fill: none; stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 4 4; }
 .d-rim { fill: var(--surface-2); stroke: var(--text-muted); stroke-width: 2; }
 .d-hub { fill: var(--text-muted); }
-.d-heat { fill: rgba(248, 113, 113, 0.55); }
+.d-heat { fill: rgba(255, 93, 115, 0.55); }
 .d-ground { stroke: var(--text-muted); stroke-width: 2; }
 .d-dim { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; }
 
 .d-rimline { fill: none; stroke: var(--text-muted); stroke-width: 6; stroke-linejoin: round; }
 .d-bead { fill: var(--accent); }
-.d-sidewall { fill: none; stroke: #4b5563; stroke-width: 10; stroke-linecap: round; }
+.d-sidewall { fill: none; stroke: #3a4a78; stroke-width: 10; stroke-linecap: round; }
 .d-arrow { stroke: var(--warn); stroke-width: 3; }
 .d-arrowhead { fill: var(--warn); }
 
@@ -894,7 +924,7 @@ details.explainer > summary {
 .d-bar-pressure { fill: var(--accent); }
 .d-bar-speed { fill: var(--engineering); }
 
-.d-sidewall-arc { fill: none; stroke: #2a2f36; stroke-width: 70; }
+.d-sidewall-arc { fill: none; stroke: #16224a; stroke-width: 70; }
 .d-mark-text { fill: var(--text); font: 700 22px var(--font-display); letter-spacing: 0.02em; }
 .d-leader { stroke: var(--text-muted); stroke-width: 1; }
 
@@ -1011,10 +1041,10 @@ details.explainer > summary {
   border-radius: 2px;
 }
 
-.swatch.z-road { background: rgba(74, 222, 128, 0.35); }
-.swatch.z-loadok { background: rgba(63, 182, 255, 0.3); }
-.swatch.z-belowload { background: rgba(248, 113, 113, 0.4); }
-.swatch.z-nodata { background: rgba(123, 133, 144, 0.35); }
+.swatch.z-road { background: rgba(46, 230, 166, 0.35); }
+.swatch.z-loadok { background: rgba(76, 201, 255, 0.3); }
+.swatch.z-belowload { background: rgba(255, 93, 115, 0.4); }
+.swatch.z-nodata { background: rgba(116, 135, 173, 0.35); }
 .swatch--plan { width: 0; height: 0; border-radius: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid var(--accent); }
 .swatch--range { width: 6px; border: 2px solid var(--accent); border-left: 0; border-radius: 0; }
 .swatch--field { height: 0; width: 18px; border-top: 3px dashed var(--warn); border-radius: 0; }
@@ -1078,7 +1108,7 @@ details.explainer > summary {
 }
 
 .mode-button[aria-pressed="true"] {
-  color: #0b0d10;
+  color: #031022;
   background: var(--accent);
 }
 
@@ -1255,10 +1285,10 @@ details.explainer > summary {
 }
 
 .g-zone { fill: none; stroke-width: 16; }
-.gz-road { stroke: rgba(74, 222, 128, 0.55); }
-.gz-loadok { stroke: rgba(63, 182, 255, 0.5); }
-.gz-belowload { stroke: rgba(248, 113, 113, 0.6); }
-.gz-nodata { stroke: rgba(123, 133, 144, 0.45); }
+.gz-road { stroke: rgba(46, 230, 166, 0.55); }
+.gz-loadok { stroke: rgba(76, 201, 255, 0.5); }
+.gz-belowload { stroke: rgba(255, 93, 115, 0.6); }
+.gz-nodata { stroke: rgba(116, 135, 173, 0.45); }
 .g-tick { stroke: var(--text-muted); stroke-width: 1.5; }
 .g-range { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
 .g-field { fill: none; stroke: var(--warn); stroke-width: 3; stroke-dasharray: 5 4; }
@@ -1340,9 +1370,9 @@ details.explainer > summary {
 .ic-dash { stroke: var(--warn); }
 
 .pt-pump { fill: var(--accent); }
-.pt-rest { fill: rgba(123, 133, 144, 0.5); }
+.pt-rest { fill: rgba(116, 135, 173, 0.5); }
 .pt-move { fill: var(--warn); }
-.pt-label { fill: #04111f; font: 700 12px var(--font-body); }
+.pt-label { fill: #031022; font: 700 12px var(--font-body); }
 
 /* ------------------------------------------------------------ explainer animations */
 .d-bead--ghost { fill: none; stroke: var(--accent); stroke-dasharray: 3 3; }
@@ -1410,23 +1440,52 @@ details.explainer > summary {
 
 
 /* ------------------------------------------------------------ header
-   The same header as fuel.psyphin.co.za (.brand-bar in its style.css):
-   black band with a blue glow, the PsyPhin logo, a blue eyebrow, the title
-   and a one-line description. Keep the three in step. */
+   The same header as fuel.psyphin.co.za (.brand-bar in its style.css): navy
+   band with blue/violet glow and a glowing bottom edge, the PsyPhin logo, a cyan
+   eyebrow, the title and a one-line description. Here js/fx.js draws the tyre
+   hologram on canvas.hero-fx behind it. Keep the sites in step. */
 .brand-bar {
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
   background:
-    radial-gradient(ellipse 60% 120% at 100% 0%, rgba(61, 155, 255, 0.18), transparent 60%),
-    #000000;
+    radial-gradient(ellipse 55% 90% at 82% 40%, rgba(47, 107, 255, 0.22), transparent 65%),
+    radial-gradient(ellipse 40% 70% at 0% 0%, rgba(124, 92, 255, 0.14), transparent 60%),
+    linear-gradient(180deg, #030614, rgba(3, 6, 20, 0.72));
   color: #ffffff;
-  border-bottom: 1px solid rgba(61, 155, 255, 0.35);
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Glowing line along the bottom edge, with a spark running along it. */
+.brand-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background:
+    linear-gradient(90deg, transparent 0 40%, rgba(255, 255, 255, 0.95) 50%, transparent 60% 100%) no-repeat,
+    linear-gradient(90deg, transparent, rgba(76, 201, 255, 0.7) 30%, rgba(124, 92, 255, 0.7) 70%, transparent);
+  background-size: 30% 100%, 100% 100%;
+  background-position: -40% 0, 0 0;
+  box-shadow: 0 0 14px rgba(76, 201, 255, 0.55);
+}
+
+.hero-fx {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
 }
 
 .brand-nav {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 12px 20px 0;
+  padding: 14px 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1444,6 +1503,17 @@ details.explainer > summary {
   gap: 20px 28px;
 }
 
+/* A taller header with room on the right for the tyre hologram. */
+.brand-bar--hero .brand-inner {
+  min-height: 330px;
+  padding-top: 28px;
+  padding-bottom: 48px;
+}
+
+.brand-bar--hero .brand-text {
+  flex: 0 1 560px;
+}
+
 .brand-logo-link {
   flex-shrink: 0;
   display: block;
@@ -1451,14 +1521,16 @@ details.explainer > summary {
 }
 
 .brand-logo-link:focus-visible {
-  outline: 2px solid #3d9bff;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
+/* The logo sits on black; "lighten" drops the black so it floats on the navy. */
 .brand-logo {
   width: 168px;
   height: auto;
   display: block;
+  mix-blend-mode: lighten;
 }
 
 .brand-text {
@@ -1466,30 +1538,56 @@ details.explainer > summary {
   min-width: 0;
 }
 
+.brand-text > * {
+  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.brand-text > :nth-child(2) { animation-delay: 0.08s; }
+.brand-text > :nth-child(3) { animation-delay: 0.16s; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
 .brand-eyebrow {
-  margin: 0 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #3d9bff;
+  color: var(--accent);
+}
+
+.brand-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  box-shadow: 0 0 8px var(--accent);
 }
 
 .brand-bar h1,
 .brand-title {
-  margin: 0 0 8px;
-  font-family: var(--font-body);
-  font-size: clamp(24px, 3.2vw, 34px);
-  line-height: 1.15;
-  font-weight: 700;
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1.12;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: #ffffff;
+  background: linear-gradient(100deg, #ffffff 0%, #d6ecff 40%, #7fd6ff 75%, #8f7bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .brand-bar .subtitle {
   margin: 0;
-  color: #a9b4c2;
+  color: var(--text-muted);
   max-width: 62ch;
   font-size: 15px;
   line-height: 1.6;
@@ -1503,6 +1601,12 @@ details.explainer > summary {
   .brand-inner {
     padding: 16px;
     gap: 14px 18px;
+  }
+
+  .brand-bar--hero .brand-inner {
+    min-height: 0;
+    padding-top: 16px;
+    padding-bottom: 28px;
   }
 
   .brand-logo {
@@ -1520,7 +1624,328 @@ details.explainer > summary {
 
 @media print {
   .brand-bar,
-  body::before {
+  body::before,
+  body::after,
+  .circuit-fx {
     display: none;
+  }
+}
+
+
+/* ------------------------------------------------------------ deep space finish
+   Screen only, so print keeps its plain layout. The same finish as the towing
+   checker and the winching page: glass fieldsets, cards and explainers with HUD
+   corner brackets, glowing headings, the mode switch and chosen terrain lit up,
+   and focus glow. The background is still (<html data-circuit="still">); the
+   header hologram (js/fx.js) is the only thing that runs on its own, apart
+   from the animations inside the explainers' diagrams. Diagrams also play a
+   short build-in the first time they scroll into view (js/fx.js adds .is-in).
+   Everything stops under prefers-reduced-motion (end of file). */
+@media screen {
+  /* -------- glass */
+  .inputs fieldset,
+  .card,
+  .explainer,
+  .modes,
+  .disclaimer {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008)), var(--glass);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .terrain,
+  .answer-axle {
+    background-color: var(--glass-2);
+  }
+
+  .inputs fieldset,
+  .card,
+  .explainer {
+    position: relative;
+    border-radius: 18px;
+  }
+
+  /* -------- HUD corner brackets */
+  .inputs fieldset::after,
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    --c: rgba(76, 201, 255, 0.75);
+    background:
+      linear-gradient(var(--c), var(--c)) top left / 14px 1px,
+      linear-gradient(var(--c), var(--c)) top left / 1px 14px,
+      linear-gradient(var(--c), var(--c)) top right / 14px 1px,
+      linear-gradient(var(--c), var(--c)) top right / 1px 14px,
+      linear-gradient(var(--c), var(--c)) bottom left / 14px 1px,
+      linear-gradient(var(--c), var(--c)) bottom left / 1px 14px,
+      linear-gradient(var(--c), var(--c)) bottom right / 14px 1px,
+      linear-gradient(var(--c), var(--c)) bottom right / 1px 14px;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 4px rgba(76, 201, 255, 0.8));
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .inputs fieldset:hover::after,
+  .inputs fieldset:focus-within::after,
+  .card:hover::after {
+    opacity: 1;
+  }
+
+  .inputs fieldset:focus-within {
+    border-color: rgba(76, 201, 255, 0.35);
+  }
+
+  /* the form's own scroll column: a thin blue scrollbar instead of the light one */
+  .inputs {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(76, 201, 255, 0.35) transparent;
+  }
+
+  /* -------- headings */
+  .inputs legend {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 14px var(--accent-glow);
+  }
+
+  .results > h2,
+  .explainers > h2,
+  .faq > h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(76, 201, 255, 0.35);
+    text-shadow: 0 0 18px rgba(76, 201, 255, 0.55);
+  }
+
+  .results > h2::before,
+  .explainers > h2::before,
+  .faq > h2::before {
+    content: "";
+    flex: none;
+    width: 4px;
+    height: 1.1em;
+    border-radius: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .card > h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 0 0 16px rgba(76, 201, 255, 0.4);
+  }
+
+  .answer-value {
+    font-size: 1.7rem;
+    font-weight: 600;
+    text-shadow: 0 0 20px rgba(76, 201, 255, 0.55);
+  }
+
+  .explainer > summary {
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+
+  .explainer > summary:hover {
+    text-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .explainer[open] > :not(summary) {
+    animation: open-down 0.35s ease;
+  }
+
+  @keyframes open-down {
+    from { opacity: 0; transform: translateY(-4px); }
+  }
+
+  .nav a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+
+  .nav a[aria-current="page"],
+  .nav a:hover {
+    text-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  /* -------- photos: a lit edge */
+  .hero-photo img,
+  .card-photo,
+  .inline-photo img {
+    box-shadow: 0 0 0 1px rgba(76, 201, 255, 0.25), 0 18px 40px -20px rgba(0, 0, 0, 0.8);
+  }
+
+  /* -------- mode switch and terrain picks */
+  .modes {
+    border-radius: 16px;
+    padding: 5px;
+  }
+
+  .mode-button {
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 11px;
+    transition: color 0.2s, background-color 0.2s, box-shadow 0.25s;
+  }
+
+  .mode-button:hover {
+    background: rgba(76, 201, 255, 0.08);
+  }
+
+  .mode-button[aria-pressed="true"] {
+    color: #031022;
+    background: linear-gradient(100deg, var(--accent-strong), var(--accent));
+    box-shadow: 0 0 22px -2px rgba(76, 201, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .terrain {
+    transition: border-color 0.2s, box-shadow 0.25s, transform 0.2s;
+  }
+
+  .terrain:hover {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+    transform: translateY(-1px);
+  }
+
+  .terrain[aria-checked="true"] {
+    box-shadow: 0 0 22px -6px var(--accent);
+  }
+
+  /* -------- entries glow when they have focus */
+  input[type="number"],
+  input[type="text"],
+  select {
+    transition: border-color 0.2s, box-shadow 0.25s;
+  }
+
+  input[type="number"]:focus,
+  input[type="text"]:focus,
+  select:focus {
+    box-shadow: 0 0 0 3px rgba(76, 201, 255, 0.18), 0 0 22px -4px var(--accent);
+  }
+
+  /* -------- diagrams in light */
+  .d-patch,
+  .d-bar-pressure,
+  .g-range {
+    filter: drop-shadow(0 0 5px rgba(76, 201, 255, 0.55));
+  }
+
+  .d-bar-speed {
+    filter: drop-shadow(0 0 5px rgba(251, 146, 60, 0.5));
+  }
+
+  .d-heat {
+    animation: heat-pulse 2.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes heat-pulse {
+    from { opacity: 0.35; }
+    to { opacity: 1; filter: drop-shadow(0 0 6px rgba(255, 93, 115, 0.9)); }
+  }
+
+  /* The first time a diagram is in view: the footprints grow one after the
+     other, the bars rise and the pumping timeline fills left to right. A
+     diagram redrawn in the same place later (new inputs) gets .fx-seen and
+     just shows. */
+  .fx-diagrams .diagram-svg:not(.is-in) .d-patch,
+  .fx-diagrams .diagram-svg:not(.is-in) .d-bar-pressure:not([y="10"]),
+  .fx-diagrams .diagram-svg:not(.is-in) .d-bar-speed:not([y="10"]),
+  .fx-diagrams .diagram-svg:not(.is-in) rect[y="30"] {
+    opacity: 0;
+  }
+
+  .d-patch,
+  .d-bar-pressure,
+  .d-bar-speed,
+  .pt-pump,
+  .pt-rest,
+  .pt-move {
+    transform-box: fill-box;
+  }
+
+  .fx-diagrams .is-in:not(.fx-seen) .d-patch {
+    transform-origin: 50% 50%;
+    animation: patch-grow 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.35s);
+  }
+
+  @keyframes patch-grow {
+    from { transform: scaleY(0.55); opacity: 0.2; }
+  }
+
+  .fx-diagrams .is-in:not(.fx-seen) .d-bar-pressure:not([y="10"]),
+  .fx-diagrams .is-in:not(.fx-seen) .d-bar-speed:not([y="10"]) {
+    transform-origin: 50% 100%;
+    animation: bar-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+  }
+
+  @keyframes bar-rise {
+    from { transform: scaleY(0); }
+  }
+
+  .fx-diagrams .is-in:not(.fx-seen) rect[y="30"] {
+    transform-origin: 0 50%;
+    animation: fill-right 0.45s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+  }
+
+  @keyframes fill-right {
+    from { transform: scaleX(0); }
+  }
+
+  /* -------- fade-ins (explainers; the form scrolls in its own column, so it
+     doesn't fade) */
+  .fx-reveal .explainer {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s;
+  }
+
+  .fx-reveal .explainer.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* -------- footer */
+  .site-footer {
+    position: relative;
+    border-top: 0;
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(76, 201, 255, 0.4), rgba(124, 92, 255, 0.35), transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-text > *,
+  .explainer[open] > :not(summary),
+  .d-heat,
+  .fx-diagrams .is-in .d-patch,
+  .fx-diagrams .is-in .d-bar-pressure,
+  .fx-diagrams .is-in .d-bar-speed,
+  .fx-diagrams .is-in rect[y="30"] {
+    animation: none !important;
   }
 }
