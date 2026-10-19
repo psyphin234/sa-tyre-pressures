@@ -21,6 +21,12 @@
   --accent-glow: rgba(76, 201, 255, 0.35);
   --violet: #7c5cff;
 
+  /* anything the visitor can change: blue box, blue value, pencil (worked-out
+     figures stay plain). The same as the towing, winching, ropes and EV pages. */
+  --input-bg: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
+  --input-border: color-mix(in srgb, var(--accent) 70%, var(--border));
+  --pencil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234cc9ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.2 2.3l2.5 2.5-8.4 8.4-3.2.7.7-3.2z'/%3E%3Cpath d='M9.6 3.9l2.5 2.5'/%3E%3C/svg%3E");
+
   --pass: #2ee6a6;
   --warn: #ffc857;
   --fail: #ff5d73;
@@ -495,13 +501,39 @@ input[type="text"],
 select {
   width: 100%;
   font: inherit;
-  font-size: 1rem;
-  color: var(--text);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  font-size: 1rem; /* 16px stops iOS zooming on focus */
+  font-weight: 600;
+  color: var(--accent);
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 10px;
   padding: 10px 12px;
   min-height: 44px;
+}
+
+input[type="number"],
+input[type="text"] {
+  padding-right: 30px;
+  background: var(--input-bg) var(--pencil) no-repeat right 9px center / 14px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+select option {
+  color: var(--text);
+  background: var(--surface-2);
+  font-weight: 400;
 }
 
 input[type="number"]:focus,
@@ -527,10 +559,10 @@ select:focus {
   display: flex;
   align-items: center;
   padding: 0 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--input-border);
   border-left: 0;
   border-radius: 0 10px 10px 0;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--input-bg) 60%, #000);
   color: var(--text-muted);
   font-size: 0.9rem;
   white-space: nowrap;
@@ -1829,6 +1861,19 @@ details.explainer > summary {
   input[type="text"],
   select {
     transition: border-color 0.2s, box-shadow 0.25s;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  select,
+  .with-unit > span {
+    box-shadow: 0 0 16px -8px var(--accent);
+  }
+
+  input[type="number"]:hover,
+  input[type="text"]:hover,
+  select:hover {
+    border-color: var(--accent);
   }
 
   input[type="number"]:focus,
