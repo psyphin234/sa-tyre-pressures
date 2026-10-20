@@ -16,7 +16,7 @@
     ["vehicle-maker", "Vehicle makers"],
     ["engineering", "Engineering research"],
     ["calculation", "This site's own calculations (physics)"],
-    ["field-practice", "Field practice (experience, not from any maker; shown at the owner's request)"],
+    ["field-practice", "Field practice (experience, not from any maker)"],
   ];
 
   function sourceLink(id) {
@@ -53,7 +53,7 @@
   const tableIds = ["etrto-sl", "etrto-xl", "tra-lt", "tra-flotation", "michelin-750r16"];
   const bar = (psi) => (Math.round(psi * 0.0689476 * 20) / 20).toFixed(2).replace(/0$/, "");
   document.getElementById("table-info").replaceChildren(
-    el("p", null, "Loads per tyre at each pressure, typed out of the source as published (pounds and psi; shown here in bar), checked row by row against the page and by script (every row rises with pressure and ends at its load index's rated load). The calculator converts them to kg and kPa, and reads between two published pressures in a straight line."),
+    el("p", null, "Loads per tyre at each pressure, typed out of the source as published (pounds and psi, shown here in bar), checked row by row against the page and by script (every row rises with pressure and ends at its load index's rated load). The calculator converts them to kg and kPa, and reads between two published pressures in a straight line."),
     el(
       "ul",
       { class: "source-list" },

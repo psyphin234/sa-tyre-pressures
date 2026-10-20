@@ -112,7 +112,7 @@
     return svg(
       W,
       H,
-      "Cross-section of a drop-centre rim: the tyre bead sits on the bead seat, held in by the flange outside and the hump inside; if it is pushed past the hump it can drop into the well and the tyre comes off",
+      "Cross-section of a drop-centre rim: the tyre bead sits on the bead seat, held in by the flange outside and the hump inside. If it is pushed past the hump it can drop into the well and the tyre comes off",
       s("path", { d: rim, class: "d-rimline" }),
       // beads on seats
       s("rect", { x: 82, y: 98, width: 40, height: 22, rx: 8, class: "d-bead" }),
@@ -414,7 +414,7 @@
     return svg(
       W,
       H,
-      "Corrugations: a hard tyre bounces over every ripple; a softer tyre flattens over them and the ride is smoother",
+      "Corrugations: a hard tyre bounces over every ripple, and a softer tyre flattens over them and the ride is smoother",
       lane(110, true, "Hard tyre: bounces"),
       lane(230, false, "Softer tyre: soaks it up")
     );

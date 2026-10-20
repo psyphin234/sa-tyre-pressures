@@ -408,7 +408,7 @@
             hd[0].h && hd[0].h.higherCapKpa ? ` (not above ${fmt(hd[0].h.capKpa)}, or ${fmt(hd[0].h.higherCapKpa)} if your tyre's speed symbol is H, V, W or Y), unless your vehicle handbook says otherwise.` : " (not above the tyre's maximum), unless your vehicle handbook says otherwise."
           )
         );
-      else extra.push(el("p", { class: "note" }, `ETRTO's towing advice (${fmt(hdRule.addMinKpa)}–${fmt(hdRule.addMaxKpa)} extra) is for passenger-type tyres; nothing equivalent was found for LT tyres. Check your vehicle handbook.`));
+      else extra.push(el("p", { class: "note" }, `ETRTO's towing advice (${fmt(hdRule.addMinKpa)}–${fmt(hdRule.addMaxKpa)} extra) is for passenger-type tyres. Nothing equivalent was found for LT tyres. Check your vehicle handbook.`));
     }
     const advice = terrainAdvice(t, m.cls, m.axles.map((x) => x.range), { loadKnown: m.axles.some((a) => a.need && a.need.status !== "noLoad") });
     if (m.axles.some((a) => a.range && a.range.raised))
@@ -484,7 +484,7 @@
         lines.push(el("p", { class: "note note--fail" }, `Below ${fmt(lowest.kpa)}, the lowest a tyre maker publishes for ${CLASS_NAME[m.cls]} on ${D.terrains.find((x) => x.id === terrainId).name.toLowerCase()}.`));
       }
       if (st.speed != null && a.assess.maxKmh && st.speed > a.assess.maxKmh)
-        lines.push(el("p", { class: "note note--fail" }, `You plan ${st.speed} km/h; the limit at this pressure is ${a.assess.maxKmh} km/h.`));
+        lines.push(el("p", { class: "note note--fail" }, `You plan ${st.speed} km/h, but the limit at this pressure is ${a.assess.maxKmh} km/h.`));
       else if (st.speed != null && (a.assess.band === "belowLoad" || a.assess.band === "belowTable") && !a.assess.maxKmh)
         lines.push(el("p", { class: "note note--warn" }, `You plan ${st.speed} km/h. No tyre maker found gives a speed for this pressure, only that you must slow down.`));
       if (!a.assess.publicRoad) lines.push(el("p", { class: "note" }, "Public roads, gravel included: reinflate first (reg 238)."));
@@ -506,7 +506,7 @@
       ["Reinflate before the road", "Back to road pressure before the tar. On any public road, gravel included, the law also needs at least the pressure your load needs.", ["bfg-reinflate", "ford-off-road", "etrto-off-road", "law-reg238", "law-public-road"]],
       ["Heat", "Low pressure plus load plus speed makes heat, a tyre's greatest enemy. Slow down when you air down.", ["bfg-air-carries-load", "bfg-speed-load", "nhtsa-deflection-heat"]],
       ["Temperature", "Set pressures cold (morning, or parked at least an hour). Warm tyres read 20% or more higher: never let air out to reach a cold figure, and recheck once cool after airing down or pumping up warm tyres. Keep tyres away from anything over 90°C.", ["etrto-hot-pressure", "toyo-cold", "nhtsa-temperature", "calc-temperature", "etrto-90c"]],
-      ["After the trail", "Check every tyre for cuts, exposed cords and bulges before the road; those make a tyre illegal on public roads.", ["ford-off-road", "law-reg212"]],
+      ["After the trail", "Check every tyre for cuts, exposed cords and bulges before the road. Those make a tyre illegal on public roads.", ["ford-off-road", "law-reg212"]],
       ["No compressor", "Don't air down far. BFGoodrich: without a compressor drive very slowly and only short distances.", ["bfg-sand"]],
     ];
     if (lowered) items.splice(1, 0, ["Side slopes and the bead", "Low pressure plus a sideways push can roll a bead off the rim. Run road pressure across steep side slopes.", ["bfg-side-slopes", "etrto-hump-rims", "etrto-underinflation"]]);
@@ -658,7 +658,7 @@
     const parts = ["Read as " + (tyre.cls === "lt" && pz.kind === "metric" ? "LT" : "") + pz.label + ", " + kind];
     if (li && tyre.cls === "passenger") parts.push("load index " + li + " (" + window.TYRE_TABLES.loadIndexKg[li] + " kg max per tyre)");
     let text = parts.join(", ") + ".";
-    if (pz.oddWidth) text += ` ${pz.widthMm} isn't a usual width (they end in 5, like ${Math.round((pz.widthMm - 5) / 10) * 10 + 5}); check the sidewall.`;
+    if (pz.oddWidth) text += ` ${pz.widthMm} isn't a usual width (they end in 5, like ${Math.round((pz.widthMm - 5) / 10) * 10 + 5}), so check the sidewall.`;
     if (pz.oddAspect) text += ` ${pz.aspect} isn't a usual height: the middle number is the sidewall height as a % of the width, usually 30–95 (e.g. 265/65R17).`;
     if (tyre.reason === "noLtTable") text += " There's no load table for this LT size here yet, so no weight check.";
     if (tyre.reason === "liOutOfRange") text += " That load index isn't in the table here, so no weight check.";
@@ -724,7 +724,7 @@
       else loadLines.push(el("p", { class: "note" }, `About ${kg} kg per tyre: these tyres need at least ${fmt(need.kpa)} to carry it, according to their load table.`));
       if (axles.some((a) => a.road.raisedForLoad)) loadLines.push(el("p", { class: "note note--warn" }, "Your placard pressure is lower than this weight needs, so road pressure here is raised to match."));
       if (axles.some((a) => a.r.raised)) loadLines.push(el("p", { class: "note note--warn" }, `The bottom of the range is raised to ${fmt(floor)}, what your weight needs: the law doesn't allow less on public roads, gravel included.`));
-      if (axles.some((a) => a.r.belowFloor)) loadLines.push(el("p", { class: "note note--warn" }, `Below ${fmt(floor)} your tyres are carrying more than their load table allows. The makers allow that off-road only if the tyre still carries the load, and slowly; keep off public roads until you've pumped up.`));
+      if (axles.some((a) => a.r.belowFloor)) loadLines.push(el("p", { class: "note note--warn" }, `Below ${fmt(floor)} your tyres are carrying more than their load table allows. The makers allow that off-road only if the tyre still carries the load, and slowly. Keep off public roads until you've pumped up.`));
       loadLines.push(el("p", { class: "muted small" }, "This assumes the weight is shared evenly by all four tyres. A loaded bakkie's rear tyres carry more, so leave some margin, or use Advanced with weighbridge axle weights."));
     }
     // Weight notes go right after the "lowest published" line under the headline.

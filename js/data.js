@@ -198,7 +198,7 @@
       checked: CHECKED,
       notes: [
         "Each tyre carries half its axle's load (single wheels).",
-        "The tables are for single fitment; dual wheels carry less and aren't covered here.",
+        "The tables are for single fitment. Dual wheels carry less and aren't covered here.",
         "The ETRTO tables in the Toyo guide are marked as reproduced from the ETRTO Standards Manual 2005.",
       ],
     },
@@ -243,7 +243,7 @@
       params: { fillVolumeL: 57, overallDiameterIn: 32.4, sectionWidthIn: 8.3 },
       notes: [
         "This is Michelin's table for this one tyre. Other makes of 7.50R16 (C-type) tyre follow the ETRTO commercial table, which isn't available here, so check your own tyre maker's table.",
-        "The page labels 2 500 kg as \"max load per tyre\"; with load index 116 (1 250 kg per tyre) it can only be per axle, and that's how this site reads it.",
+        "The page labels 2 500 kg as \"max load per tyre\", but with load index 116 (1 250 kg per tyre) it can only be per axle, and that's how this site reads it.",
       ],
     },
 
@@ -332,12 +332,12 @@
       category: "tyre-maker",
       title: "Lower pressure means lower speed",
       summary:
-        "Load, speed and pressure are linked. If you lower pressure and keep the load, you must slow down; lowering pressure without reducing load or speed overheats the tyre.",
+        "Load, speed and pressure are linked. If you lower pressure and keep the load, you must slow down. Lowering pressure without reducing load or speed overheats the tyre.",
       quote:
         "If you reduce tyre pressure while maintaining load, you must reduce speed. … Reducing pressure without reducing load or speed will lead to excessive heat build-up in the tyre.",
       sources: ["bfgUkPressure"],
       checked: CHECKED,
-      notes: ["BFGoodrich gives no speed figure for pressures above 1.5 bar; it only says to slow down."],
+      notes: ["BFGoodrich gives no speed figure for pressures above 1.5 bar. It only says to slow down."],
     },
     {
       id: "bfg-below-1-5",
@@ -438,7 +438,7 @@
     {
       id: "bfg-air-carries-load",
       category: "tyre-maker",
-      title: "Air carries the load; heat is the enemy",
+      title: "Air carries the load, and heat is what kills a tyre",
       summary:
         "The air in the tyre carries the load, not the tyre itself. Heat from over-flexing or overloading is a tyre's greatest enemy, so keep enough pressure to support the load.",
       quote:
@@ -450,7 +450,7 @@
       id: "bfg-reinflate",
       category: "tyre-maker",
       title: "Reinflate before the tar",
-      summary: "Reinflate to the correct pressure when you return to paved roads; not doing so seriously affects handling and could cause tyre failure.",
+      summary: "Reinflate to the correct pressure when you return to paved roads. Not doing so seriously affects handling and could cause tyre failure.",
       quote:
         "Always remember to reinflate your tyres to the correct pressure when returning to paved roads. Failure to do so will seriously affect vehicle handling and could cause tyre failure.",
       sources: ["bfgUkPressure", "bfgAuFaq", "fordRanger2025", "etrtoRec2024"],
@@ -482,7 +482,7 @@
       category: "tyre-maker",
       title: "Rocks: very slow, and not too low",
       summary:
-        "Cooper's rock range assumes a very slow pace in low range, without much heat in the tyre. Lower pressure helps the tyre wrap over obstacles without impact damage; below about 1.4 bar there's a risk of pushing the tyre off the rim, so about 1.5 bar is a practical minimum for most vehicles.",
+        "Cooper's rock range assumes a very slow pace in low range, without much heat in the tyre. Lower pressure helps the tyre wrap over obstacles without impact damage. Below about 1.4 bar there's a risk of pushing the tyre off the rim, so about 1.5 bar is a practical minimum for most vehicles.",
       quote: "Pressures below around 20 PSI increase the risk of pushing the tyre off the rim.",
       sources: ["cooperAu", "cooperAu2022"],
       checked: CHECKED,
@@ -528,7 +528,7 @@
       id: "toyo-speeds",
       category: "tyre-maker",
       title: "Toyo: aired-down speeds",
-      summary: "Toyo's tyre technical manager: off-road pressures should relate to speed. Aired down for dirt roads, keep to 80 km/h at most; aired down for sand, an average of about 30 km/h. Low pressures are a premature tyre killer.",
+      summary: "Toyo's tyre technical manager: off-road pressures should relate to speed. Aired down for dirt roads, keep to 80 km/h at most. Aired down for sand, keep to, an average of about 30 km/h. Low pressures are a premature tyre killer.",
       quote: "Off-road tyre pressures should relate to speed … unsealed dirt roads at a maximum of 80km/h … sand (or equivalent terrain) at an average speed of 30km/h",
       sources: ["toyoAuSpeed"],
       checked: CHECKED,
@@ -541,7 +541,7 @@
       category: "vehicle-maker",
       title: "Ford: reinflate, inspect, carry a compressor",
       summary:
-        "Ford's Ranger manual: always re-inflate to the placard pressure before driving on-road; after off-road use check wheels and tyres for damage; be prepared to re-inflate before returning to the road, for example with a portable compressor. The TPMS warning light will come on when you've aired down. It gives no off-road pressure figures.",
+        "Ford's Ranger manual: always re-inflate to the placard pressure before driving on-road. After off-road use, check wheels and tyres for damage. Be prepared to re-inflate before returning to the road, for example with a portable compressor. The TPMS warning light will come on when you've aired down. It gives no off-road pressure figures.",
       quote:
         "WARNING: Always re-inflate tires to recommended tire pressures before the vehicle is operated on-road. … WARNING: After off-road use, before returning to the road, check the wheels and tires for damage. … If a tire filling station is not available, remember to prepare a supplemental means to inflate the tires, such as a portable compressor.",
       sources: ["fordRanger2025"],
@@ -559,7 +559,7 @@
       sources: ["fordRanger2025"],
       checked: CHECKED,
       notes: [
-        "A beadlock holds the bead; it doesn't change how much load the air in the tyre carries (see \"Air carries the load\"), so it doesn't change the load floor or the speed limits shown here.",
+        "A beadlock holds the bead, but it doesn't change how much load the air in the tyre carries (see \"Air carries the load\"), so it doesn't change the load floor or the speed limits shown here.",
         "Whether beadlocks are legal on SA public roads hasn't been checked (see Gaps).",
       ],
     },
@@ -593,7 +593,7 @@
       category: "engineering",
       title: "Pressure and speed go together (military trucks)",
       summary:
-        "Military trucks with central tyre inflation pair each pressure with a top speed. FMTV example: Highway 4.1 bar / 88 km/h, Cross-country 2.55 bar / 64 km/h, Sand 1.5 bar / 19 km/h, Emergency 1.1 bar / 8 km/h. These are big truck tyres, so the numbers don't apply to a 4x4; the pattern does.",
+        "Military trucks with central tyre inflation pair each pressure with a top speed. FMTV example: Highway 4.1 bar / 88 km/h, Cross-country 2.55 bar / 64 km/h, Sand 1.5 bar / 19 km/h, Emergency 1.1 bar / 8 km/h. These are big truck tyres, so the numbers don't apply to a 4x4, but the pattern does.",
       sources: ["armyTm366"],
       checked: CHECKED,
       params: {
@@ -619,7 +619,7 @@
       params: { sandFrontPsi: 12, sandRearPsi: 16, mssFrontPsi: 12, mssRearPsi: 20, maxMph: 15, maxKmh: 24 },
       notes: [
         "The manual prints \"15 mph [48 kph]\", but 15 mph is 24 km/h (48 km/h is 30 mph). This site uses the lower figure, 24 km/h.",
-        "The table's column layout is hard to read in the web copy; front and rear are as reconstructed from it. The 0.83/1.1 bar (12/16 psi) sand figures are stated in words in para 2-32.",
+        "The table's column layout is hard to read in the web copy, so front and rear are as reconstructed from it. The 0.83/1.1 bar (12/16 psi) sand figures are stated in words in para 2-32.",
       ],
     },
     {
@@ -627,7 +627,7 @@
       category: "engineering",
       title: "Lower pressure, fewer corrugations (log trucks)",
       summary:
-        "US Forest Service trials ran loaded log trucks at reduced pressures within the tyre makers' load and speed tables. Washboarding (corrugation) of the gravel roads dropped noticeably and drivers' ride improved; earlier studies found no washboarding when empty trucks' drive tyres were at about 1.7 bar. Trucks needed tubeless radial tyres, and highway speed was limited because of casing heat.",
+        "US Forest Service trials ran loaded log trucks at reduced pressures within the tyre makers' load and speed tables. Washboarding (corrugation) of the gravel roads dropped noticeably and drivers' ride improved. Earlier studies found no washboarding when empty trucks' drive tyres were at about 1.7 bar. Trucks needed tubeless radial tyres, and highway speed was limited because of casing heat.",
       quote:
         "The Soper-Wheeler test also experienced a noticeable reduction in washboarding of the unpaved roads. … Ride quality for the truck operator, especially in the loaded truck, improved in all three tests. … Trucks must be equipped with tubeless radial tires for operation at lower pressures. Travel at highway speeds may need to be limited because tire casing heat buildup could be detrimental on a sustained high-speed haul.",
       sources: ["watkins1991"],
@@ -679,7 +679,7 @@
       id: "nexen-rocks",
       category: "tyre-maker",
       title: "Nexen: lower isn't always better on rocks",
-      summary: "Nexen: there are diminishing returns to lowering pressure past a comfortable point, with the risk of the tyre slipping off the rim; beadlocks help. It advises against going below about 0.75–1.0 bar unless you're an experienced off-roader and have asked a tyre fitter, and that's for its heavy-duty, dual-sidewall mud-terrain tyre.",
+      summary: "Nexen: there are diminishing returns to lowering pressure past a comfortable point, with the risk of the tyre slipping off the rim. Beadlocks help. It advises against going below about 0.75–1.0 bar unless you're an experienced off-roader and have asked a tyre fitter, and that's for its heavy-duty, dual-sidewall mud-terrain tyre.",
       quote: "There are diminishing returns to lowering air pressures past a comfortable point … Airing down below 11-15 PSI is not recommended unless you are a capable off-road expert and have consulted a tire installer.",
       sources: ["nexen2018"],
       checked: CHECKED,
@@ -927,7 +927,7 @@
     { id: "gap-sans1550", title: "SANS 1550 not read", text: "SANS 1550 is a paid standard, so it hasn't been checked that its load tables match the ETRTO and TRA tables used here. Reg 238 refers to SANS 1550." },
     { id: "gap-below-tables", title: "No load data below the tables", text: "No standard or tyre maker found publishes what a tyre can carry below the lowest pressure in its table (2.4 bar for LT tyres, 1.5 bar for passenger tyres). This site shows no floor there, only the makers' speed limits." },
     { id: "gap-terrain", title: "Deep snow, and rock on passenger tyres", text: "No civilian tyre or vehicle maker publishes deep-snow pressures, so the sand figures are used for deep snow off-road. No tyre maker publishes a rock pressure for passenger-type tyres (Cooper's is LT only), so Toyo's 20% dirt-road rule is used as a cautious start." },
-    { id: "gap-sand-low", title: "Soft sand below the published figures", text: "For LT tyres Cooper goes down to about 1.25 bar in sand; for passenger-type tyres the lowest published figure is BFGoodrich Africa's 1.4 bar (1.5 bar on its UK site), though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
+    { id: "gap-sand-low", title: "Soft sand below the published figures", text: "For LT tyres Cooper goes down to about 1.25 bar in sand. For passenger-type tyres the lowest published figure is BFGoodrich Africa's 1.4 bar (1.5 bar on its UK site), though its general page allows lower at 20 km/h or less if the tyre still carries the load. The US Army's Humvee manual goes to 0.83 bar on its own tyres, and experienced drivers go lower still (see the field-practice note)." },
     { id: "gap-speed", title: "Speed limits between road pressure and 1.5 bar", text: "BFGoodrich says to slow down when you lower pressure but gives no figure above 1.5 bar." },
     { id: "gap-beadlock-law", title: "Beadlocks on SA roads", text: "Whether beadlock wheels are allowed on SA public roads hasn't been checked." },
     { id: "gap-vehicle-handbooks", title: "SA-market owner's manuals", text: "Only a US Ford Ranger manual was read. SA editions of the Hilux, Land Cruiser, Fortuner, Ranger and Defender manuals may give figures." },
