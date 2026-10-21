@@ -222,7 +222,7 @@
   function readState() {
     const f = form.elements;
     const num = (name) => {
-      const v = parseFloat(String(f[name].value).replace(",", "."));
+      const v = C.parseNumber(f[name].value);
       return isFinite(v) ? v : null;
     };
     return {
@@ -233,7 +233,7 @@
       speed: num("speed"),
       tyreClass: f.tyreClass ? f.tyreClass.value : "unsure",
       simpleSize: f.simpleSize.value.trim(),
-      simpleLi: parseInt(f.simpleLi.value, 10),
+      simpleLi: Math.trunc(C.parseNumber(f.simpleLi.value)),
       simpleKg: num("simpleKg"),
       beadlock: f.beadlock.checked,
       towing: f.towing.checked,
@@ -891,6 +891,21 @@
       b.addEventListener("click", () => {
         setMode(b.dataset.mode, true);
         update();
+      })
+    );
+
+    // The number boxes are type="text" (see C.parseNumber), so the up and down arrows step them here.
+    document.querySelectorAll("input[inputmode]").forEach((input) =>
+      input.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        const step = Number(input.getAttribute("step")) || 1;
+        const v = C.parseNumber(input.value);
+        let next = (isFinite(v) ? v : 0) + (e.key === "ArrowUp" ? step : -step);
+        if (input.hasAttribute("min")) next = Math.max(Number(input.getAttribute("min")), next);
+        if (input.hasAttribute("max")) next = Math.min(Number(input.getAttribute("max")), next);
+        input.value = String(Math.round(next * 100) / 100);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
       })
     );
 

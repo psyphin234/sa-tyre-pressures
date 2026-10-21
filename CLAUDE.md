@@ -14,6 +14,8 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 
 **Inputs vs worked-out figures** (since 2026-10-19, owner's request, as on the towing, winching, ropes and EV pages): every typed field and select is a blue box (`--input-bg`, `--input-border`) with a blue value and, on typed fields, a pencil (`--pencil`); units beside them sit in a darker blue cap; they glow softly, brighter on hover and focus. Keep blue boxes for inputs only.
 
+**Number boxes are `type="text"` with `inputmode`**, not `type="number"` (since 2026-10-21: on the EV page a tester's iPhone turned "6,2" into 62, because Safari's number boxes mangle a decimal comma, and South African keypads show a comma). `C.parseNumber()` in calc.js reads what was typed (comma or point decimal, spaces or commas for thousands; tested), and app.js steps the value on the up and down arrows using the `step`/`min`/`max` attributes. Keep new number boxes the same way.
+
 ## Source policy (non-negotiable)
 
 - Only **tyre makers, vehicle makers, standards bodies (ETRTO/TRA), SA law and engineering research**. No forum, club, retailer, blog or "everyone runs 1 bar" figures, however common.
