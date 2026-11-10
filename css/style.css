@@ -1372,12 +1372,78 @@ details.explainer > summary {
   max-width: 520px;
 }
 
-.slider-pics .diagram-svg + .diagram-svg {
+.slider-pics .diagram-svg + .diagram-svg,
+.slider-pics .tyre3d + .diagram-svg {
   width: 84px;
   flex: none;
 }
 
 .lt-sand { fill: #c8a165; opacity: 0.55; }
+
+/* The 3D tyre beside the slider (js/tyre3d.js) */
+.tyre3d {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.tyre3d-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 100%, rgba(217, 181, 124, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(76, 201, 255, 0.07), rgba(4, 8, 23, 0) 55%);
+}
+
+.tyre3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.tyre3d canvas:active { cursor: grabbing; }
+
+.tyre3d-len {
+  position: absolute;
+  transform: translate(-100%, -50%);
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(4, 8, 23, 0.72);
+  border: 1px solid var(--accent-glow);
+  color: var(--accent);
+  font: 700 0.8rem var(--font-display);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tyre3d-cap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+
+.tyre3d-cap strong { color: var(--text); }
+.tyre3d-cap span { color: var(--text-muted); font-size: 0.8rem; }
+
+/* Narrow screens: the tyre takes the full width, the speed sign sits in its top corner */
+@media (max-width: 520px) {
+  .tyre3d-stage { aspect-ratio: 4 / 3; }
+  .slider-pics { position: relative; }
+  .slider-pics .tyre3d + .diagram-svg {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 62px;
+    pointer-events: none;
+  }
+}
 
 /* ------------------------------------------------------------ icons, timeline */
 .before-list {

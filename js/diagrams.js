@@ -277,15 +277,26 @@
    * tread width; its length gives how far the tyre flattens.
    * o: { kpa, wheelKg, radiusMm, widthMm, fmt }
    */
+  // The footprint at a pressure: area = load ÷ pressure, held at the tread
+  // width; the tyre is a circle cut flat by the ground over that length.
+  function patch(o) {
+    const areaM2 = (o.wheelKg * 9.81) / (o.kpa * 1000);
+    const lengthMm = Math.min((areaM2 * 1e6) / o.widthMm, o.radiusMm * 1.2);
+    const halfMm = lengthMm / 2;
+    const deflMm = o.radiusMm - Math.sqrt(Math.max(0, o.radiusMm * o.radiusMm - halfMm * halfMm));
+    return { areaM2, lengthMm, deflMm };
+  }
+
+  function patchLabel(o, p) {
+    return `At ${o.fmt(o.kpa)} one tyre carrying ${Math.round(o.wheelKg)} kg has a footprint of about ${Math.round(p.areaM2 * 10000)} square centimetres, about ${Math.round(p.lengthMm / 10)} cm long`;
+  }
+
   function liveTyre(o) {
     const W = 520;
     const H = 230;
     const EXAGGERATE = 2.5; // the flattening is only a few cm: drawn larger so it shows
-    const areaM2 = (o.wheelKg * 9.81) / (o.kpa * 1000);
-    const lengthMm = Math.min((areaM2 * 1e6) / o.widthMm, o.radiusMm * 1.2);
-    // A circle cut flat by the ground over the footprint length.
-    const halfMm = lengthMm / 2;
-    const deflMm = o.radiusMm - Math.sqrt(Math.max(0, o.radiusMm * o.radiusMm - halfMm * halfMm));
+    const p = patch(o);
+    const { areaM2, lengthMm, deflMm } = p;
     const k = 80 / o.radiusMm; // px per mm, side view
     const R = o.radiusMm * k;
     const d = Math.min(deflMm * k * EXAGGERATE, R * 0.45);
@@ -313,7 +324,7 @@
     ];
     for (let i = -2; i <= 2; i++) nodes.push(s("line", { x1: fx + (i * fw) / 6, x2: fx + (i * fw) / 6, y1: fy - fl / 2 + 6, y2: fy + fl / 2 - 6, class: "d-tread" }));
     nodes.push(text(fx, 222, `≈ ${Math.round(lengthMm / 10)} cm long · ${Math.round(areaM2 * 10000)} cm²`, "d-small d-strong", { "text-anchor": "middle" }));
-    return svg(W, H + 4, `At ${o.fmt(o.kpa)} one tyre carrying ${Math.round(o.wheelKg)} kg has a footprint of about ${Math.round(areaM2 * 10000)} square centimetres, about ${Math.round(lengthMm / 10)} cm long`, nodes);
+    return svg(W, H + 4, patchLabel(o, p), nodes);
   }
 
   /*
@@ -487,5 +498,5 @@
     return s("svg", { viewBox: "0 0 24 24", class: "icon", "aria-hidden": "true" }, f());
   }
 
-  root.TYRE_DIAGRAMS = { footprint, deflection, bead, ctis, markings, gauge, speedSign, liveTyre, pumpTimeline, beadAnimated, corrugation, warmUp, icon };
+  root.TYRE_DIAGRAMS = { footprint, deflection, bead, ctis, markings, gauge, speedSign, liveTyre, patch, patchLabel, pumpTimeline, beadAnimated, corrugation, warmUp, icon };
 })(window);

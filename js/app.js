@@ -9,6 +9,7 @@
   const C = window.TYRE_CALC;
   const UI = window.TYRE_UI;
   const G = window.TYRE_DIAGRAMS;
+  const T3D = window.TYRE_3D;
   const { el } = UI;
 
   const form = document.getElementById("tyre-form");
@@ -578,15 +579,27 @@
   // Tyre radius and tread width (mm) for the live tyre: from the typed size, else 265/65R17.
   function tyreDims(tyre) {
     const pz = tyre && tyre.parsed;
-    if (pz && pz.kind === "metric" && !pz.oddAspect) return { radiusMm: (pz.rimIn * 25.4) / 2 + (pz.widthMm * pz.aspect) / 100, widthMm: pz.widthMm, label: pz.label };
-    if (pz && pz.kind === "flotation") return { radiusMm: (pz.overallIn * 25.4) / 2, widthMm: pz.sectionWidthIn * 25.4, label: pz.label };
-    if (pz && pz.label === "7.50R16") return { radiusMm: (32.4 * 25.4) / 2, widthMm: 8.3 * 25.4, label: pz.label };
-    return { radiusMm: (17 * 25.4) / 2 + 265 * 0.65, widthMm: 265, label: null };
+    if (pz && pz.kind === "metric" && !pz.oddAspect) return { radiusMm: (pz.rimIn * 25.4) / 2 + (pz.widthMm * pz.aspect) / 100, widthMm: pz.widthMm, rimMm: pz.rimIn * 25.4, label: pz.label };
+    if (pz && pz.kind === "flotation") return { radiusMm: (pz.overallIn * 25.4) / 2, widthMm: pz.sectionWidthIn * 25.4, rimMm: pz.rimIn * 25.4, label: pz.label };
+    if (pz && pz.label === "7.50R16") return { radiusMm: (32.4 * 25.4) / 2, widthMm: 8.3 * 25.4, rimMm: 16 * 25.4, label: pz.label };
+    return { radiusMm: (17 * 25.4) / 2 + 265 * 0.65, widthMm: 265, rimMm: 17 * 25.4, label: null };
+  }
+
+  // The tyre picture beside the slider: 3D if it's ready, else the flat drawing.
+  function tyrePicture(o) {
+    if (T3D && T3D.ready()) {
+      const p = G.patch(o);
+      const pic = T3D.view({ ...o, lengthMm: p.lengthMm, deflMm: p.deflMm, areaCm2: p.areaM2 * 10000, label: G.patchLabel(o, p) });
+      if (pic) return pic;
+    }
+    return G.liveTyre(o);
   }
 
   /*
    * "Try a pressure": drag down from road pressure and watch the tyre flatten,
-   * the footprint grow and the speed sign change. Front axle figures.
+   * the footprint grow and the speed sign change. Front axle figures. The tyre
+   * is the 3D one (tyre3d.js) once three.js has arrived, and the flat drawing
+   * until then or where WebGL isn't available.
    */
   function pressureSlider(t, r, tyre, perTyreKg, floorKpa) {
     if (!r || r.bottomKpa >= r.topKpa - 1) return null;
@@ -614,7 +627,7 @@
         el(
           "div",
           { class: "slider-pics" },
-          G.liveTyre({ kpa, wheelKg, radiusMm: dims.radiusMm, widthMm: dims.widthMm, fmt }),
+          tyrePicture({ kpa, wheelKg, radiusMm: dims.radiusMm, widthMm: dims.widthMm, rimMm: dims.rimMm, terrain: t.id, fmt }),
           cap ? G.speedSign(cap.text, cap.kmh ? "km/h max" : cap.text === "Crawl" ? "low range" : "no figure") : null
         ),
         ...notes,
@@ -623,6 +636,8 @@
     };
     input.addEventListener("input", draw);
     draw();
+    // Fetch the 3D tyre the first time the slider shows, then redraw with it.
+    if (T3D && T3D.supported() && !T3D.ready()) T3D.load(() => { if (input.isConnected) draw(); });
     return el("div", { class: "slider-box" }, el("h4", null, "Try a pressure"), el("div", { class: "slider-row" }, el("span", { class: "muted small" }, fmt(min)), input, el("span", { class: "muted small" }, fmt(top)), out), live);
   }
 
