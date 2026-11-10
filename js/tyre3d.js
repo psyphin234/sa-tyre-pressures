@@ -30,10 +30,12 @@
   // Ground by terrain. soft: the tyre sinks in and leaves a rut.
   var TERRAIN = {
     sand: { soft: 1, color: 0xd9b57c, tex: "ripple", relief: 0.9, rough: 1, dust: 0xe8cc9c, print: 0.4 },
-    snow: { soft: 1, color: 0xe6edf6, tex: "ripple", relief: 0.35, rough: 0.75, dust: 0xffffff, print: 0.22 },
+    deepsnow: { soft: 1, color: 0xe6edf6, tex: "ripple", relief: 0.35, rough: 0.75, dust: 0xffffff, print: 0.22 },
     mud: { soft: 1, color: 0x5d4631, tex: "lump", relief: 1.2, rough: 0.45, dust: 0x4d3a29, print: 0.5 },
     gravel: { soft: 0, color: 0x9a9184, tex: "lump", relief: 1.4, rough: 1, dust: 0xbdb4a6, print: 0.16 },
     corrugations: { soft: 0, color: 0xa98b64, tex: "ripple", relief: 1.7, rough: 1, dust: 0xcbb08a, print: 0.16 },
+    tar: { soft: 0, color: 0x3d3f45, tex: "lump", relief: 0.7, rough: 0.9, dust: 0x8a8d94, print: 0 },
+    snow: { soft: 0, color: 0xdfe8f2, tex: "lump", relief: 0.5, rough: 0.5, dust: 0xffffff, print: 0.12 },
     rock: { soft: 0, color: 0x79746e, tex: "lump", relief: 1.9, rough: 0.9, dust: 0xa09a92, print: 0.1 }
   };
 
@@ -685,7 +687,7 @@
 
       // spray: more where the tyre digs in
       if (!reduce) {
-        emitDebt += dt * (terrain.soft ? 110 + 700 * cur.sink : 30);
+        emitDebt += dt * (terrain.soft ? 110 + 700 * cur.sink : terrain.print ? 30 : 0);
         while (emitDebt >= 1) { emitDebt -= 1; emit(h, cur.sink); }
       }
       for (var k = 0; k < NP; k++) {

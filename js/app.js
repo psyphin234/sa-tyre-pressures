@@ -412,6 +412,8 @@
       else extra.push(el("p", { class: "note" }, `ETRTO's towing advice (${fmt(hdRule.addMinKpa)}–${fmt(hdRule.addMaxKpa)} extra) is for passenger-type tyres. Nothing equivalent was found for LT tyres. Check your vehicle handbook.`));
     }
     const advice = terrainAdvice(t, m.cls, m.axles.map((x) => x.range), { loadKnown: m.axles.some((a) => a.need && a.need.status !== "noLoad") });
+    const sliderAxle = m.axles.find((a) => a.range);
+    const slider = sliderAxle ? pressureSlider(t, sliderAxle.range, m.tyre, sliderAxle.wheelKg, sliderAxle.need && sliderAxle.need.status === "ok" ? sliderAxle.need.kpa : null, sliderAxle.name) : null;
     if (m.axles.some((a) => a.range && a.range.raised))
       extra.push(el("p", { class: "note note--warn" }, "The bottom of the range is raised to what your load needs: the law doesn't allow less on public roads, gravel included."));
     return card(
@@ -423,6 +425,7 @@
       el("ul", { class: "range-list" }, rows),
       advice.lines,
       extra,
+      slider,
       UI.sourcesLink(t.ruleIds)
     );
   }
@@ -601,12 +604,16 @@
    * is the 3D one (tyre3d.js) once three.js has arrived, and the flat drawing
    * until then or where WebGL isn't available.
    */
-  function pressureSlider(t, r, tyre, perTyreKg, floorKpa) {
-    if (!r || r.bottomKpa >= r.topKpa - 1) return null;
+  function pressureSlider(t, r, tyre, perTyreKg, floorKpa, axleName) {
+    if (!r) return null;
     const top = r.topKpa;
     const bottom = r.bottomKpa;
-    const min = Math.max(80, Math.floor((bottom - 40) / 5) * 5);
-    if (sliderTerrain !== t.id || sliderKpa == null || sliderKpa > top || sliderKpa < min) sliderKpa = bottom;
+    // No range to go down (tar, snow and ice on roads, or already at the
+    // lowest published): the slider still shows what less air does, and says so.
+    const flat = bottom >= top - 1;
+    const min = Math.max(80, Math.floor(((flat ? top - 60 : bottom) - 40) / 5) * 5);
+    if (min > top - 10) return null;
+    if (sliderTerrain !== t.id || sliderKpa == null || sliderKpa > top || sliderKpa < min) sliderKpa = flat ? Math.round(top) : bottom;
     sliderTerrain = t.id;
     const dims = tyreDims(tyre);
     const wheelKg = perTyreKg || 650;
@@ -619,7 +626,10 @@
       out.textContent = fmt(kpa);
       const cap = C.speedCap(kpa, top, t.id);
       const notes = [];
-      if (kpa < bottom - 0.5) {
+      if (flat) {
+        if (kpa < top - 0.5) notes.push(el("p", { class: "note note--warn" }, `Below ${fmt(top)}. Nothing published supports going lower on ${t.name.toLowerCase()}: this only shows what less air does to the tyre.`));
+        else notes.push(el("p", { class: "note" }, `${fmt(top)} is what to run on ${t.name.toLowerCase()}. Drag down to see what less air does to the tyre.`));
+      } else if (kpa < bottom - 0.5) {
         notes.push(el("p", { class: "note note--warn" }, `Below ${fmt(bottom)}, the lowest published for ${t.name.toLowerCase()}.` + (t.id === "sand" ? " That's field-practice territory: walking pace, gentle turns, and the bead can come off the rim." : " No tyre maker publishes a figure this low.")));
       } else notes.push(el("p", { class: "note" }, "Within the range above."));
       if (floorKpa != null && kpa < floorKpa - 0.5) notes.push(el("p", { class: "note note--fail" }, `Below ${fmt(floorKpa)}, what your weight needs on these tyres according to their load table.`));
@@ -631,7 +641,7 @@
           cap ? G.speedSign(cap.text, cap.kmh ? "km/h max" : cap.text === "Crawl" ? "low range" : "no figure") : null
         ),
         ...notes,
-        el("p", { class: "muted small" }, `Drawn for ${dims.label ? "a " + dims.label + " tyre" : "a 265/65R17 tyre (type your size above to use yours)"} carrying ${Math.round(wheelKg)} kg${perTyreKg ? "" : " (an example: add your weight above)"}. Footprint ≈ load ÷ pressure.`)
+        el("p", { class: "muted small" }, `Drawn for ${dims.label ? "a " + dims.label + " tyre" : "a 265/65R17 tyre (type your size above to use yours)"} carrying ${Math.round(wheelKg)} kg${perTyreKg ? (axleName ? ` (your ${axleName.toLowerCase()} axle)` : "") : axleName ? " (an example: add your axle loads above)" : " (an example: add your weight above)"}. Footprint ≈ load ÷ pressure.`)
       );
     };
     input.addEventListener("input", draw);
